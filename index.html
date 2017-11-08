@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>MONOBASKET - Le site de gestion et de statistiue du monobasket</title>
+    <!-- import ELM script : main application -->
+    <script type="text/javascript" src="elm.js"></script>
+
+  </head>
+  <body>
+    <!-- main application bloc -->
+    <div id="elm-app"></div>
+
+    <script type="text/javascript">
+      var div = document.getElementById('elm-app');
+      var app = Elm.Main.embed(div);
+
+      // Définition des ports de connexion pour LinkToJS (sens ELM vers JS)
+      // app.ports.exportProject.subscribe(function(word) {
+      //   var obj = JSON.parse(word);
+      //   var filename = obj.filename;
+      //   var model = obj.model;
+      //   download( JSON.stringify ( model ), filename, "text/plain");
+      // });
+
+    </script>
+  </body>
+</html>
