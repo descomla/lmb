@@ -1,0 +1,301 @@
+
+.navigation
+{
+	width: 100%;
+	background-color: #C6D8E5;
+}
+
+.navigation table
+{
+    padding: 5px 0;
+    position: relative;
+    margin: auto auto;
+    width: 80%;
+}
+
+.navigation table tr
+{
+}
+
+.navigation table td
+{
+	font-size: 0.8em;
+  font-variant: small-caps;
+	font-family: Verdana,Helvetica,Arial,sans-serif;
+}
+
+.navigation table td a
+{
+	text-decoration: none;
+  color : #333333;
+}
+
+.navigation table td:hover
+{
+		color : #FFA500;
+}
+
+.navigation table td div:hover
+{
+		cursor : pointer;
+}
+
+.menuLogin
+{
+    padding: 5px 5px 15px 0px;
+    position: relative;
+    margin: auto auto;
+    width: 80%;
+		font-size: 0.8em;
+}
+
+#loginButton
+{
+		background-color: #C6D8E5;
+		font-size: 0.8em;
+	  font-variant: small-caps;
+		font-family: Verdana,Helvetica,Arial,sans-serif;
+		text-decoration: none;
+	  color : #333333;
+}
+#loginButton:hover
+{
+	color : #FFA500;
+	cursor : pointer;
+}
+
+.contentBody
+{
+    margin: auto auto;
+    width: 90%;
+	font-size: 0.8em;
+}
+
+.fullWidth
+{
+	width: 100%;
+	height: auto;
+}
+/*
+.colonne25
+{
+	width: 24%;
+	height: auto;
+	display: inline-block;
+    position: relative;
+    vertical-align: top;
+}
+
+.colonne50
+{
+	width: 49%;
+	height: auto;
+	display: inline-block;
+    position: relative;
+    vertical-align: top;
+}
+
+
+
+.champ_a_cliquer, .champ_a_cliquer_neutre, .champ_a_cliquer_ok, .champ_a_cliquer_nok
+{
+	font-size: 1em;
+    font-variant: small-caps;
+	font-family: Verdana,Helvetica,Arial,sans-serif;
+	text-decoration: none;
+	padding: 3px 5px 3px 5px;
+	margin: 3px 5px 3px 5px;
+	display: inline-block;
+}
+
+.champ_a_cliquer_ok_petit, .champ_a_cliquer_nok_petit
+{
+	font-size: 0.8em;
+    font-variant: small-caps;
+	font-family: Verdana,Helvetica,Arial,sans-serif;
+	text-decoration: none;
+	padding: 1px 2px 1px 2px;
+	margin: 1px 2px 1px 2px;
+	display: inline-block;
+}
+
+.champ_a_cliquer_neutre
+{
+	vertical-align: middle;
+}
+
+.champ_a_cliquer
+{
+    color : #333333;
+	background-color: #C6D8E5;
+}
+.champ_a_cliquer:hover
+{
+	background-color: #A4B6C3;
+}
+
+.champ_a_cliquer_ok, .champ_a_cliquer_ok_petit
+{
+    color : #333333;
+	background-color: #D8E5C6;
+}
+.champ_a_cliquer_ok:hover, .champ_a_cliquer_ok_petit:hover
+{
+	background-color: #B6C3A4;
+}
+
+.champ_a_cliquer_nok, .champ_a_cliquer_nok_petit
+{
+    color : #333333;
+	background-color: #FFCF88;
+}
+.champ_a_cliquer_nok:hover, .champ_a_cliquer_nok_petit:hover
+{
+	background-color: #DDAD66;
+}
+
+
+
+.image_a_cliquer
+{
+	max-height: 15px;
+	max-width: 15px;
+}
+
+.image_symbole
+{
+	max-height: 10px;
+	max-width: 10px;
+}
+
+.image_petite
+{
+	max-height: 50px;
+	max-width: 200px;
+}
+
+.image_moyenne
+{
+	max-height: 200px;
+	max-width: 200px;
+}
+
+.image_grande
+{
+	max-height: 400px;
+	max-width: 400px;
+}*/
+
+
+.infoFooter
+{
+	font-weight: bold;
+	font-size: 10px;
+	text-align: center;
+}
+/*
+.texte
+{
+	font-family: Verdana,Helvetica,Arial,sans-serif !important;
+	margin-top: 10px;
+    border: 0 none;
+    font-size: 1em;
+    margin: 0;
+    vertical-align: baseline;
+	text-align: justify;
+    border-left: 6px solid #E3E3E3;
+    padding-bottom: 10px;
+    width: 100%;
+}
+.texte a
+{
+	text-decoration: none;
+}
+.texte a:hover
+{
+	background-color: #A4B6C3;
+}
+
+.titre
+{
+	border-left: 6px solid #C6D8E5;
+    color: #2E6488;
+    line-height: 1.5;
+    padding: 5px 5px 5px 10px;
+    font-size: 1.25em;
+    font-variant: small-caps;
+}
+
+.soustitre
+{
+	border-left: 6px solid #C6D8E5;
+    color: #2E6488;
+    line-height: 1.5;
+    padding: 5px 5px 5px 10px;
+    font-size: 1.10em;
+    font-variant: small-caps;
+}
+
+
+
+.tableau_recherche
+{
+	width: 100%;
+    vertical-align: center;
+	text-align: center;
+	font-family: Arial,Helvetica,sans-serif;
+    font-size: 0.9em;
+}
+
+.tableau_recherche_tr
+{
+}
+
+.tableau_recherche_tr:nth-child(2n+1)
+{
+    background-color: #ECF3F7;
+}
+
+.tableau_recherche_tr:nth-child(2n+2)
+{
+    background-color: #E1EBF2;
+}
+
+.tableau_recherche_th
+{
+	background-color: #234477;
+    text-transform: uppercase;
+	color: #FFFFFF;
+	font-weight: bold;
+	padding: 5px 0px 5px 0px;
+	overflow: hidden;
+	word-wrap: break-word;
+}
+
+.tableau_recherche_td
+{
+	overflow: hidden;
+	word-wrap: break-word;
+}
+
+.tableau_recherche_td_vide
+{
+	background-color: #888888;
+}
+
+
+.messageInfo
+{
+	font-weight: bold;
+	font: 12px sans-serif;
+	text-align: center;
+	color: #00AA00;
+}
+
+.messageErreur
+{
+	font-weight: bold;
+	font: 12px sans-serif;
+	text-align: center;
+	color: #AA0000;
+}*/

@@ -1,6 +1,7 @@
 module Actions exposing (..)
 
 import Model exposing (..)
+import User exposing (..)
 import Navigation exposing (..)
 
 
@@ -12,6 +13,10 @@ type Msg
   | NavigationCurrentLeague
   | NavigationOthersLeagues
   | NavigationHelp
+  | LoginChange String
+  | PasswordChange String
+  | Login
+  | Logout
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -30,3 +35,25 @@ update msg model =
       ( { model | navigation = Navigation.OthersLeagues }, Cmd.none)
     NavigationHelp ->
       ( { model | navigation = Navigation.Help }, Cmd.none)
+    LoginChange s ->
+      ( { model | inputLogin = s }, Cmd.none)
+    PasswordChange s ->
+      ( { model | inputPswd = s }, Cmd.none)
+    Login ->
+      let
+        newUser = { status = Connected
+        , login = model.inputLogin
+        , firstName = ""
+        , lastName = ""
+        }
+      in
+        ( { model | user = newUser }, Cmd.none)
+    Logout ->
+      let
+        newUser = { status = Undefined
+        , login = ""
+        , firstName = ""
+        , lastName = ""
+        }
+      in
+        ( { model | user = newUser }, Cmd.none)
