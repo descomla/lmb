@@ -1,4 +1,4 @@
-module UserModel exposing (UserModel, defaultUserModel, UserConnectionInput, defaultUserConnectionInput, UserProfile, UserProfiles, defaultUserProfile, login, logout, createUser, updateUser, deleteUser, decoderUserProfiles)
+module UserModel exposing (UserModel, defaultUserModel, UserConnectionInput, defaultUserConnectionInput, UserProfile, UserProfiles, defaultUserProfile, login, logout, createUser, updateUser, deleteUser, decoderUserProfiles, decoderUserProfile)
 
 import Json.Decode exposing (Decoder, string, map)
 import Json.Decode.Pipeline exposing (decode, required)
@@ -22,9 +22,6 @@ defaultUserModel =
   , userInput = defaultUserConnectionInput
   , userError = NoError
   , users = [] }
-
-type alias UserProfileAndStatus =
-  {  }
 
 --
 -- User Input Connection Info
@@ -84,7 +81,7 @@ readUserFromLogin model =
     sublist = List.filter (isSameLogin model.userInput.login) model.users
   in
       if (List.length sublist) == 0 then -- no match for the login
-        (ProfileNotFound, Nothing)
+        (WrongLoginOrPassword, Nothing)
       else
         (NoError, List.head sublist) -- login found at least one time
 
@@ -103,7 +100,7 @@ readUserFromLoginPassword model =
         (NoError, profileByLogin) -- successfull
       else
         -- password mismatch
-        (WrongPassword, Nothing)
+        (WrongLoginOrPassword, Nothing)
     else
       -- login not found
       (errorLogin, Nothing)

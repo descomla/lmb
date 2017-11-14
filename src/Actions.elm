@@ -2,8 +2,12 @@ module Actions exposing (..)
 
 import Model exposing (..)
 import UserModel exposing (..)
+import UserStatus exposing (..)
+import UserActionError exposing (..)
 import Msg exposing (..)
 import Navigation exposing (..)
+
+import Http exposing (..)
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -56,10 +60,32 @@ update msg model =
         Err error ->
           ( { model | error = toString error }, Cmd.none)
     Login ->
+      -- let
+      --   newUserModel = login model.userModel
+      -- in
+      --   ( { model | userModel = newUserModel }, Cmd.none )
       let
-        newUserModel = login model.userModel
+        url = "http://localhost:3000/users?login=" ++ model.userModel.userInput.login ++ "&password=" ++ model.userModel.userInput.password
       in
-        ( { model | userModel = newUserModel }, Cmd.none )
+        ( model, Http.send OnLoginResult (Http.get url decoderUserProfile) )
+
+    OnLoginResult result ->
+      let
+        newModel = case result of
+          Ok connectedUser ->
+              { profile = connectedUser
+                , status = Connected
+                , userInput = defaultUserConnectionInput
+                , userError = NoError
+                , users = model.userModel.users }
+          Err error ->
+              { profile = defaultUserProfile
+                , status = NotConnected
+                , userInput = defaultUserConnectionInput
+                , userError = ProfileNotFound
+                , users = model.userModel.users }
+      in
+        ( { model | userModel = newModel }, Cmd.none)
     Logout ->
       let
         newUserModel = logout model.userModel

@@ -75,6 +75,9 @@
 {
 	width: 100%;
 	height: auto;
+	display:flex;
+	flex-direction: column; /* row or column / row-reverseS or column-reverse */
+  justify-content: space-between;
 }
 
 .colonne25

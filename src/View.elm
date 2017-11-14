@@ -10,7 +10,10 @@ import Msg exposing (..)
 import Navigation exposing (..)
 
 import ViewUserInfo exposing (viewUserInfo)
-import ViewLeague exposing (viewCurrentLeague)
+import ViewLeague exposing (viewCurrentLeague, viewOthersLeagues)
+import ViewHelp exposing (viewHelp)
+import ViewPlayers exposing (viewPlayers)
+import ViewTeams exposing (viewTeams)
 
 view : Model -> Html Msg
 view model =
@@ -55,15 +58,15 @@ viewContent model =
       Home ->
         viewHome model
       Players ->
-        viewHome model-- viewPlayers model
+        viewPlayers model
       Teams ->
-        viewHome model-- viewTeams model
+        viewTeams model
       CurrentLeague ->
         viewCurrentLeague model
       OthersLeagues ->
-        viewHome model-- viewOthersLeagues model
+        viewOthersLeagues model
       Help ->
-        viewHome model-- viewHelp model
+        viewHelp model
 
 viewHome : Model -> Html Msg
 viewHome model =

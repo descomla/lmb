@@ -76,5 +76,14 @@
       "name": "CFM 2017",
       "type": "SingleEvent"
     }
+  ],
+  "tournaments" : [
+    {
+      "id": 1,
+      "name": "Bron 2013",
+      "location": "Bron",
+      "maxTeams": 10,
+      "league_id": 1
+    }
   ]
 }

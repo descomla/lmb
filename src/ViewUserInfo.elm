@@ -8,27 +8,6 @@ import UserStatus exposing (..)
 import UserActionError exposing (..)
 import Msg exposing (..)
 
-errorToString : UserActionError -> String
-errorToString err =
-  case err of
-    NoError ->
-      ""
-    ProfileNotFound ->
-      "Utilisateur inconnu."
-    WrongPassword ->
-      "Mot de passe erroné."
-    ExistingLogin ->
-      "L'utilisateur existe déjà."
-    IncorrectLogin ->
-      "Le nom d'utilisateur ne respecte pas les règles."
-    IncorrectPassword ->
-      "Le mot de passe ne respecte par les règles."
-    EmptyFirstName ->
-      "Prénom vide."
-    EmptyLastName ->
-      "Nom de famille vide."
-
-
 -- User info display
 viewUserInfo : UserModel -> Html Msg
 viewUserInfo userModel =
@@ -63,3 +42,23 @@ viewConnectedUser userModel =
     , label [ class "messageInfo" ][ text (userModel.profile.firstName ++ " " ++ userModel.profile.lastName ++ " (" ++ userModel.profile.login ++ ") ") ]
     , label [ id "loginButton", onClick Logout ][ text "Se déconnecter"]
   ]
+
+errorToString : UserActionError -> String
+errorToString err =
+  case err of
+    NoError ->
+      ""
+    ProfileNotFound ->
+      "Profile utilisateur inconnu."
+    WrongLoginOrPassword ->
+      "Login ou Mot de passe erroné."
+    ExistingLogin ->
+      "L'utilisateur existe déjà."
+    IncorrectLogin ->
+      "Le nom d'utilisateur ne respecte pas les règles."
+    IncorrectPassword ->
+      "Le mot de passe ne respecte par les règles."
+    EmptyFirstName ->
+      "Prénom vide."
+    EmptyLastName ->
+      "Nom de famille vide."

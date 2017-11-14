@@ -1,6 +1,6 @@
 module Msg exposing (..)
 
-import UserModel exposing (UserProfiles)
+import UserModel exposing (UserProfiles, UserProfile)
 import Http exposing (..)
 
 type Msg
@@ -16,4 +16,5 @@ type Msg
   | LoginChange String
   | PasswordChange String
   | Login
+  | OnLoginResult (Result Error UserProfile)
   | Logout
