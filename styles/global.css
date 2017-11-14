@@ -73,11 +73,13 @@
 
 .fullWidth
 {
-	width: 100%;
+  margin: auto auto;
+	width: 95%;
 	height: auto;
 	display:flex;
 	flex-direction: column; /* row or column / row-reverseS or column-reverse */
   justify-content: space-between;
+	font-size: 0.8em;
 }
 
 .colonne25
@@ -202,7 +204,7 @@
 	font-family: Verdana,Helvetica,Arial,sans-serif !important;
 	margin-top: 10px;
     border: 0 none;
-    font-size: 1em;
+    font-size: 0.8em;
     margin: 0;
     vertical-align: baseline;
 	text-align: justify;
@@ -235,7 +237,7 @@
     color: #2E6488;
     line-height: 1.5;
     padding: 5px 5px 5px 10px;
-    font-size: 1.10em;
+    font-size: 1.0em;
     font-variant: small-caps;
 }
 

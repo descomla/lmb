@@ -14,6 +14,7 @@ import ViewLeague exposing (viewCurrentLeague, viewOthersLeagues)
 import ViewHelp exposing (viewHelp)
 import ViewPlayers exposing (viewPlayers)
 import ViewTeams exposing (viewTeams)
+import ViewHome exposing (viewHome)
 
 view : Model -> Html Msg
 view model =
@@ -67,21 +68,6 @@ viewContent model =
         viewOthersLeagues model
       Help ->
         viewHelp model
-
-viewHome : Model -> Html Msg
-viewHome model =
-  div [ class "fullWidth" ]
-    [ div [ class "texte", style [("text-align","center")] ]
-      [ text " Bienvenue sur le site du monobasket français."
-      , br [][]
-      , text "Le but de celui-ci est de rassembler les documents, et les résultats des championnats, matchs, tournois de monobasket en France"
-      , br [][]
-      , text "Le site est actuellement en construction, particulièrement sur la partie design et 'présentation'"
-      , br [][]
-      , text "Si vous rencontrez un bug sur le site, n'hésitez pas à m'en faire part pour correction,"
-      , a [href "mailto:lmb@monocycle.info"][text "par mail"]
-      ]
-    ]
 
 --
 -- Bas de page

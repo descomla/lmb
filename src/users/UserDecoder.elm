@@ -28,6 +28,8 @@ decodeUserRights =
       case str of
         "Administrator" ->
           Json.Decode.succeed Administrator
+        "Director" ->
+          Json.Decode.succeed Director
         "Visitor" ->
           Json.Decode.succeed Visitor
         somethingElse ->

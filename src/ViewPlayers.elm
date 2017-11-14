@@ -9,6 +9,7 @@ import Msg exposing (..)
 viewPlayers: Model -> Html Msg
 viewPlayers model =
   div [ class "fullWidth" ]
-  [ div [ style [("text-align","center")]] [ img [ src "img/Under-construction.png" ][] ]
-  , div [ class "texte", style [("text-align","center")] ] [ text "Site en construction." ]
-  ]
+    [ div [ class "titre" ] [ text "Les joueurs" ]
+    , div [ style [("text-align","center")]] [ img [ src "img/Under-construction.png" ][] ]
+    , div [ class "contentBody", style [("text-align","center"), ("font-size", "1.25em")] ] [ text "Site en construction." ]
+    ]
