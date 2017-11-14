@@ -9,8 +9,7 @@
 {
     padding: 5px 0;
     position: relative;
-    margin: auto auto;
-    width: 80%;
+    margin: auto auto;    width: 80%;
 }
 
 .navigation table tr
@@ -57,6 +56,7 @@
 		font-family: Verdana,Helvetica,Arial,sans-serif;
 		text-decoration: none;
 	  color : #333333;
+		padding: 5px 5px 5px 5px;
 }
 #loginButton:hover
 {
@@ -76,7 +76,7 @@
 	width: 100%;
 	height: auto;
 }
-/*
+
 .colonne25
 {
 	width: 24%;
@@ -184,7 +184,7 @@
 {
 	max-height: 400px;
 	max-width: 400px;
-}*/
+}
 
 
 .infoFooter
@@ -193,7 +193,7 @@
 	font-size: 10px;
 	text-align: center;
 }
-/*
+
 .texte
 {
 	font-family: Verdana,Helvetica,Arial,sans-serif !important;
@@ -289,7 +289,7 @@
 	font-weight: bold;
 	font: 12px sans-serif;
 	text-align: center;
-	color: #00AA00;
+	color: #0000AA;
 }
 
 .messageErreur
@@ -298,4 +298,4 @@
 	font: 12px sans-serif;
 	text-align: center;
 	color: #AA0000;
-}*/
+}

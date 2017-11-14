@@ -1,10 +1,13 @@
 module Main exposing (..)
 
 import Html exposing (..)
+import Http exposing (..)
 
+import Msg exposing (..)
 import Model exposing (..)
 import View exposing (..)
 import Actions exposing (..)
+import UserModel exposing (..)
 
 --import LinkToJS exposing (..)
 
@@ -31,7 +34,11 @@ subscriptions model =
           --, LinkToJS.validateProject ValidateProject
     --    ]
 
+usersUrl : String
+usersUrl =
+  "http://localhost:3000/users"
+
 -- INIT
 init : Model -> (Model, Cmd Msg)
 init model =
-    (model, Cmd.none)
+  ( model, Http.send UserProfilesLoaded (Http.get usersUrl decoderUserProfiles) )

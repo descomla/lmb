@@ -17,12 +17,10 @@
       var app = Elm.Main.embed(div);
 
       // Définition des ports de connexion pour LinkToJS (sens ELM vers JS)
-      // app.ports.exportProject.subscribe(function(word) {
-      //   var obj = JSON.parse(word);
-      //   var filename = obj.filename;
-      //   var model = obj.model;
-      //   download( JSON.stringify ( model ), filename, "text/plain");
-      // });
+      app.ports.userProfilesLoaded.subscribe(function(word) {
+        var label = document.getElementById("messageErreur");
+        label.innerHtml = word;
+      });
 
     </script>
   </body>

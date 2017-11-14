@@ -1,0 +1,80 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "login": "se",
+      "password": "se",
+      "firstName": "Sebastian",
+      "lastName": "Eschweiler",
+      "rights": "Administrator"
+    },
+    {
+      "id": 2,
+      "login": "sp",
+      "password": "sp",
+      "firstName": "Steve",
+      "lastName": "Palmer",
+      "rights": "Visitor"
+    },
+    {
+      "id": 3,
+      "login": "as",
+      "password": "as",
+      "firstName": "Ann",
+      "lastName": "Smith",
+      "rights": "Visitor"
+    }
+  ],
+  "leagues" : [
+    {
+      "id": 1,
+      "name": "Ligue de Monobasket 2013-2014",
+      "type": "LeagueWithRanking"
+    },
+    {
+      "id": 2,
+      "name": "UNICON 17",
+      "type": "SingleEvent"
+    },
+    {
+      "id": 3,
+      "name": "Ligue de Monobasket 2014-2015",
+      "type": "LeagueWithRanking"
+    },
+    {
+      "id": 4,
+      "name": "Ligue de Monobasket 2015-2016",
+      "type": "LeagueWithRanking"
+    },
+    {
+      "id": 5,
+      "name": "CFM 2015",
+      "type": "SingleEvent"
+    },
+    {
+      "id": 6,
+      "name": "UNICON 18",
+      "type": "SingleEvent"
+    },
+    {
+      "id": 7,
+      "name": "Ligue de Monobasket 2016-2017",
+      "type": "LeagueWithRanking"
+    },
+    {
+      "id": 8,
+      "name": "CFM 2016",
+      "type": "SingleEvent"
+    },
+    {
+      "id": 9,
+      "name": "Ligue de Monobasket 2017-2018",
+      "type": "LeagueWithRanking"
+    },
+    {
+      "id": 10,
+      "name": "CFM 2017",
+      "type": "SingleEvent"
+    }
+  ]
+}

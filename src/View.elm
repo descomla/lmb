@@ -6,19 +6,23 @@ import Html.Lazy exposing (lazy, lazy2)
 import Html.Events exposing (..)
 
 import Model exposing (..)
-import Actions exposing (..)
+import Msg exposing (..)
 import Navigation exposing (..)
 
 import ViewUserInfo exposing (viewUserInfo)
+import ViewLeague exposing (viewCurrentLeague)
 
 view : Model -> Html Msg
 view model =
-  div []
-    [ lazy viewNavigation "LMB 2017-2018" -- TODO To get from a config file or something else
-    , lazy ViewUserInfo.viewUserInfo model.user
-    , lazy viewContainer model
-    , infoFooter
-    ]
+    let _ = Debug.log (toString (List.length model.userModel.users))
+    in
+      div []
+        [ lazy viewNavigation "LMB 2017-2018" -- TODO To get from a config file or something else
+        , lazy ViewUserInfo.viewUserInfo model.userModel
+        , div [ class "messageErreur" ] [ label [ id "messageErreur" ][ text model.error ] ]
+        , lazy viewContainer model
+        , infoFooter
+        ]
 
 -- Navigation Toolbar
 viewNavigation : String -> Html Msg
@@ -55,7 +59,7 @@ viewContent model =
       Teams ->
         viewHome model-- viewTeams model
       CurrentLeague ->
-        viewHome model-- viewCurrentLeague model
+        viewCurrentLeague model
       OthersLeagues ->
         viewHome model-- viewOthersLeagues model
       Help ->
