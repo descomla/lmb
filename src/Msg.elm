@@ -1,6 +1,6 @@
 module Msg exposing (..)
 
-import UserModel exposing (UserProfiles, UserProfile)
+import UserModel exposing (UserProfile, UserProfiles)
 import Http exposing (..)
 
 type Msg
@@ -12,9 +12,10 @@ type Msg
   | NavigationOthersLeagues
   | NavigationHelp
   | HttpFail Http.Error
-  | UserProfilesLoaded (Result Error UserProfiles)
+  -- Users
+  | Login
+  | Logout
   | LoginChange String
   | PasswordChange String
-  | Login
-  | OnLoginResult (Result Error UserProfile)
-  | Logout
+  | OnLoginResult (Result Error UserProfiles)
+  | OnProfilesLoaded (Result Error UserProfiles)

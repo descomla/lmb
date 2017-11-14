@@ -1,4 +1,4 @@
-module UserActionError exposing (UserActionError(NoError, ProfileNotFound, WrongLoginOrPassword, ExistingLogin, IncorrectLogin, IncorrectPassword, EmptyFirstName, EmptyLastName))
+module UserActionError exposing (UserActionError(NoError, ProfileNotFound, WrongLoginOrPassword, ExistingLogin, IncorrectLogin, IncorrectPassword, EmptyFirstName, EmptyLastName, HttpError))
 
 --
 -- User actions errors
@@ -12,3 +12,4 @@ type UserActionError
   | IncorrectPassword -- creating the profile - Password not respecting rules
   | EmptyFirstName -- creating the profile - firstName not respecting rules
   | EmptyLastName -- creating the profile - lastName not respecting rules
+  | HttpError String
