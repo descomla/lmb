@@ -29,61 +29,407 @@
     {
       "id": 1,
       "name": "Ligue de Monobasket 2013-2014",
-      "type": "LeagueWithRanking"
+      "kind": "LeagueWithRanking",
+      "tournaments": [
+        { "id": 1 },
+        { "id": 2 },
+        { "id": 3 },
+        { "id": 4 },
+        { "id": 5 },
+        { "id": 6 }
+      ]
     },
     {
       "id": 2,
       "name": "UNICON 17",
-      "type": "SingleEvent"
+      "kind": "SingleEvent",
+      "tournaments": [
+        { "id": 7 },
+        { "id": 8 }
+      ]
     },
     {
       "id": 3,
       "name": "Ligue de Monobasket 2014-2015",
-      "type": "LeagueWithRanking"
+      "kind": "LeagueWithRanking",
+      "tournaments": [
+        { "id": 9 },
+        { "id": 10 },
+        { "id": 11 },
+        { "id": 12 },
+        { "id": 13 },
+        { "id": 14 },
+        { "id": 15 }
+      ]
     },
     {
       "id": 4,
       "name": "Ligue de Monobasket 2015-2016",
-      "type": "LeagueWithRanking"
+      "kind": "LeagueWithRanking",
+      "tournaments": [
+        { "id": 16 },
+        { "id": 17 },
+        { "id": 18 },
+        { "id": 19 },
+        { "id": 20 },
+        { "id": 21 },
+        { "id": 22 },
+        { "id": 23 }
+      ]
     },
     {
       "id": 5,
       "name": "CFM 2015",
-      "type": "SingleEvent"
+      "kind": "SingleEvent",
+      "tournaments": [
+        { "id": 24 }
+      ]
     },
     {
       "id": 6,
       "name": "UNICON 18",
-      "type": "SingleEvent"
+      "kind": "SingleEvent",
+      "tournaments": [
+        { "id": 25 }
+      ]
     },
     {
       "id": 7,
       "name": "Ligue de Monobasket 2016-2017",
-      "type": "LeagueWithRanking"
+      "kind": "LeagueWithRanking",
+      "tournaments": [
+        { "id": 26 },
+        { "id": 27 },
+        { "id": 28 },
+        { "id": 29 },
+        { "id": 30 },
+        { "id": 31 },
+        { "id": 32 },
+        { "id": 33 },
+        { "id": 34 }
+      ]
     },
     {
       "id": 8,
       "name": "CFM 2016",
-      "type": "SingleEvent"
+      "kind": "SingleEvent",
+      "tournaments": [
+        { "id": 35 },
+        { "id": 36 }
+      ]
     },
     {
       "id": 9,
       "name": "Ligue de Monobasket 2017-2018",
-      "type": "LeagueWithRanking"
+      "kind": "LeagueWithRanking",
+      "tournaments": [
+        { "id": 37 },
+        { "id": 38 },
+        { "id": 39 }
+      ]
     },
     {
       "id": 10,
       "name": "CFM 2017",
-      "type": "SingleEvent"
+      "kind": "SingleEvent",
+      "tournaments": [
+        { "id": 40 },
+        { "id": 41 }
+      ]
     }
   ],
+  "currentLeague" : {
+    "id": 9,
+    "name": "LMB 2017-2018",
+    "kind": "LeagueWithRanking"
+  },
   "tournaments" : [
     {
       "id": 1,
       "name": "Bron 2013",
       "location": "Bron",
-      "maxTeams": 10,
+      "maxTeams": 20,
       "league_id": 1
+    },
+    {
+      "id": 2,
+      "name": "Saint-Brévin les pins 2014",
+      "location": "Saint-Brévin les pins",
+      "maxTeams": 16,
+      "league_id": 1
+    },
+    {
+      "id": 3,
+      "name": "Ingré 2014",
+      "location": "Ingré",
+      "maxTeams": 24,
+      "league_id": 1
+    },
+    {
+      "id": 4,
+      "name": "Louvain-La-Neuve 2014",
+      "location": "Louvain-La-Neuve",
+      "maxTeams": 20,
+      "league_id": 1
+    },
+    {
+      "id": 5,
+      "name": "Brumath 2014",
+      "location": "Brumath",
+      "maxTeams": 20,
+      "league_id": 1
+    },
+    {
+      "id": 6,
+      "name": "La Teste de Buch 2014",
+      "location": "?",
+      "maxTeams": 16,
+      "league_id": 1
+    },
+    {
+      "id": 7,
+      "name": "Tournoi A",
+      "location": "Montréal, CANADA",
+      "maxTeams": 9,
+      "league_id": 2
+    },
+    {
+      "id": 8,
+      "name": "Tournoi B",
+      "location": "Montréal, CANADA",
+      "maxTeams": 9,
+      "league_id": 2
+    },
+    {
+      "id": 9,
+      "name": "Scionzier 2014",
+      "location": "Scionzier",
+      "maxTeams": 20,
+      "league_id": 3
+    },
+    {
+      "id": 10,
+      "name": "Rennes 2014",
+      "location": "Rennes",
+      "maxTeams": 20,
+      "league_id": 3
+    },
+    {
+      "id": 11,
+      "name": "Bron 2014",
+      "location": "Bron",
+      "maxTeams": 20,
+      "league_id": 3
+    },
+    {
+      "id": 12,
+      "name": "Saint Brévin 2015",
+      "location": "Saint Brévin les pins",
+      "maxTeams": 20,
+      "league_id": 3
+    },
+    {
+      "id": 13,
+      "name": "Ingré 2015",
+      "location": "Ingré",
+      "maxTeams": 21,
+      "league_id": 3
+    },
+    {
+      "id": 14,
+      "name": "Louvain 2015",
+      "location": "Louvain-La-Neuve",
+      "maxTeams": 20,
+      "league_id": 3
+    },
+    {
+      "id": 15,
+      "name": "Bordeaux 2015",
+      "location": "Bordeaux",
+      "maxTeams": 12,
+      "league_id": 3
+    },
+    {
+      "id": 16,
+      "name": "Scionzier 2015",
+      "location": "Sconzier",
+      "maxTeams": 20,
+      "league_id": 4
+    },
+    {
+      "id": 17,
+      "name": "Rennes 2015",
+      "location": "Rennes",
+      "maxTeams": 20,
+      "league_id": 4
+    },
+    {
+      "id": 18,
+      "name": "Bron 2015",
+      "location": "Bron",
+      "maxTeams": 20,
+      "league_id": 4
+    },
+    {
+      "id": 19,
+      "name": "St Brévin 2016",
+      "location": "Saint Brévin les pins",
+      "maxTeams": 20,
+      "league_id": 4
+    },
+    {
+      "id": 20,
+      "name": "Ingré 2016",
+      "location": "Ingré",
+      "maxTeams": 20,
+      "league_id": 4
+    },
+    {
+      "id": 21,
+      "name": "Louvain 2016",
+      "location": "Louvain",
+      "maxTeams": 20,
+      "league_id": 4
+    },
+    {
+      "id": 22,
+      "name": "Brumath 2016",
+      "location": "Brumath",
+      "maxTeams": 5,
+      "league_id": 4
+    },
+    {
+      "id": 23,
+      "name": "Bordeaux 2016",
+      "location": "Bordeaux",
+      "maxTeams": 20,
+      "league_id": 4
+    },
+    {
+      "id": 24,
+      "name": "CFM 2015",
+      "location": "Scionzier",
+      "maxTeams": 16,
+      "league_id": 5
+    },
+    {
+      "id": 25,
+      "name": "Tournament A",
+      "location": "San Sebastian",
+      "maxTeams": 12,
+      "league_id": 6
+    },
+    {
+      "id": 26,
+      "name": "Scionzier 2016",
+      "location": "Sconzier",
+      "maxTeams": 20,
+      "league_id": 7
+    },
+    {
+      "id": 27,
+      "name": "Rennes 2016",
+      "location": "Rennes",
+      "maxTeams": 20,
+      "league_id": 7
+    },
+    {
+      "id": 28,
+      "name": "Bron 2016",
+      "location": "Bron",
+      "maxTeams": 20,
+      "league_id": 7
+    },
+    {
+      "id": 29,
+      "name": "St Brévin 2017",
+      "location": "Saint Brévin les pins",
+      "maxTeams": 20,
+      "league_id": 7
+    },
+    {
+      "id": 30,
+      "name": "Ingré 2017",
+      "location": "Ingré",
+      "maxTeams": 20,
+      "league_id": 7
+    },
+    {
+      "id": 31,
+      "name": "Grenoble 2017",
+      "location": "Grenoble",
+      "maxTeams": 12,
+      "league_id": 7
+    },
+    {
+      "id": 32,
+      "name": "Louvain 2017",
+      "location": "Louvain",
+      "maxTeams": 20,
+      "league_id": 7
+    },
+    {
+      "id": 33,
+      "name": "Brumath 2017",
+      "location": "Brumath",
+      "maxTeams": 20,
+      "league_id": 7
+    },
+    {
+      "id": 34,
+      "name": "Bordeaux 2017",
+      "location": "Bordeaux",
+      "maxTeams": 20,
+      "league_id": 7
+    },
+    {
+      "id": 35,
+      "name": "Tournoi Junior",
+      "location": "Montpellier",
+      "maxTeams": 7,
+      "league_id": 8
+    },
+    {
+      "id": 36,
+      "name": "Tournoi Elite",
+      "location": "Montpellier",
+      "maxTeams": 12,
+      "league_id": 8
+    },
+    {
+      "id": 37,
+      "name": "Rennes 2017",
+      "location": "Rennes",
+      "maxTeams": 12,
+      "league_id": 9
+    },
+    {
+      "id": 38,
+      "name": "Bron 2017",
+      "location": "Bron",
+      "maxTeams": 16,
+      "league_id": 9
+    },
+    {
+      "id": 39,
+      "name": "Ingré 2018",
+      "location": "Ingré",
+      "maxTeams": 24,
+      "league_id": 9
+    },
+    {
+      "id": 40,
+      "name": "Tournoi Sénior",
+      "location": "Chatenoy Le Royal",
+      "maxTeams": 9,
+      "league_id": 10
+    },
+    {
+      "id": 41,
+      "name": "Tournoi Juniors",
+      "location": "Chatenoy Le Royal",
+      "maxTeams": 7,
+      "league_id": 10
     }
   ]
 }
