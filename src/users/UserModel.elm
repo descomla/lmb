@@ -9,7 +9,6 @@ type alias UserModel =
     , status : UserStatus
     , userInput : UserConnectionInput
     , userError : UserActionError
-    , users : UserProfiles
   }
 
 defaultUserModel : UserModel
@@ -17,8 +16,7 @@ defaultUserModel =
   { profile = defaultUserProfile
   , status = NotConnected
   , userInput = defaultUserConnectionInput
-  , userError = NoError
-  , users = [] }
+  , userError = NoError }
 
 --
 -- User Input Connection Info

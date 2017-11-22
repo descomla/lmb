@@ -6,7 +6,10 @@
     "source-directories": [
         ".",
         "src",
-        "src/users"
+        "src/tables",
+        "src/users",
+        "src/leagues",
+        "src/tournaments"
     ],
     "exposed-modules": [],
     "dependencies": {

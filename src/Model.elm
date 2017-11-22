@@ -1,6 +1,8 @@
 module Model exposing (..)
 
 import UserModel exposing (UserModel, defaultUserModel)
+import LeaguesModel exposing (LeaguesModel, defaultLeaguesModel)
+import TournamentsModel exposing (Tournament, defaultTournament)
 import Navigation exposing (..)
 
 -- MODEL
@@ -8,7 +10,8 @@ import Navigation exposing (..)
 type alias Model =
   {
     userModel : UserModel
-  , currentLeague : String -- current lmb league
+  , leaguesModel : LeaguesModel
+  , tournament : Tournament
   , navigation : Navigation
   , error : String
 }
@@ -16,7 +19,8 @@ type alias Model =
 defaultModel : Model
 defaultModel =
     { userModel = defaultUserModel
-    , currentLeague = "LMB 2016-2017"
+    , leaguesModel = defaultLeaguesModel
+    , tournament = defaultTournament
     , navigation = Navigation.Home
     , error = ""
   }

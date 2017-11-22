@@ -8,6 +8,7 @@ import UserActionError exposing (..)
 import UserDecoder exposing (..)
 
 import Http exposing (..)
+import Task exposing (..)
 
 mainUrl : String
 mainUrl =
@@ -37,50 +38,47 @@ update msg model =
         ( m, Http.send OnLoginResult (Http.get url decoderUserProfiles) )
     -- Login request result
     OnLoginResult result ->
-      let
-        newModel = case result of
-          Ok users ->
-              { profile = Maybe.withDefault defaultUserProfile (List.head users)
-                , status = Connected
-                , userInput = defaultUserConnectionInput
-                , userError = NoError
-                , users = model.users }
-          Err error ->
-              { profile = defaultUserProfile
-                , status = NotConnected
-                , userInput = defaultUserConnectionInput
-                , userError = HttpError (toString error)-- model.userError --WrongLoginOrPassword
-                , users = model.users }
-      in
-        ( newModel, Cmd.none)
+      case result of
+        Ok user ->
+            ({ profile = Maybe.withDefault defaultUserProfile (List.head user)
+              , status = Connected
+              , userInput = defaultUserConnectionInput
+              , userError = NoError }, Cmd.none )
+        Err error ->
+            ({ profile = defaultUserProfile
+              , status = NotConnected
+              , userInput = defaultUserConnectionInput
+              -- , userError = HttpError (toString error) --> to display HttpError
+              -- , userError = model.userError --> to display the url used
+              , userError = WrongLoginOrPassword
+            }, send (HttpFail error))
     -- Logout Action
     Logout ->
       ( { profile = defaultUserProfile
         , status = NotConnected
         , userInput = defaultUserConnectionInput
-        , userError = NoError
-        , users = model.users }, Cmd.none )
+        , userError = NoError }, Cmd.none )
     -- Users request result
-    OnProfilesLoaded result ->
-      case result of
-        Ok profiles ->
-          ( { model | users = profiles }, Cmd.none)
-        Err err ->
-          ( { model | userError = (HttpError (toString err)) }, Cmd.none)
+    -- OnProfilesLoaded result ->
+    --   case result of
+    --     Ok profiles ->
+    --       ( { model | users = profiles }, Cmd.none)
+    --     Err err ->
+    --       ( { model | userError = (HttpError (toString err)) }, Cmd.none)
     other ->
       ( model, Cmd.none)
 --
 -- Check existing login
 --
-loginExists : String -> UserModel -> Bool
-loginExists login model =
-  let
-    sublist = List.filter (isSameLogin login) model.users
-  in
-    if (List.length sublist) == 0 then
-      False
-    else
-      True
+-- loginExists : String -> UserModel -> Bool
+-- loginExists login model =
+--   let
+--     sublist = List.filter (isSameLogin login) model.users
+--   in
+--     if (List.length sublist) == 0 then
+--       False
+--     else
+--       True
 
 -- --
 -- -- Get the User from his login
@@ -119,101 +117,106 @@ loginExists login model =
 --
 -- Add a new User to the list
 --
-createUser : UserProfile -> UserModel -> UserModel
-createUser profile model =
-    let
-      -- compute final error
-      err =
-        -- get User profile from login
-        if loginExists profile.login model then
-          ExistingLogin -- do not create a user if login already exists
-        else
-          -- check profile with rules
-          validateProfile profile
+-- createUser : UserProfile -> UserModel -> UserModel
+-- createUser profile model =
+--     let
+--       -- compute final error
+--       err =
+--         -- get User profile from login
+--         if loginExists profile.login model then
+--           ExistingLogin -- do not create a user if login already exists
+--         else
+--           -- check profile with rules
+--           validateProfile profile
+--
+--       newList =
+--         if err == NoError then -- if does not exists and validates rules
+--           List.append model.users (List.singleton profile)
+--         else -- an error occured => model unchanges
+--           model.users
+--     in
+--         { profile = model.profile
+--         , status = model.status
+--         , userInput = model.userInput
+--         , userError = err -- update error code
+--         , users = newList } -- and user list
+--
+-- --
+-- -- Update an existing User of the list
+-- --
+-- updateUser : UserProfile -> UserModel -> UserModel
+-- updateUser profile model =
+--     if loginExists profile.login model then -- if login exists
+--       -- delete profile and then create the new profile
+--       createUser profile (deleteUser profile model)
+--     else -- profile does not exist
+--       { model | userError = ProfileNotFound }
+--
+-- --
+-- -- Update an existing User of the list
+-- --
+-- deleteUser : UserProfile -> UserModel -> UserModel
+-- deleteUser profile model =
+--     if loginExists profile.login model then
+--       let
+--         sublist = List.filter (isDifferentLogin model.profile.login) model.users
+--         newModel = { model | users = sublist }
+--       in
+--         { newModel | userError = NoError }
+--     else -- profile does not exist
+--       { model | userError = ProfileNotFound }
+--
+-- --
+-- -- Check rules for user creation
+-- --
+-- validateProfile : UserProfile -> UserActionError
+-- validateProfile profile =
+--     if String.isEmpty profile.login then
+--       IncorrectLogin
+--     else if validatePassword profile.password then
+--       IncorrectPassword
+--     else if String.isEmpty profile.firstName then
+--       EmptyFirstName
+--     else if String.isEmpty profile.firstName then
+--       EmptyLastName
+--     else
+--       NoError
+--
+-- --
+-- -- Check rules for password creation
+-- --
+-- validatePassword : String -> Bool
+-- validatePassword pswd =
+--   String.isEmpty pswd
+--
+-- --
+-- -- compare logins
+-- --
+-- isSameLogin : String -> UserProfile -> Bool
+-- isSameLogin login profile =
+--   if (String.toLower login) == (String.toLower profile.login) then
+--     True
+--   else
+--     False
+--
+-- isDifferentLogin : String -> UserProfile -> Bool
+-- isDifferentLogin login profile =
+--   if isSameLogin login profile then
+--     False
+--   else
+--     True
+--
+-- --
+-- -- Check Login & Password
+-- --
+-- isSamePassword : String -> UserProfile -> Bool
+-- isSamePassword pswd profile =
+--   if pswd == profile.password then
+--     True
+--   else
+--     False
 
-      newList =
-        if err == NoError then -- if does not exists and validates rules
-          List.append model.users (List.singleton profile)
-        else -- an error occured => model unchanges
-          model.users
-    in
-        { profile = model.profile
-        , status = model.status
-        , userInput = model.userInput
-        , userError = err -- update error code
-        , users = newList } -- and user list
-
---
--- Update an existing User of the list
---
-updateUser : UserProfile -> UserModel -> UserModel
-updateUser profile model =
-    if loginExists profile.login model then -- if login exists
-      -- delete profile and then create the new profile
-      createUser profile (deleteUser profile model)
-    else -- profile does not exist
-      { model | userError = ProfileNotFound }
-
---
--- Update an existing User of the list
---
-deleteUser : UserProfile -> UserModel -> UserModel
-deleteUser profile model =
-    if loginExists profile.login model then
-      let
-        sublist = List.filter (isDifferentLogin model.profile.login) model.users
-        newModel = { model | users = sublist }
-      in
-        { newModel | userError = NoError }
-    else -- profile does not exist
-      { model | userError = ProfileNotFound }
-
---
--- Check rules for user creation
---
-validateProfile : UserProfile -> UserActionError
-validateProfile profile =
-    if String.isEmpty profile.login then
-      IncorrectLogin
-    else if validatePassword profile.password then
-      IncorrectPassword
-    else if String.isEmpty profile.firstName then
-      EmptyFirstName
-    else if String.isEmpty profile.firstName then
-      EmptyLastName
-    else
-      NoError
-
---
--- Check rules for password creation
---
-validatePassword : String -> Bool
-validatePassword pswd =
-  String.isEmpty pswd
-
---
--- compare logins
---
-isSameLogin : String -> UserProfile -> Bool
-isSameLogin login profile =
-  if (String.toLower login) == (String.toLower profile.login) then
-    True
-  else
-    False
-
-isDifferentLogin : String -> UserProfile -> Bool
-isDifferentLogin login profile =
-  if isSameLogin login profile then
-    False
-  else
-    True
-
---
--- Check Login & Password
---
-isSamePassword : String -> UserProfile -> Bool
-isSamePassword pswd profile =
-  if pswd == profile.password then
-    True
-  else
-    False
+send : Msg -> Cmd Msg
+send msg =
+  Task.succeed msg
+  |> Task.perform identity
