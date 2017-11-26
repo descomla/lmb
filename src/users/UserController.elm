@@ -38,6 +38,15 @@ update msg model =
     OnLoginResult result ->
       case result of
         Ok user ->
+          if List.isEmpty user then
+            ({ profile = defaultUserProfile
+              , status = NotConnected
+              , userInput = defaultUserConnectionInput
+              -- , userError = HttpError (toString error) --> to display HttpError
+              -- , userError = model.userError --> to display the url used
+              , userError = WrongLoginOrPassword
+            }, Cmd.none)
+          else
             ({ profile = Maybe.withDefault defaultUserProfile (List.head user)
               , status = Connected
               , userInput = defaultUserConnectionInput
