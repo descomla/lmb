@@ -7,12 +7,10 @@ import UserStatus exposing (..)
 import UserActionError exposing (..)
 import UserDecoder exposing (..)
 
-import Http exposing (..)
-import Task exposing (..)
+import Http exposing (get)
+import CmdExtra exposing (createCmd)
 
-mainUrl : String
-mainUrl =
-  "http://localhost:3000/users/"
+import Addresses exposing (..)
 
 update : Msg -> UserModel -> (UserModel, Cmd Msg)
 update msg model =
@@ -32,7 +30,7 @@ update msg model =
     -- Login Action
     Login ->
       let
-        url = mainUrl ++ "?login=" ++ model.userInput.login ++ "&password=" ++ model.userInput.password
+        url = usersUrl ++ "?login=" ++ model.userInput.login ++ "&password=" ++ model.userInput.password
         m = { model | userError = (HttpError url) }
       in
         ( m, Http.send OnLoginResult (Http.get url decoderUserProfiles) )
@@ -51,7 +49,7 @@ update msg model =
               -- , userError = HttpError (toString error) --> to display HttpError
               -- , userError = model.userError --> to display the url used
               , userError = WrongLoginOrPassword
-            }, send (HttpFail error))
+            }, CmdExtra.createCmd (HttpFail error))
     -- Logout Action
     Logout ->
       ( { profile = defaultUserProfile
@@ -215,8 +213,3 @@ update msg model =
 --     True
 --   else
 --     False
-
-send : Msg -> Cmd Msg
-send msg =
-  Task.succeed msg
-  |> Task.perform identity

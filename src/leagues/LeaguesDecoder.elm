@@ -17,7 +17,8 @@ decoderLeague =
     |> Json.Decode.Pipeline.required "id" (Json.Decode.int)
     |> Json.Decode.Pipeline.required "name" (Json.Decode.string)
     |> Json.Decode.Pipeline.required "kind" decodeLeagueType
-    |> Json.Decode.Pipeline.required "tournaments" decodeTournamentIds
+    |> Json.Decode.Pipeline.required "nbRankingTournaments" (Json.Decode.int)
+    |> Json.Decode.Pipeline.optional "tournaments" decodeTournamentIds []
 
 --
 -- Json Decoder for LeaguerRights

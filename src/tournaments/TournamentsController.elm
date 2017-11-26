@@ -7,16 +7,14 @@ import Msg exposing (..)
 import TournamentsModel exposing (..)
 import TournamentsDecoder exposing (decoderTournament)
 
-mainUrl : String
-mainUrl =
-  "http://localhost:3000/tournaments/"
+import Addresses exposing (..)
 
 update : Msg -> Tournament -> (Tournament, Cmd Msg)
 update msg model =
   case msg of
-    EditTournament id ->
+    OnEditTournament id ->
       (model, Cmd.none)
-    DeleteTournament id ->
+    OnDeleteTournament id ->
       (model, Cmd.none)
     -- Others messages not processed
     other ->
@@ -27,6 +25,6 @@ requestTournamentFromLeagueById : Int -> Int -> Cmd Msg
 requestTournamentFromLeagueById league_id tournament_id =
   let
     url =
-      mainUrl ++ "?id=" ++ (toString tournament_id)
+      tournamentsUrl ++ "?id=" ++ (toString tournament_id)
   in
     Http.send (LeaguesTournamentItemLoaded league_id) (Http.get url decoderTournament)

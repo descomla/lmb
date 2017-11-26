@@ -3,18 +3,23 @@ module Msg exposing (..)
 import Http exposing (..)
 
 import UserModel exposing (UserProfile, UserProfiles)
-import LeaguesModel exposing (Leagues)
+import LeaguesModel exposing (League, Leagues)
 import TournamentsModel exposing (Tournament, Tournaments)
 
 import Table exposing (State)
 
 type Msg
   = NoOp
+  -- Init
+  | CurrentLeagueLoaded (Result Error League)
+  -- Navigation
   | NavigationHome
   | NavigationPlayers
   | NavigationTeams
-  | NavigationCurrentLeague
-  | NavigationOthersLeagues
+  | NavigationCurrentLeague -- CurrentLeague
+  | NavigationOthersLeagues -- OthersLeagues
+  | NavigationCreateLeague
+  | NavigationCreateTournament Int -- with league id
   | NavigationHelp
   | HttpFail Http.Error
   -- Users
@@ -29,7 +34,13 @@ type Msg
   | LeaguesTournamentItemLoaded Int (Result Error Tournament)
   | LeaguesSortChange Table.State
   | LeaguesFilterChange String
-  | CreateLeague
+  | LeagueFormNameChange String
+  | LeagueFormKindChange String
+  | LeagueFormNbTournamentsChange String
+  | LeagueFormCreate
+  | OnCreateLeagueResult (Result Error League)
+  | OnEditLeague Int
+  | OnDeleteLeague Int
   -- Tournaments
-  | EditTournament Int
-  | DeleteTournament Int
+  | OnEditTournament Int
+  | OnDeleteTournament Int

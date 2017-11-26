@@ -293,6 +293,9 @@
 	background-color: #888888;
 }
 
+.hidden_item {
+	visibility: hidden;
+ }
 
 .messageInfo
 {

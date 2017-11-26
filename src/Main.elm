@@ -1,11 +1,16 @@
 module Main exposing (..)
 
 import Html exposing (..)
+import Http exposing (send)
 
 import Msg exposing (..)
 import Model exposing (..)
 import View exposing (..)
 import Actions exposing (..)
+
+import LeaguesDecoder exposing (decoderLeague)
+
+import Addresses exposing (..)
 
 --import LinkToJS exposing (..)
 
@@ -35,4 +40,4 @@ subscriptions model =
 -- INIT
 init : Model -> (Model, Cmd Msg)
 init model =
-  ( model, Cmd.none )--Http.send UserProfilesLoaded (Http.get usersUrl decoderUserProfiles) )
+  ( model, Http.send CurrentLeagueLoaded (Http.get currentLeagueUrl decoderLeague) )

@@ -1,9 +1,11 @@
 module Navigation exposing (..)
 
+import LeaguesPages exposing (..)
+
 type Navigation
  = Home
  | Players
  | Teams
- | CurrentLeague
- | OthersLeagues
+ | CurrentLeague LeaguesPages
+ | OthersLeagues LeaguesPages
  | Help

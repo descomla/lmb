@@ -2,18 +2,18 @@
   "users": [
     {
       "id": 1,
-      "login": "se",
-      "password": "se",
-      "firstName": "Sebastian",
-      "lastName": "Eschweiler",
+      "login": "admin",
+      "password": "admin",
+      "firstName": "Admin",
+      "lastName": "Istrator",
       "rights": "Administrator"
     },
     {
       "id": 2,
-      "login": "sp",
-      "password": "sp",
+      "login": "se",
+      "password": "se",
       "firstName": "Steve",
-      "lastName": "Palmer",
+      "lastName": "Eschweizer",
       "rights": "Visitor"
     },
     {
@@ -23,127 +23,91 @@
       "firstName": "Ann",
       "lastName": "Smith",
       "rights": "Visitor"
+    },
+    {
+      "id": 4,
+      "login": "ldescombes",
+      "password": "Sodena2002",
+      "firstName": "Laurent",
+      "lastName": "Descombes",
+      "rights": "Director"
     }
   ],
-  "leagues" : [
+  "leagues": [
     {
       "id": 1,
       "name": "Ligue de Monobasket 2013-2014",
       "kind": "LeagueWithRanking",
-      "tournaments": [
-        { "id": 1 },
-        { "id": 2 },
-        { "id": 3 },
-        { "id": 4 },
-        { "id": 5 },
-        { "id": 6 }
-      ]
+      "nbRankingTournaments": 4
     },
     {
       "id": 2,
       "name": "UNICON 17",
       "kind": "SingleEvent",
-      "tournaments": [
-        { "id": 7 },
-        { "id": 8 }
-      ]
+      "nbRankingTournaments": 0
     },
     {
       "id": 3,
       "name": "Ligue de Monobasket 2014-2015",
       "kind": "LeagueWithRanking",
-      "tournaments": [
-        { "id": 9 },
-        { "id": 10 },
-        { "id": 11 },
-        { "id": 12 },
-        { "id": 13 },
-        { "id": 14 },
-        { "id": 15 }
-      ]
+      "nbRankingTournaments": 5
     },
     {
       "id": 4,
       "name": "Ligue de Monobasket 2015-2016",
       "kind": "LeagueWithRanking",
-      "tournaments": [
-        { "id": 16 },
-        { "id": 17 },
-        { "id": 18 },
-        { "id": 19 },
-        { "id": 20 },
-        { "id": 21 },
-        { "id": 22 },
-        { "id": 23 }
-      ]
+      "nbRankingTournaments": 4
     },
     {
       "id": 5,
       "name": "CFM 2015",
       "kind": "SingleEvent",
-      "tournaments": [
-        { "id": 24 }
-      ]
+      "nbRankingTournaments": 1
     },
     {
       "id": 6,
       "name": "UNICON 18",
       "kind": "SingleEvent",
-      "tournaments": [
-        { "id": 25 }
-      ]
+      "nbRankingTournaments": 1
     },
     {
       "id": 7,
       "name": "Ligue de Monobasket 2016-2017",
       "kind": "LeagueWithRanking",
-      "tournaments": [
-        { "id": 26 },
-        { "id": 27 },
-        { "id": 28 },
-        { "id": 29 },
-        { "id": 30 },
-        { "id": 31 },
-        { "id": 32 },
-        { "id": 33 },
-        { "id": 34 }
-      ]
+      "nbRankingTournaments": 4
     },
     {
       "id": 8,
       "name": "CFM 2016",
       "kind": "SingleEvent",
-      "tournaments": [
-        { "id": 35 },
-        { "id": 36 }
-      ]
+      "nbRankingTournaments": 0
     },
     {
       "id": 9,
       "name": "Ligue de Monobasket 2017-2018",
       "kind": "LeagueWithRanking",
-      "tournaments": [
-        { "id": 37 },
-        { "id": 38 },
-        { "id": 39 }
-      ]
+      "nbRankingTournaments": 5
     },
     {
       "id": 10,
       "name": "CFM 2017",
       "kind": "SingleEvent",
-      "tournaments": [
-        { "id": 40 },
-        { "id": 41 }
-      ]
+      "nbRankingTournaments": 0
+    },
+    {
+      "id": 11,
+      "name": "toto",
+      "kind": "LeagueWithRanking",
+      "nbRankingTournaments": 4
     }
   ],
-  "currentLeague" : {
+  "currentLeague": {
     "id": 9,
     "name": "LMB 2017-2018",
-    "kind": "LeagueWithRanking"
+    "kind": "LeagueWithRanking",
+    "nbRankingTournaments": 0
   },
-  "tournaments" : [
+  "tournaments": [
     {
       "id": 1,
       "name": "Bron 2013",

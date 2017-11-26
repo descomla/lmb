@@ -8,6 +8,7 @@ import Html.Events exposing (..)
 import Model exposing (..)
 import Msg exposing (..)
 import Navigation exposing (..)
+import LeaguesPages exposing (..)
 
 import ViewUserInfo exposing (viewUserInfo)
 import ViewLeague exposing (viewCurrentLeague, viewOthersLeagues)
@@ -19,7 +20,7 @@ import ViewHome exposing (viewHome)
 view : Model -> Html Msg
 view model =
     div []
-      [ lazy2 viewNavigation model.navigation "LMB 2017-2018" -- TODO To get from a config file or something else
+      [ lazy2 viewNavigation model.navigation model.leaguesModel.currentLeague.name -- TODO To get from a config file or something else
       , lazy ViewUserInfo.viewUserInfo model.userModel
       , div [ class "messageErreur" ] [ label [ id "messageErreur" ][ text model.error ] ]
       , lazy viewContainer model
@@ -33,20 +34,26 @@ viewNavigation page league =
     [ div [ class "navigation" ]
     [ Html.table []
       [ Html.tr []
-        [ Html.td [class (isNavigationSelected page Navigation.Home)] [div [ onClick NavigationHome, id "Navigation-Home" ][text "Accueil"]]
-        , Html.td [class (isNavigationSelected page Navigation.Players)] [div [ onClick NavigationPlayers, id "Navigation-Players"] [ text "Les joueurs"]]
-        , Html.td [class (isNavigationSelected page Navigation.Teams)] [div [ onClick NavigationTeams, id "Navigation-Teams"] [ text "Les équipes"]]
-        , Html.td [class (isNavigationSelected page Navigation.CurrentLeague)] [div [ onClick NavigationCurrentLeague, id "Navigation-Current"] [ text league]]
-        , Html.td [class (isNavigationSelected page Navigation.OthersLeagues)] [div [ onClick NavigationOthersLeagues, id "Navigation-Others"] [ text "Les autres ligues"]]
-        , Html.td [class (isNavigationSelected page Navigation.Help)] [div [ onClick NavigationHelp, id "Navigation-Help"] [ text "Aide d'utilisation"]]
+        [ Html.td [class (navigationTdClass page [Navigation.Home])]
+          [div [ onClick NavigationHome, id "Navigation-Home" ][text "Accueil"]]
+        , Html.td [class (navigationTdClass page [Navigation.Players])]
+          [div [ onClick NavigationPlayers, id "Navigation-Players"] [ text "Les joueurs"]]
+        , Html.td [class (navigationTdClass page [Navigation.Teams])]
+          [div [ onClick NavigationTeams, id "Navigation-Teams"] [ text "Les équipes"]]
+        , Html.td [class (navigationTdClass page [Navigation.CurrentLeague Default, Navigation.CurrentLeague CreateLeague])]
+          [div [ onClick NavigationCurrentLeague, id "Navigation-Current"] [ text league]]
+        , Html.td [class (navigationTdClass page [Navigation.OthersLeagues Default, Navigation.OthersLeagues CreateLeague])]
+          [div [ onClick NavigationOthersLeagues, id "Navigation-Others"] [ text "Les autres ligues"]]
+        , Html.td [class (navigationTdClass page [Navigation.Help])]
+          [div [ onClick NavigationHelp, id "Navigation-Help"] [ text "Aide d'utilisation"]]
         ]
       ]
     ]
   ]
 
-isNavigationSelected : Navigation -> Navigation -> String
-isNavigationSelected selected  expected =
-  if selected == expected then
+navigationTdClass : Navigation -> List Navigation -> String
+navigationTdClass selected expected =
+  if (List.member selected expected) then
     "navigation-selected"
   else
     ""
@@ -67,10 +74,10 @@ viewContent model =
         viewPlayers model
       Teams ->
         viewTeams model
-      CurrentLeague ->
-        viewCurrentLeague model.leaguesModel
-      OthersLeagues ->
-        viewOthersLeagues model
+      CurrentLeague subNavigation ->
+        viewCurrentLeague model.userModel.profile.rights subNavigation model.leaguesModel
+      OthersLeagues subNavigation ->
+        viewOthersLeagues subNavigation model
       Help ->
         viewHelp model
 
