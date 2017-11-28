@@ -6,6 +6,7 @@ import Html.Events exposing (onInput, onClick, onMouseOver )
 import Html.Lazy exposing (lazy, lazy2)
 
 import Table exposing (..)
+import TableActionButtons exposing (..)
 import Toolbar exposing (..)
 
 import Msg exposing (..)
@@ -62,7 +63,7 @@ viewLeagueDisplay rights league isCurrentLeague =
         , br [][]
         , div [ id "tournois.liste", class "texte" ]
           [ -- Debug -- text ("Nb Tournaments = " ++ (toString (List.length currentLeague.tournaments)))]
-          lazy viewTournamentTable league.tournaments ]
+          lazy2 viewTournamentTable rights league.tournaments ]
         ]
       , br [][]
       , lazy2 viewToolbar rights [ toolbarButtonCreateTournament league.id  ] -- Create tournament action button
@@ -125,13 +126,13 @@ List of tournaments for a league
 
 --}
 -- Leagues table
-viewTournamentTable : Tournaments -> Html Msg
-viewTournamentTable tournois =
-    Table.view tournamentTableConfig (Table.initialSort "Nom du tournoi") tournois
+viewTournamentTable : UserRights -> Tournaments -> Html Msg
+viewTournamentTable rights tournois =
+    Table.view (tournamentTableConfig rights) (Table.initialSort "Nom du tournoi") tournois
 
 -- Leagues table configuration
-tournamentTableConfig : Table.Config Tournament Msg
-tournamentTableConfig =
+tournamentTableConfig : UserRights -> Table.Config Tournament Msg
+tournamentTableConfig rights =
   Table.customConfig
   { toId = .name
   , toMsg = noSorter
@@ -146,7 +147,7 @@ tournamentTableConfig =
       , viewData = tournamentMaxTeamsToHtmlDetails
       , sorter = Table.unsortable
       }
-    , tournamentImgActionList "Actions" .id
+    , tournamentImgActionList rights "Actions" .id
     ]
     , customizations = tableCustomizations
   }
@@ -163,19 +164,19 @@ tournamentMaxTeamsToHtmlDetails : Tournament -> HtmlDetails msg
 tournamentMaxTeamsToHtmlDetails tournois =
     stringToHtmlDetails (toString tournois.maxTeams)
 
-tournamentImgActionList : String -> (data -> Int) -> Column data Msg
-tournamentImgActionList name toInt =
+tournamentImgActionList : UserRights -> String -> (data -> Int) -> Column data Msg
+tournamentImgActionList rights name toInt =
    Table.veryCustomColumn
      { name = name
-     , viewData = tournamentActionsDetails << toInt
+     , viewData = (tournamentActionsDetails rights) << toInt
      , sorter = Table.unsortable
      }
 
-tournamentActionsDetails : Int -> HtmlDetails Msg
-tournamentActionsDetails i =
-    HtmlDetails [ class "image_a_cliquer"]
-    [ actionButton "EditTournament" (NavigationDisplayTournament i) "img/validate.png"
-    , actionButton "DeleteTournament" (TournamentDeleteAction i) "img/delete.png"
+tournamentActionsDetails : UserRights -> Int -> HtmlDetails Msg
+tournamentActionsDetails rights i =
+  renderActionButtons rights
+    [ actionButton "EditTournament" (NavigationDisplayTournament i) "img/validate.png" Visitor
+    , actionButton "DeleteTournament" (TournamentDeleteAction i) "img/delete.png" Director
     ]
 
 {--
@@ -231,15 +232,15 @@ viewLeaguesList rights model =
           ] []
         ]
         , br [][]
-        , div [ id "ligues.liste", class "texte" ] [ lazy viewLeagueTable model ]
+        , div [ id "ligues.liste", class "texte" ] [ lazy2 viewLeagueTable rights model ]
         , br [][]
         , lazy2 viewToolbar rights [ toolbarButtonCreateLeague  ] -- Create tournament action button
       ]
     ]
 
 -- Leagues table
-viewLeagueTable : LeaguesModel -> Html Msg
-viewLeagueTable model =
+viewLeagueTable : UserRights -> LeaguesModel -> Html Msg
+viewLeagueTable rights model =
   let
     -- filter By name
     lowerFilter =
@@ -249,11 +250,11 @@ viewLeagueTable model =
       List.filter (String.contains lowerFilter << String.toLower << .name) model.leagues
 
   in
-    Table.view leagueTableConfig model.sortState acceptableLeagues
+    Table.view (leagueTableConfig rights) model.sortState acceptableLeagues
 
 -- Leagues table configuration
-leagueTableConfig : Table.Config League Msg
-leagueTableConfig =
+leagueTableConfig : UserRights -> Table.Config League Msg
+leagueTableConfig rights =
   Table.customConfig
   { toId = .name
   , toMsg = LeaguesSortChange
@@ -261,7 +262,7 @@ leagueTableConfig =
     [ Table.dataToStringColumn "NOM DE LA LIGUE" leagueNameToHtmlDetails .name
     , Table.dataToStringColumn "TYPE DE LIGUE" leagueTypeToHtmlDetails leagueToLeagueTypeString
     , Table.dataToIntColumn "NB TOURNOIS CLASSEMENT" leagueTournamentsToHtmlDetails leagueTournamentsToInt
-    , leagueImgActionList "ACTIONS" .id
+    , (leagueImgActionList rights) "ACTIONS" .id
     ]
     , customizations = tableCustomizations
   }
@@ -317,27 +318,20 @@ tableTheadHelp : ( String, Status, Attribute msg ) -> Html msg
 tableTheadHelp (name, status, onClick) =
     Html.th [ class "tableau_recherche_th", onClick ] (simpleTheadContent name status)
 
-leagueImgActionList : String -> (data -> Int) -> Column data Msg
-leagueImgActionList name toInt =
+leagueImgActionList : UserRights -> String -> (data -> Int) -> Column data Msg
+leagueImgActionList rights name toInt =
    Table.veryCustomColumn
      { name = name
-     , viewData = leagueActionsDetails << toInt
+     , viewData = (leagueActionsDetails rights) << toInt
      , sorter = Table.decreasingBy toInt
      }
 
-leagueActionsDetails : Int -> HtmlDetails Msg
-leagueActionsDetails i =
-    HtmlDetails [ class "image_a_cliquer"]
-    [ actionButton "EditLeague" (NavigationDisplayLeague i) "img/validate.png"
-    , actionButton "DeleteLeague" (LeagueDeleteAction i) "img/delete.png"
+leagueActionsDetails : UserRights -> Int -> HtmlDetails Msg
+leagueActionsDetails rights i =
+  renderActionButtons rights
+    [ actionButton "EditLeague" (NavigationDisplayLeague i) "img/validate.png" Visitor
+    , actionButton "DeleteLeague" (LeagueDeleteAction i) "img/delete.png" Director
     ]
-
-actionButton : String -> msg -> String -> Html msg
-actionButton ident msg imgSrc =
-    Html.button
-        [ id ident, onClick msg ]
-        [ img [src imgSrc, width 15][] ]
-
 
 {--
 

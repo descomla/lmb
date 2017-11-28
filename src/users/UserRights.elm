@@ -1,5 +1,4 @@
 module UserRights exposing (UserRights(..), isUpperOrEqualRights)
-
 --
 -- User Rights
 --

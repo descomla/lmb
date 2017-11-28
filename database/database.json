@@ -93,12 +93,6 @@
       "name": "CFM 2017",
       "kind": "SingleEvent",
       "nbRankingTournaments": 0
-    },
-    {
-      "id": 11,
-      "name": "toto",
-      "kind": "LeagueWithRanking",
-      "nbRankingTournaments": 4
     }
   ],
   "currentLeague": {

@@ -17,9 +17,10 @@
       var app = Elm.Main.embed(div);
 
       // Définition des ports de connexion pour LinkToJS (sens ELM vers JS)
-      app.ports.userProfilesLoaded.subscribe(function(word) {
-        var label = document.getElementById("messageErreur");
-        label.innerHtml = word;
+      app.ports.requestDeleteLeagueConfirmation.subscribe(function(word) {
+        if( confirm("Voulez-vous vraiment supprimer cette ligue?"/*""(id="+word+")"*/) == true ) {
+          app.ports.confirmDeleteLeague.send(word);
+        }
       });
 
     </script>

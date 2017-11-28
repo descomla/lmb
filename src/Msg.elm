@@ -42,6 +42,8 @@ type Msg
   | LeagueFormCreate
   | OnCreateLeagueResult (Result Error League)
   | LeagueDeleteAction Int
+  | ConfirmDeleteLeague String
+  | OnDeletedLeagueResult (Result Error League)
   -- Tournaments
   | TournamentsLoaded (Result Error Tournaments)
   | TournamentDeleteAction Int

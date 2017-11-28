@@ -1,8 +1,9 @@
-module LeaguesController exposing (create, update, requestLeagues, updateLeagueFormValue, checkLeagueForm, checkLeagueFormInput)
+module LeaguesController exposing (create, update, delete, requestLeagues, updateLeagueFormValue, checkLeagueForm, checkLeagueFormInput)
 
 import Http exposing (get, send)
 import CmdExtra exposing (createCmd)
 import Json.Encode exposing (..)
+import Json.Decode exposing (..)
 
 import Msg exposing (..)
 import LeaguesModel exposing (..)
@@ -45,6 +46,10 @@ update msg model =
     other ->
       ( model, Cmd.none)
 
+delete : Int -> LeaguesModel -> (LeaguesModel, Cmd Msg)
+delete league_id model =
+    ( model, requestDeleteLeague league_id )
+
 checkLeagueFormInput : Msg -> String
 checkLeagueFormInput msg =
   case msg of
@@ -64,6 +69,7 @@ checkLeagueFormInput msg =
     -- Others messages not processed
     other ->
       ""
+-- check rules for league form
 checkLeagueForm : LeagueForm -> String
 checkLeagueForm f =
     if String.isEmpty f.name then
@@ -73,7 +79,7 @@ checkLeagueForm f =
         Nothing -> "Le type de ligue est invalide !"
         Just kind ->
           ""
-
+-- League form real-time input update
 updateLeagueFormValue : Msg -> LeagueForm -> LeagueForm
 updateLeagueFormValue msg lf =
   case msg of
@@ -121,7 +127,30 @@ requestCreateLeague newId league =
   in
     Http.send OnCreateLeagueResult request
 
+-- request league creation
+requestDeleteLeague : Int -> Cmd Msg
+requestDeleteLeague league_id =
+  let
+    decoder =
+      -- since the api returns an empty object on delete success,
+      -- let's have the success value be the value that was
+      -- passed in originally so it can be used elsewhere
+      -- to remove itself
+      Json.Decode.succeed defaultLeague
 
+    request = Http.request
+      { method = "DELETE"
+      , headers = []
+      , url = leaguesUrl ++ (toString league_id)
+      , body = Http.emptyBody
+      , expect = Http.expectJson decoder
+      , timeout = Maybe.Nothing
+      , withCredentials = False
+      }
+  in
+    Http.send OnDeletedLeagueResult request
+
+-- get the last free id for a new league
 retrieveFreeId : Leagues -> Int
 retrieveFreeId leagues =
   let
@@ -133,14 +162,17 @@ retrieveFreeId leagues =
       Nothing ->
         1
 
+-- get the maximum id value in the leagues list
 retrieveMaxId : Leagues -> Maybe Int
 retrieveMaxId leagues =
     List.maximum (List.map .id leagues)
 
+-- fill tournmanents into the leagues list
 updateTournaments : Leagues -> Tournaments -> Leagues
 updateTournaments leagues tournaments =
   List.map (selectTournaments tournaments) leagues
 
+-- selects tournaments for the league and updates the league object
 selectTournaments : Tournaments -> League -> League
 selectTournaments tournaments league =
   let
@@ -148,49 +180,10 @@ selectTournaments tournaments league =
   in
     { league | tournaments = myTournaments }
 
+-- compare the league id with the tournament league id
 compareLeagueId : League -> Tournament -> Bool
 compareLeagueId league tournament =
    if league.id == tournament.league_id then
      True
    else
      False
-
--- retrieveLeague : Int -> Leagues -> Maybe League
--- retrieveLeague lid leagues =
---   let
---     l = List.filter (compareLeague lid) leagues
---   in
---     List.head l
---
--- compareLeague : Int -> League -> Bool
--- compareLeague i league =
---   if league.id == i then
---     True
---   else
---     False
---
--- updateTournament : Leagues -> Int -> Tournament -> Leagues
--- updateTournament leagues league_id tournament =
---   let
---     l = retrieveLeague league_id leagues
---   in
---     case l of
---       Just league ->
---         let
---           lts = replaceTournament tournament league.tournaments
---           newLeague = { league | tournaments = lts }
---         in
---           replaceLeague league leagues
---       Nothing ->
---         leagues
---
--- replaceLeague : League -> Leagues -> Leagues
--- replaceLeague league leagues =
---   List.map (substituteLeague league) leagues
---
--- substituteLeague : League -> League -> League
--- substituteLeague toUse toCompare =
---   if toCompare.id == toUse.id then
---     toUse
---   else
---     toCompare

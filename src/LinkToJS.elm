@@ -1,11 +1,12 @@
-port module LinkToJS exposing ( userProfilesLoaded )
+port module LinkToJS exposing (..)
 
 {--
 //////////////////////////////////////////////////////////////////////////////
 -- communication Elm -> JS
 //////////////////////////////////////////////////////////////////////////////
 --}
-port userProfilesLoaded : String -> Cmd msg
+port requestDeleteLeagueConfirmation : String -> Cmd msg
+port requestDeleteTournamentConfirmation : String -> Cmd msg
 
 {--
 //////////////////////////////////////////////////////////////////////////////
@@ -14,7 +15,8 @@ port userProfilesLoaded : String -> Cmd msg
 --}
 
 -- -- recuperation du modele XML en js dans elm
--- port decodeFromXML : (String -> msg) -> Sub msg
+port confirmDeleteLeague : (String -> msg) -> Sub msg
+port confirmDeleteTournament : (String -> msg) -> Sub msg
 --
 -- -- selection : recuperation de la selection js dans elm
 -- port scenarioSelected : (String -> msg) -> Sub msg

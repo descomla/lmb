@@ -12,7 +12,7 @@ import LeaguesDecoder exposing (decoderLeague)
 
 import Addresses exposing (..)
 
---import LinkToJS exposing (..)
+import LinkToJS exposing (..)
 
 -- Main
 main : Program Never Model Msg
@@ -28,14 +28,15 @@ main =
 -- SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.none
-    --Sub.batch
-    --    [ -- WebSocket.listen (model.modelURL) (NewSimuState << Json.Decode.decodeString Decoders.timerResponseDecode)
-          --LinkToJS.decodeFromXML DecodeFromXML
+    --Sub.none
+    Sub.batch
+        [ -- WebSocket.listen (model.modelURL) (NewSimuState << Json.Decode.decodeString Decoders.timerResponseDecode)
+          LinkToJS.confirmDeleteLeague ConfirmDeleteLeague
+          -- LinkToJS.confirmDeleteTournament ConfirmDeleteTournament
           --, LinkToJS.scenarioSelected ScenarioSelected
           --, LinkToJS.validateScenario ValidateScenario
           --, LinkToJS.validateProject ValidateProject
-    --    ]
+        ]
 
 -- INIT
 init : Model -> (Model, Cmd Msg)

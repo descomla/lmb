@@ -12,6 +12,8 @@ import Navigation exposing (..)
 import LeaguesPages exposing (..)
 import LeaguesModel exposing (..)
 
+import LinkToJS exposing (..)
+
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
@@ -125,8 +127,24 @@ update msg model =
         Err err ->
           ( { model | error = (toString err) }, Cmd.none )
     LeagueDeleteAction league_id ->
-      --deleteLeagueModel msg model
-      ( model, Cmd.none )
+      ( model, LinkToJS.requestDeleteLeagueConfirmation (toString league_id) )
+    ConfirmDeleteLeague s ->
+      let
+        result = String.toInt s
+        league_id =
+          case result of
+            Ok l ->
+              l
+            Err err ->
+              0
+      in
+        deleteLeague (league_id) model
+    OnDeletedLeagueResult result ->
+      case result of
+        Ok _ ->
+          ( model, LeaguesController.requestLeagues )
+        Err err ->
+          ( { model | error = (toString err) }, Cmd.none )
     {--
 
     TOURNAMENTS
@@ -165,6 +183,14 @@ createLeagueInModel model =
         ( { model | leaguesModel = lm }, cmd )
     else
       ( { model | error = error }, Cmd.none )
+
+deleteLeague : Int -> Model -> (Model, Cmd Msg)
+deleteLeague league_id model =
+  let
+    (lm, cmd) = LeaguesController.delete league_id model.leaguesModel
+  in
+    ( { model | leaguesModel = lm }, cmd )
+
 
 updateLeagueForm : Msg -> Model -> (Model, Cmd Msg)
 updateLeagueForm msg model =
