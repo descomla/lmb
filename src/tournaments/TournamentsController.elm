@@ -1,6 +1,7 @@
-module TournamentsController exposing (update, requestTournaments)
+module TournamentsController exposing (update, delete, requestTournaments)
 
 import Http exposing (send, get)
+import Json.Decode exposing (..)
 
 import Msg exposing (..)
 
@@ -33,3 +34,30 @@ substituteTournament toUse toCompare =
     toUse
   else
     toCompare
+
+delete : Int -> Cmd Msg
+delete tournament_id =
+    requestDeleteTournament tournament_id
+
+-- request Tournament creation
+requestDeleteTournament : Int -> Cmd Msg
+requestDeleteTournament tournament_id =
+  let
+    decoder =
+      -- since the api returns an empty object on delete success,
+      -- let's have the success value be the value that was
+      -- passed in originally so it can be used elsewhere
+      -- to remove itself
+      Json.Decode.succeed defaultTournament
+
+    request = Http.request
+      { method = "DELETE"
+      , headers = []
+      , url = tournamentsUrl ++ (toString tournament_id)
+      , body = Http.emptyBody
+      , expect = Http.expectJson decoder
+      , timeout = Maybe.Nothing
+      , withCredentials = False
+      }
+  in
+    Http.send OnDeletedTournamentResult request

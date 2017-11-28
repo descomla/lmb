@@ -6,6 +6,7 @@ import CmdExtra exposing (createCmd)
 
 import UserController exposing (..)
 import LeaguesController exposing (..)
+import TournamentsController exposing (..)
 
 import Msg exposing (..)
 import Navigation exposing (..)
@@ -123,7 +124,7 @@ update msg model =
     OnCreateLeagueResult result ->
       case result of
         Ok league ->
-          ( model, LeaguesController.requestLeagues )
+          ( { model | navigation = (Navigation.OthersLeagues LeaguesPages.Default) }, LeaguesController.requestLeagues)
         Err err ->
           ( { model | error = (toString err) }, Cmd.none )
     LeagueDeleteAction league_id ->
@@ -153,8 +154,24 @@ update msg model =
     TournamentsLoaded result ->
       updateLeagueInModel msg model
     TournamentDeleteAction tournament_id ->
-      --deleteLeagueModel msg model
-      ( model, Cmd.none )
+      ( model, LinkToJS.requestDeleteTournamentConfirmation (toString tournament_id) )
+    ConfirmDeleteTournament s ->
+      let
+        result = String.toInt s
+        tournament_id =
+          case result of
+            Ok l ->
+              l
+            Err err ->
+              0
+      in
+        deleteTournament (tournament_id) model
+    OnDeletedTournamentResult result ->
+      case result of
+        Ok _ ->
+          ( model, LeaguesController.requestLeagues )
+        Err err ->
+          ( { model | error = (toString err) }, Cmd.none )
     {--
 
     GLOBAL HTTP ERROR
@@ -190,6 +207,12 @@ deleteLeague league_id model =
     (lm, cmd) = LeaguesController.delete league_id model.leaguesModel
   in
     ( { model | leaguesModel = lm }, cmd )
+deleteTournament : Int -> Model -> (Model, Cmd Msg)
+deleteTournament tournament_id model =
+  let
+    cmd = TournamentsController.delete tournament_id
+  in
+    ( model, cmd )
 
 
 updateLeagueForm : Msg -> Model -> (Model, Cmd Msg)
@@ -202,8 +225,9 @@ updateLeagueForm msg model =
         lf = LeaguesController.updateLeagueFormValue msg model.leaguesModel.leagueForm
         lm = model.leaguesModel
         nlm = { lm | leagueForm = lf}
+        nm = { model | leaguesModel = nlm }
       in
-      ( { model | leaguesModel = nlm }, Cmd.none)
+      ( { nm | error = "" }, Cmd.none)
     else
       ( { model | error = err }, Cmd.none )
 

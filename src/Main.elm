@@ -24,18 +24,14 @@ main =
     , subscriptions = subscriptions
     }
 
-
 -- SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
 subscriptions model =
     --Sub.none
     Sub.batch
-        [ -- WebSocket.listen (model.modelURL) (NewSimuState << Json.Decode.decodeString Decoders.timerResponseDecode)
-          LinkToJS.confirmDeleteLeague ConfirmDeleteLeague
-          -- LinkToJS.confirmDeleteTournament ConfirmDeleteTournament
-          --, LinkToJS.scenarioSelected ScenarioSelected
-          --, LinkToJS.validateScenario ValidateScenario
-          --, LinkToJS.validateProject ValidateProject
+        [ LinkToJS.confirmDeleteLeague ConfirmDeleteLeague
+        , LinkToJS.confirmDeleteTournament ConfirmDeleteTournament
+          --, WebSocket.listen (model.modelURL) (NewSimuState << Json.Decode.decodeString Decoders.timerResponseDecode)--, LinkToJS.scenarioSelected ScenarioSelected
         ]
 
 -- INIT

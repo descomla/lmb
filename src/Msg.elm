@@ -47,3 +47,5 @@ type Msg
   -- Tournaments
   | TournamentsLoaded (Result Error Tournaments)
   | TournamentDeleteAction Int
+  | ConfirmDeleteTournament String
+  | OnDeletedTournamentResult (Result Error Tournament)
