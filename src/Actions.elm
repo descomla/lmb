@@ -10,6 +10,7 @@ import LeaguesController exposing (..)
 import Msg exposing (..)
 import Navigation exposing (..)
 import LeaguesPages exposing (..)
+import LeaguesModel exposing (..)
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -42,12 +43,43 @@ update msg model =
     NavigationOthersLeagues ->
       ( { model | navigation = (Navigation.OthersLeagues LeaguesPages.Default) }, LeaguesController.requestLeagues)
     NavigationCreateLeague ->
-      ( { model | navigation = (Navigation.OthersLeagues LeaguesPages.CreateLeague) }, Cmd.none)
-    NavigationCreateTournament id_league ->
-      if id_league == model.leaguesModel.currentLeague.id then
-        ( { model | navigation = (Navigation.CurrentLeague (LeaguesPages.CreateTournament id_league) ) }, Cmd.none)
-      else
-        ( { model | navigation = (Navigation.OthersLeagues (LeaguesPages.CreateTournament id_league) ) }, Cmd.none)
+      let
+        oldLeaguesModel = model.leaguesModel
+        newLeaguesModel = { oldLeaguesModel | leagueForm = defaultLeagueForm }
+        newModel = { model | leaguesModel = newLeaguesModel }
+      in
+      ( { newModel | navigation = (Navigation.OthersLeagues LeaguesPages.LeagueForm) }, Cmd.none)
+    NavigationModifyLeague league_id ->
+      let
+        league = getLeague league_id model.leaguesModel
+        newLeagueForm = fillForm league
+        oldLeaguesModel = model.leaguesModel
+        newLeaguesModel = { oldLeaguesModel | leagueForm = newLeagueForm }
+        newModel = { model | leaguesModel = newLeaguesModel }
+      in
+        case model.navigation of
+          Navigation.CurrentLeague _ ->
+            ( { newModel | navigation = (Navigation.CurrentLeague LeaguesPages.LeagueForm) }, Cmd.none)
+          others ->
+            ( { newModel | navigation = (Navigation.OthersLeagues LeaguesPages.LeagueForm) }, Cmd.none)
+    NavigationCreateTournament league_id ->
+        case model.navigation of
+          Navigation.CurrentLeague _ ->
+            ( { model | navigation = (Navigation.CurrentLeague (LeaguesPages.CreateTournament league_id) ) }, Cmd.none)
+          others ->
+            ( { model | navigation = (Navigation.OthersLeagues (LeaguesPages.CreateTournament league_id) ) }, Cmd.none)
+    NavigationDisplayLeague league_id ->
+        case model.navigation of
+          Navigation.CurrentLeague _ ->
+            ( { model | navigation = (Navigation.CurrentLeague (LeaguesPages.DisplayLeague league_id)) }, Cmd.none)
+          others ->
+          ( { model | navigation = (Navigation.OthersLeagues (LeaguesPages.DisplayLeague league_id)) }, Cmd.none)
+    NavigationDisplayTournament tournament_id ->
+        case model.navigation of
+          Navigation.CurrentLeague _ ->
+            ( { model | navigation = (Navigation.CurrentLeague (LeaguesPages.DisplayTournament tournament_id)) }, Cmd.none)
+          others ->
+            ( { model | navigation = (Navigation.OthersLeagues (LeaguesPages.DisplayTournament tournament_id)) }, Cmd.none)
     NavigationHelp ->
       ( { model | navigation = Navigation.Help }, Cmd.none)
     {--
@@ -74,8 +106,6 @@ update msg model =
     --}
     LeaguesLoaded result ->
       updateLeagueInModel msg model
-    LeaguesTournamentItemLoaded league_id result ->
-      updateLeagueInModel msg model
     LeaguesSortChange s ->
       updateLeagueInModel msg model
     LeaguesFilterChange s ->
@@ -94,21 +124,17 @@ update msg model =
           ( model, LeaguesController.requestLeagues )
         Err err ->
           ( { model | error = (toString err) }, Cmd.none )
-    OnEditLeague i ->
-      --updateLeagueInModel msg model
-      ( model, Cmd.none )
-    OnDeleteLeague i ->
-      --updateLeagueInModel msg model
+    LeagueDeleteAction league_id ->
+      --deleteLeagueModel msg model
       ( model, Cmd.none )
     {--
 
     TOURNAMENTS
 
     --}
-    OnEditTournament i ->
-      --updateLeagueInModel msg model
-      ( model, Cmd.none )
-    OnDeleteTournament i ->
+    TournamentsLoaded result ->
+      updateLeagueInModel msg model
+    TournamentDeleteAction tournament_id ->
       --deleteLeagueModel msg model
       ( model, Cmd.none )
     {--

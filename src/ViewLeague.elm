@@ -3,9 +3,10 @@ module ViewLeague exposing (viewCurrentLeague, viewOthersLeagues)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput, onClick, onMouseOver )
-import Html.Lazy exposing (lazy)
+import Html.Lazy exposing (lazy, lazy2)
 
 import Table exposing (..)
+import Toolbar exposing (..)
 
 import Msg exposing (..)
 import Model exposing (..)
@@ -17,24 +18,6 @@ import UserRights exposing (..)
 
 import LeaguesModel exposing (..)
 import LeagueType exposing (..)
-
--- get the current league data
-getCurrentLeague : LeaguesModel -> League
-getCurrentLeague model =
-  let
-    temp = List.filter (compareLeagueId model.currentLeague.id) model.leagues
-  in
-    if List.isEmpty temp then
-      { defaultLeague | name = "Aucune ligue !" {--++ (debugString model)--} }
-    else if (List.length temp) > 1 then
-      { defaultLeague | name = "Trop de ligues !" }
-    else
-      Maybe.withDefault defaultLeague (List.head temp)
-
--- compare current league id with others leagues ids
-compareLeagueId : Int -> League -> Bool
-compareLeagueId i league =
-  i == league.id
 
 -- debugString : LeaguesModel -> String
 -- debugString model =
@@ -66,33 +49,75 @@ viewCurrentLeagueDefault rights model =
   let
     currentLeague = getCurrentLeague model
   in
-    div [ class "fullWidth" ]
-      [ div [ class "titre" ] [ text currentLeague.name ] -- Titre
-      , div [ class "fullWidth" ] -- Content
-        [ div [ class "texte "]
-          [ div [ class "soustitre" ][ text "Tournois" ] -- Sous-titre
-          , br [][]
-          , div [ id "tournois.liste", class "texte" ]
-            [ lazy viewTournamentTable currentLeague.tournaments ]
-          , br [][]
-          , createTournamentDiv rights currentLeague -- Create tournament action button
-          , br [][]
---          , div [ id "classement" class "texte" ]
---            [ lazy viewClassement currentLeague ]
-          ]
-        ]
-      ]
+    viewLeagueDisplay rights currentLeague True
 
-createTournamentDiv : UserRights -> League -> Html Msg
-createTournamentDiv rights league =
-    if rights == Visitor then
-      div [][]
-    else
-      div [ id "ligues.creation.tournoi"
-          , class "champ_a_cliquer"
-          --, onMouseOver "this.style.cursor='pointer'"
-          , style [("cursor", "pointer")]
-          ] [ label [ id "createTournamentButton", onClick (NavigationCreateTournament league.id) ][text "Création d'un nouveau tournoi pour cette ligue"] ]
+viewLeagueDisplay : UserRights -> League -> Bool -> Html Msg
+viewLeagueDisplay rights league isCurrentLeague =
+  div [ class "corps" ]
+    [ div [ class "fullWidth" ]
+      [ div [ class "titre" ] [ text league.name ] ] -- Titre
+    , div [ class "fullWidth" ] -- Content
+      [ div [ class "texte "]
+        [ div [ class "soustitre" ][ text "Tournois" ] -- Sous-titre
+        , br [][]
+        , div [ id "tournois.liste", class "texte" ]
+          [ -- Debug -- text ("Nb Tournaments = " ++ (toString (List.length currentLeague.tournaments)))]
+          lazy viewTournamentTable league.tournaments ]
+        ]
+      , br [][]
+      , lazy2 viewToolbar rights [ toolbarButtonCreateTournament league.id  ] -- Create tournament action button
+      , br [][]
+      , div [ class "texte "]
+        [ div [ class "soustitre" ][ text "Classement" ] -- Sous-titre
+        , br [][]
+        , div [ id "classement", class "texte" ]
+          [ -- Debug -- text "Classement = "
+          lazy viewClassementTable league ]
+        ]
+      , br [][]
+      , if isCurrentLeague then
+          lazy2 viewToolbar rights [ toolbarButtonModifyLeague league.id ] -- actions toolbar
+        else
+          lazy2 viewToolbar rights [ toolbarButtonModifyLeague league.id, toolbarButtonBackToLeaguesList ] -- actions toolbar
+
+      ]
+    ]
+
+toolbarButtonCreateTournament : Int -> ToolbarButton
+toolbarButtonCreateTournament league_id =
+  { buttonId = "ligues.creation.tournoi"
+  , labelId = "createTournamentButton"
+  , msg = NavigationCreateTournament league_id
+  , caption = "Création d'un nouveau tournoi pour cette ligue"
+  , minimalRights = Director
+  }
+
+toolbarButtonModifyLeague : Int -> ToolbarButton
+toolbarButtonModifyLeague league_id =
+  { buttonId = "ligue.modifie.ligue"
+  , labelId = "modifyLeagueButton"
+  , msg = NavigationModifyLeague league_id
+  , caption = "Modification de la ligue"
+  , minimalRights = Director
+  }
+
+toolbarButtonCreateLeague : ToolbarButton
+toolbarButtonCreateLeague =
+  { buttonId = "ligue.creation.ligue"
+  , labelId = "createLeagueButton"
+  , msg = NavigationCreateLeague
+  , caption = "Création d'une nouvelle ligue"
+  , minimalRights = Director
+  }
+
+toolbarButtonBackToLeaguesList : ToolbarButton
+toolbarButtonBackToLeaguesList =
+  { buttonId = "ligue.retour.ligues"
+  , labelId = "backToLeaguesListButton"
+  , msg = NavigationOthersLeagues
+  , caption = "Retour à la liste des ligues"
+  , minimalRights = Visitor
+  }
 
 {--
 
@@ -149,9 +174,18 @@ tournamentImgActionList name toInt =
 tournamentActionsDetails : Int -> HtmlDetails Msg
 tournamentActionsDetails i =
     HtmlDetails [ class "image_a_cliquer"]
-    [ actionButton "EditTournament" (Msg.OnEditTournament i) "img/validate.png"
-    , actionButton "DeleteTournament" (Msg.OnDeleteTournament i) "img/delete.png"
+    [ actionButton "EditTournament" (NavigationDisplayTournament i) "img/validate.png"
+    , actionButton "DeleteTournament" (TournamentDeleteAction i) "img/delete.png"
     ]
+
+{--
+
+Classement
+
+--}
+viewClassementTable : League -> Html Msg
+viewClassementTable league =
+  div [][]
 
 {--
 
@@ -162,19 +196,23 @@ viewOthersLeagues : LeaguesPages -> Model -> Html Msg
 viewOthersLeagues page model =
     case page of
       Default ->
-        viewLeaguesList model
-      CreateLeague ->
-        viewCreateLeague model.leaguesModel
+        viewLeaguesList model.userModel.profile.rights model.leaguesModel
+      LeagueForm ->
+        viewLeagueForm model.leaguesModel
       CreateTournament league_id ->
         viewCreateTournament league_id
+      DisplayLeague league_id ->
+        viewLeagueDisplay model.userModel.profile.rights (getLeague league_id model.leaguesModel) False
+      DisplayTournament tournament_id ->
+        div [][]
 
 {--
 
 List of existing leagues
 
 --}
-viewLeaguesList : Model -> Html Msg
-viewLeaguesList model =
+viewLeaguesList : UserRights -> LeaguesModel -> Html Msg
+viewLeaguesList rights model =
   div [ class "corps" ]
     [ div [ class "fullWidth" ]
       [ div [ class "titre" ] [ text "Les ligues / matchs" ] ]
@@ -193,22 +231,11 @@ viewLeaguesList model =
           ] []
         ]
         , br [][]
-        , div [ id "ligues.liste", class "texte" ] [ lazy viewLeagueTable model.leaguesModel ]
+        , div [ id "ligues.liste", class "texte" ] [ lazy viewLeagueTable model ]
         , br [][]
-        , createLeagueDiv model.userModel.profile.rights
+        , lazy2 viewToolbar rights [ toolbarButtonCreateLeague  ] -- Create tournament action button
       ]
     ]
-
-createLeagueDiv : UserRights -> Html Msg
-createLeagueDiv rights =
-    if rights == Visitor then
-      div [][]
-    else
-      div [ id "ligues.creation.ligue"
-          , class "champ_a_cliquer"
-          --, onMouseOver "this.style.cursor='pointer'"
-          , style [("cursor", "pointer")]
-          ] [ label [ id "createLeagueButton", onClick NavigationCreateLeague ][text "Création d'une nouvelle ligue"] ]
 
 -- Leagues table
 viewLeagueTable : LeaguesModel -> Html Msg
@@ -301,8 +328,8 @@ leagueImgActionList name toInt =
 leagueActionsDetails : Int -> HtmlDetails Msg
 leagueActionsDetails i =
     HtmlDetails [ class "image_a_cliquer"]
-    [ actionButton "EditLeague" (Msg.OnEditLeague i) "img/validate.png"
-    , actionButton "DeleteLeague" (Msg.OnDeleteLeague i) "img/delete.png"
+    [ actionButton "EditLeague" (NavigationDisplayLeague i) "img/validate.png"
+    , actionButton "DeleteLeague" (LeagueDeleteAction i) "img/delete.png"
     ]
 
 actionButton : String -> msg -> String -> Html msg
@@ -314,11 +341,11 @@ actionButton ident msg imgSrc =
 
 {--
 
-Create League Form
+League Form
 
 --}
-viewCreateLeague : LeaguesModel -> Html Msg
-viewCreateLeague model =
+viewLeagueForm : LeaguesModel -> Html Msg
+viewLeagueForm model =
   div [ class "corps" ]
   [ div [ class "fullWidth" ][ div [class "titre"][text "Création / Edition d'une ligue"] ]
   , div [ class "fullWidth" ]
@@ -370,6 +397,7 @@ leagueTypeOption leaguetype =
   option
     [value (leagueTypeToDatabaseString leaguetype)]
     [text (leagueTypeToDisplayString leaguetype)]
+
 
 {--
 

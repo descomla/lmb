@@ -142,6 +142,7 @@
 .champ_a_cliquer:hover
 {
 	background-color: #A4B6C3;
+	cursor : pointer;
 }
 
 .champ_a_cliquer_ok, .champ_a_cliquer_ok_petit
@@ -152,6 +153,7 @@
 .champ_a_cliquer_ok:hover, .champ_a_cliquer_ok_petit:hover
 {
 	background-color: #B6C3A4;
+	cursor : pointer;
 }
 
 .champ_a_cliquer_nok, .champ_a_cliquer_nok_petit
@@ -162,6 +164,7 @@
 .champ_a_cliquer_nok:hover, .champ_a_cliquer_nok_petit:hover
 {
 	background-color: #DDAD66;
+	cursor : pointer;
 }
 
 

@@ -19,7 +19,10 @@ type Msg
   | NavigationCurrentLeague -- CurrentLeague
   | NavigationOthersLeagues -- OthersLeagues
   | NavigationCreateLeague
+  | NavigationModifyLeague Int
   | NavigationCreateTournament Int -- with league id
+  | NavigationDisplayLeague Int -- with league id
+  | NavigationDisplayTournament Int -- with league id
   | NavigationHelp
   | HttpFail Http.Error
   -- Users
@@ -31,7 +34,6 @@ type Msg
   | OnProfilesLoaded (Result Error UserProfiles)
   -- Leagues
   | LeaguesLoaded (Result Error Leagues)
-  | LeaguesTournamentItemLoaded Int (Result Error Tournament)
   | LeaguesSortChange Table.State
   | LeaguesFilterChange String
   | LeagueFormNameChange String
@@ -39,8 +41,7 @@ type Msg
   | LeagueFormNbTournamentsChange String
   | LeagueFormCreate
   | OnCreateLeagueResult (Result Error League)
-  | OnEditLeague Int
-  | OnDeleteLeague Int
+  | LeagueDeleteAction Int
   -- Tournaments
-  | OnEditTournament Int
-  | OnDeleteTournament Int
+  | TournamentsLoaded (Result Error Tournaments)
+  | TournamentDeleteAction Int

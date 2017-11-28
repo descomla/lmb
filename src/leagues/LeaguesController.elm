@@ -29,8 +29,16 @@ update msg model =
     LeaguesLoaded result ->
       case result of
         Ok myLeagues ->
-            ({ model | leagues = myLeagues },
-              requestTournaments myLeagues)
+            ({ model | leagues = myLeagues }, requestTournaments)
+        Err error ->
+          (model, CmdExtra.createCmd (HttpFail error))
+    TournamentsLoaded result ->
+      case result of
+        Ok myTournaments ->
+          let
+            myLeagues = updateTournaments model.leagues myTournaments
+          in
+            ({ model | leagues = myLeagues }, Cmd.none)
         Err error ->
           (model, CmdExtra.createCmd (HttpFail error))
     -- Others messages not processed
@@ -89,20 +97,6 @@ requestLeagues : Cmd Msg
 requestLeagues =
   Http.send LeaguesLoaded (Http.get leaguesUrl decoderLeagues)
 
--- request all tournaments associted with leagues
-requestTournaments : Leagues -> Cmd Msg
-requestTournaments leagues =
-  Cmd.batch (List.map requestTournamentsFromLeague leagues)
-
--- request all tournaments for a league
-requestTournamentsFromLeague : League -> Cmd Msg
-requestTournamentsFromLeague league =
-  Cmd.batch (List.map (requestTournamentFromLeagueById league.id) (extractTournamentIds league.tournaments))
-
-extractTournamentIds : List Tournament -> List Int
-extractTournamentIds tournaments =
-  List.map (.id) tournaments
-
 -- request league creation
 requestCreateLeague : Int -> LeagueForm -> Cmd Msg
 requestCreateLeague newId league =
@@ -142,3 +136,61 @@ retrieveFreeId leagues =
 retrieveMaxId : Leagues -> Maybe Int
 retrieveMaxId leagues =
     List.maximum (List.map .id leagues)
+
+updateTournaments : Leagues -> Tournaments -> Leagues
+updateTournaments leagues tournaments =
+  List.map (selectTournaments tournaments) leagues
+
+selectTournaments : Tournaments -> League -> League
+selectTournaments tournaments league =
+  let
+    myTournaments = List.filter (compareLeagueId league) tournaments
+  in
+    { league | tournaments = myTournaments }
+
+compareLeagueId : League -> Tournament -> Bool
+compareLeagueId league tournament =
+   if league.id == tournament.league_id then
+     True
+   else
+     False
+
+-- retrieveLeague : Int -> Leagues -> Maybe League
+-- retrieveLeague lid leagues =
+--   let
+--     l = List.filter (compareLeague lid) leagues
+--   in
+--     List.head l
+--
+-- compareLeague : Int -> League -> Bool
+-- compareLeague i league =
+--   if league.id == i then
+--     True
+--   else
+--     False
+--
+-- updateTournament : Leagues -> Int -> Tournament -> Leagues
+-- updateTournament leagues league_id tournament =
+--   let
+--     l = retrieveLeague league_id leagues
+--   in
+--     case l of
+--       Just league ->
+--         let
+--           lts = replaceTournament tournament league.tournaments
+--           newLeague = { league | tournaments = lts }
+--         in
+--           replaceLeague league leagues
+--       Nothing ->
+--         leagues
+--
+-- replaceLeague : League -> Leagues -> Leagues
+-- replaceLeague league leagues =
+--   List.map (substituteLeague league) leagues
+--
+-- substituteLeague : League -> League -> League
+-- substituteLeague toUse toCompare =
+--   if toCompare.id == toUse.id then
+--     toUse
+--   else
+--     toCompare

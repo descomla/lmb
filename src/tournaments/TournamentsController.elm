@@ -1,30 +1,35 @@
-module TournamentsController exposing (update, requestTournamentFromLeagueById)
+module TournamentsController exposing (update, requestTournaments)
 
 import Http exposing (send, get)
 
 import Msg exposing (..)
 
 import TournamentsModel exposing (..)
-import TournamentsDecoder exposing (decoderTournament)
+import TournamentsDecoder exposing (decoderTournament, decoderTournaments)
 
 import Addresses exposing (..)
 
 update : Msg -> Tournament -> (Tournament, Cmd Msg)
 update msg model =
   case msg of
-    OnEditTournament id ->
-      (model, Cmd.none)
-    OnDeleteTournament id ->
+    TournamentDeleteAction id ->
       (model, Cmd.none)
     -- Others messages not processed
     other ->
       ( model, Cmd.none)
 
 -- request a tournament for a league
-requestTournamentFromLeagueById : Int -> Int -> Cmd Msg
-requestTournamentFromLeagueById league_id tournament_id =
-  let
-    url =
-      tournamentsUrl ++ "?id=" ++ (toString tournament_id)
-  in
-    Http.send (LeaguesTournamentItemLoaded league_id) (Http.get url decoderTournament)
+requestTournaments : Cmd Msg
+requestTournaments =
+  Http.send TournamentsLoaded (Http.get tournamentsUrl decoderTournaments)
+
+replaceTournament : Tournament -> Tournaments -> Tournaments
+replaceTournament tournament tournaments =
+  List.map (substituteTournament tournament) tournaments
+
+substituteTournament : Tournament -> Tournament -> Tournament
+substituteTournament toUse toCompare =
+  if toCompare.id == toUse.id then
+    toUse
+  else
+    toCompare

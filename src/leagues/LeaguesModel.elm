@@ -1,4 +1,6 @@
-module LeaguesModel exposing (LeaguesModel, defaultLeaguesModel, League, Leagues, defaultLeague, LeagueForm, defaultLeagueForm)
+module LeaguesModel
+  exposing
+    (LeaguesModel, defaultLeaguesModel, League, Leagues, defaultLeague, LeagueForm, defaultLeagueForm, fillForm, getCurrentLeague, getLeague)
 
 import Table exposing (State)
 
@@ -43,12 +45,45 @@ defaultLeague =
   , tournaments = [] }
 
 type alias LeagueForm =
-  { name : String
+  { id : Int
+  , name : String
   , kind : Maybe LeagueType
   , nbRankingTournaments : Int }
 
 defaultLeagueForm : LeagueForm
 defaultLeagueForm =
-  { name = ""
+  { id = 0
+  , name = ""
   , kind = Nothing
   , nbRankingTournaments = 0 }
+
+fillForm : League -> LeagueForm
+fillForm league =
+  { id = league.id
+  , name = league.name
+  , kind = Just league.kind
+  , nbRankingTournaments = league.nbRankingTournaments
+  }
+
+  -- get the current league data
+getCurrentLeague : LeaguesModel -> League
+getCurrentLeague model =
+  getLeague model.currentLeague.id model
+
+  -- get the current league data
+getLeague : Int -> LeaguesModel -> League
+getLeague league_id model =
+  let
+    temp = List.filter (compareLeagueId league_id) model.leagues
+  in
+    if List.isEmpty temp then
+      { defaultLeague | name = "Aucune ligue !" {--++ (debugString model)--} }
+    else if (List.length temp) > 1 then
+      { defaultLeague | name = "Trop de ligues !" }
+    else
+      Maybe.withDefault defaultLeague (List.head temp)
+
+  -- compare current league id with others leagues ids
+compareLeagueId : Int -> League -> Bool
+compareLeagueId i league =
+  i == league.id
