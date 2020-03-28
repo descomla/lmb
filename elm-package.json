@@ -7,9 +7,11 @@
         ".",
         "src",
         "src/cmd",
-        "src/tables",
+        "src/view",
         "src/users",
+        "src/tables",
         "src/leagues",
+        "src/distant",
         "src/tournaments"
     ],
     "exposed-modules": [],
