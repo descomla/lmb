@@ -11,7 +11,6 @@
         "src/users",
         "src/tables",
         "src/leagues",
-        "src/distant",
         "src/tournaments"
     ],
     "exposed-modules": [],

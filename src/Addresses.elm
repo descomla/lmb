@@ -8,8 +8,6 @@ usersUrl : String
 usersUrl =
   mainUrl ++ "users/"
 
-
-
 leaguesUrl : String
 leaguesUrl =
   mainUrl ++ "leagues/"

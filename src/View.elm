@@ -10,6 +10,7 @@ import Msg exposing (..)
 import Navigation exposing (..)
 import LeaguesPages exposing (..)
 
+import ViewCommon exposing (..)
 import ViewUserInfo exposing (viewUserInfo)
 import ViewLeague exposing (viewCurrentLeague, viewOthersLeagues)
 import ViewHelp exposing (viewHelp)
@@ -23,7 +24,7 @@ view model =
       [ lazy2 viewNavigation model.navigation model.leaguesModel.currentLeague.name -- TODO To get from a config file or something else
       , lazy ViewUserInfo.viewUserInfo model.userModel
       , div [ class "messageErreur" ] [ label [ id "messageErreur" ][ text model.error ] ]
-      , lazy viewContainer model
+      , lazy viewContainer (viewContent model)
       , infoFooter
       ]
 
@@ -51,20 +52,6 @@ viewNavigation page league =
     ]
   ]
 
-navigationTdClass : Navigation -> List Navigation -> String
-navigationTdClass selected expected =
-  if (List.member selected expected) then
-    "navigation-selected"
-  else
-    ""
-
-viewContainer : Model -> Html Msg
-viewContainer model =
-  let
-    content = viewContent model
-  in
-    div [ id "div-container" ] [ content ]
-
 viewContent : Model -> Html Msg
 viewContent model =
     case model.navigation of
@@ -80,11 +67,3 @@ viewContent model =
         viewOthersLeagues subNavigation model
       Help ->
         viewHelp model
-
---
--- Bas de page
---
-
-infoFooter : Html Msg
-infoFooter =
-    footer [ class "infoFooter" ] [ p [] [ text "Copyright Julien Perrot 2017" ] ]
