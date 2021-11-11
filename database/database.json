@@ -33,6 +33,12 @@
       "rights": "Director"
     }
   ],
+  "currentLeague": {
+    "id": 9,
+    "name": "Ligue de Monobasket 2017-2018",
+    "kind": "LeagueWithRanking",
+    "nbRankingTournaments": 5
+  },
   "leagues": [
     {
       "id": 1,
@@ -93,20 +99,8 @@
       "name": "CFM 2017",
       "kind": "SingleEvent",
       "nbRankingTournaments": 0
-    },
-    {
-      "id": 14,
-      "name": "toto",
-      "kind": "LeagueWithoutRanking",
-      "nbRankingTournaments": 4
     }
   ],
-  "currentLeague": {
-    "id": 9,
-    "name": "LMB 2017-2018",
-    "kind": "LeagueWithRanking",
-    "nbRankingTournaments": 0
-  },
   "tournaments": [
     {
       "id": 1,

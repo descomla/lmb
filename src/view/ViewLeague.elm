@@ -11,6 +11,7 @@ import Toolbar exposing (..)
 
 import Msg exposing (..)
 import Model exposing (..)
+import Route exposing (..)
 
 import LeaguesPages exposing (..)
 import TournamentsModel exposing (..)
@@ -80,7 +81,6 @@ viewLeagueDisplay rights league isCurrentLeague =
           lazy2 viewToolbar rights [ toolbarButtonModifyLeague league.id ] -- actions toolbar
         else
           lazy2 viewToolbar rights [ toolbarButtonModifyLeague league.id, toolbarButtonBackToLeaguesList ] -- actions toolbar
-
       ]
     ]
 
@@ -88,7 +88,7 @@ toolbarButtonCreateTournament : Int -> ToolbarButton
 toolbarButtonCreateTournament league_id =
   { buttonId = "ligues.creation.tournoi"
   , labelId = "createTournamentButton"
-  , msg = NavigationCreateTournament league_id
+  , msg = OpenTournamentForm league_id
   , caption = "Création d'un nouveau tournoi pour cette ligue"
   , minimalRights = Director
   }
@@ -97,7 +97,7 @@ toolbarButtonModifyLeague : Int -> ToolbarButton
 toolbarButtonModifyLeague league_id =
   { buttonId = "ligue.modifie.ligue"
   , labelId = "modifyLeagueButton"
-  , msg = NavigationModifyLeague league_id
+  , msg = OpenLeagueForm league_id
   , caption = "Modification de la ligue"
   , minimalRights = Director
   }
@@ -106,7 +106,7 @@ toolbarButtonCreateLeague : ToolbarButton
 toolbarButtonCreateLeague =
   { buttonId = "ligue.creation.ligue"
   , labelId = "createLeagueButton"
-  , msg = NavigationCreateLeague
+  , msg = OpenLeagueForm 0
   , caption = "Création d'une nouvelle ligue"
   , minimalRights = Director
   }
@@ -115,7 +115,7 @@ toolbarButtonBackToLeaguesList : ToolbarButton
 toolbarButtonBackToLeaguesList =
   { buttonId = "ligue.retour.ligues"
   , labelId = "backToLeaguesListButton"
-  , msg = NavigationOthersLeagues
+  , msg = UrlChange OthersLeagues
   , caption = "Retour à la liste des ligues"
   , minimalRights = Visitor
   }
@@ -175,8 +175,8 @@ tournamentImgActionList rights name toInt =
 tournamentActionsDetails : UserRights -> Int -> HtmlDetails Msg
 tournamentActionsDetails rights i =
   renderActionButtons rights
-    [ actionButton "EditTournament" (NavigationDisplayTournament i) "img/validate.png" Visitor
-    , actionButton "DeleteTournament" (TournamentDeleteAction i) "img/delete.png" Director
+    [ actionButton "EditTournament" (DisplayTournament i) "img/validate.png" Visitor
+    , actionButton "DeleteTournament" (DeleteTournament i) "img/delete.png" Director
     ]
 
 {--
@@ -197,14 +197,14 @@ viewOthersLeagues : LeaguesPages -> Model -> Html Msg
 viewOthersLeagues page model =
     case page of
       Default ->
-        viewLeaguesList model.userModel.profile.rights model.leaguesModel
+        viewLeaguesList model.session.rights model.leaguesModel
       LeagueForm ->
         viewLeagueForm model.leaguesModel
       CreateTournament league_id ->
         viewCreateTournament league_id
-      DisplayLeague league_id ->
-        viewLeagueDisplay model.userModel.profile.rights (getLeague league_id model.leaguesModel) False
-      DisplayTournament tournament_id ->
+      LeagueContent league_id ->
+        viewLeagueDisplay model.session.rights (getLeague league_id model.leaguesModel) False
+      TournamentContent tournament_id ->
         div [][]
 
 {--
@@ -329,8 +329,8 @@ leagueImgActionList rights name toInt =
 leagueActionsDetails : UserRights -> Int -> HtmlDetails Msg
 leagueActionsDetails rights i =
   renderActionButtons rights
-    [ actionButton "EditLeague" (NavigationDisplayLeague i) "img/validate.png" Visitor
-    , actionButton "DeleteLeague" (LeagueDeleteAction i) "img/delete.png" Director
+    [ actionButton "EditLeague" (DisplayLeague i) "img/validate.png" Visitor
+    , actionButton "DeleteLeague" (DeleteLeague i) "img/delete.png" Director
     ]
 
 {--
@@ -372,13 +372,13 @@ viewLeagueForm model =
       , br [][]
       , div [ class "champ_a_cliquer"
         {--, onmouseover "this.style.cursor='pointer'"--}
-        , onClick LeagueFormCreate
+        , onClick ValidateLeagueForm
         , style [("cursor","pointer")]
         ]
         [ text "Créer la ligue"]
       , div [ class "champ_a_cliquer"
         {--, onmouseover "this.style.cursor='pointer'"--}
-        , onClick NavigationOthersLeagues
+        , onClick CancelLeagueForm
         , style [("cursor","pointer")]
         ]
         [text "Annuler"]

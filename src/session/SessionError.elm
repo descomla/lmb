@@ -1,9 +1,9 @@
-module UserActionError exposing (UserActionError(NoError, ProfileNotFound, WrongLoginOrPassword, ExistingLogin, IncorrectLogin, IncorrectPassword, EmptyFirstName, EmptyLastName, HttpError))
+module SessionError exposing (SessionError(NoError, ProfileNotFound, WrongLoginOrPassword, ExistingLogin, IncorrectLogin, IncorrectPassword, EmptyFirstName, EmptyLastName, HttpError))
 
 --
--- User actions errors
+-- Session actions errors
 --
-type UserActionError
+type SessionError
   = NoError
   | ProfileNotFound  -- Update/Delete action - Login not found
   | WrongLoginOrPassword -- login - password mismatch

@@ -1,21 +1,30 @@
 module Addresses exposing (..)
 
-mainUrl : String
-mainUrl =
+databaseMainUrl : String
+databaseMainUrl =
   "http://localhost:3000/"
 
-usersUrl : String
-usersUrl =
-  mainUrl ++ "users/"
+databaseSessionUrl : String
+databaseSessionUrl =
+  databaseMainUrl ++ "session/"
 
-leaguesUrl : String
-leaguesUrl =
-  mainUrl ++ "leagues/"
+databaseUsersUrl : String
+databaseUsersUrl =
+  databaseMainUrl ++ "users/"
 
-currentLeagueUrl : String
-currentLeagueUrl =
-  mainUrl ++ "currentLeague/"
+databaseLeaguesUrl : String
+databaseLeaguesUrl =
+  databaseMainUrl ++ "leagues/"
 
-tournamentsUrl : String
-tournamentsUrl =
-  mainUrl ++ "tournaments/"
+databaseCurrentLeagueUrl : String
+databaseCurrentLeagueUrl =
+  databaseMainUrl ++ "currentLeague/"
+
+databaseTournamentsUrl : String
+databaseTournamentsUrl =
+  databaseMainUrl ++ "tournaments/"
+
+
+siteMainUrl : String
+siteMainUrl =
+    "http://lmb.local.com/"

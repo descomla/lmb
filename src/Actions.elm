@@ -1,17 +1,25 @@
 module Actions exposing (..)
 
+import Http exposing (..)
+
 import Model exposing (..)
+import Route exposing (..)
+import SessionError exposing (..)
+
+import Addresses exposing (..)
 
 import CmdExtra exposing (createCmd)
 
-import UserController exposing (..)
+import SessionController exposing (..)
 import LeaguesController exposing (..)
 import TournamentsController exposing (..)
+import UserDecoder exposing (decoderUserProfiles)
 
 import Msg exposing (..)
 import Navigation exposing (..)
 import LeaguesPages exposing (..)
 import LeaguesModel exposing (..)
+import UserModel exposing (..)
 
 import LinkToJS exposing (..)
 
@@ -20,92 +28,58 @@ update msg model =
   case msg of
     NoOp ->
       (model, Cmd.none)
+    InitTime time ->
+      (model, Cmd.none)
+    TickTime time ->
+      (model, Cmd.none)
+    --
+    -- Récupération de l'URL
+    --
+    UrlChange route ->
+      ( { model  | route = route }, Navigation.newUrl (route2URL route) )
+    LocationChange location ->
+      ( { model  | route = parseURL location }, Cmd.none )
+    --
+    -- Récupération de la ligue courante
+    --
     CurrentLeagueLoaded result ->
       case result of
         Ok league ->
-          let
-            lm1 = model.leaguesModel
-            lm2 = { lm1 | currentLeague = league }
-          in
-            ( { model | leaguesModel = lm2 }, Cmd.none )
+          ( { model | currentLeague = league.name }, Cmd.none )
         Err error ->
           (model, CmdExtra.createCmd (HttpFail error))
     {--
-
-    NAVIGATION
-
+    --
+    -- SESSION
+    --
     --}
-    NavigationHome ->
-      ( { model | navigation = Navigation.Home }, Cmd.none)
-    NavigationPlayers ->
-      ( { model | navigation = Navigation.Players }, Cmd.none)
-    NavigationTeams ->
-      ( { model | navigation = Navigation.Teams }, Cmd.none)
-    NavigationCurrentLeague ->
-      ( { model | navigation = (Navigation.CurrentLeague LeaguesPages.Default) }, LeaguesController.requestLeagues)
-    NavigationOthersLeagues ->
-      ( { model | navigation = (Navigation.OthersLeagues LeaguesPages.Default) }, LeaguesController.requestLeagues)
-    NavigationCreateLeague ->
-      let
-        oldLeaguesModel = model.leaguesModel
-        newLeaguesModel = { oldLeaguesModel | leagueForm = defaultLeagueForm }
-        newModel = { model | leaguesModel = newLeaguesModel }
-      in
-      ( { newModel | navigation = (Navigation.OthersLeagues LeaguesPages.LeagueForm) }, Cmd.none)
-    NavigationModifyLeague league_id ->
-      let
-        league = getLeague league_id model.leaguesModel
-        newLeagueForm = fillForm league
-        oldLeaguesModel = model.leaguesModel
-        newLeaguesModel = { oldLeaguesModel | leagueForm = newLeagueForm }
-        newModel = { model | leaguesModel = newLeaguesModel }
-      in
-        case model.navigation of
-          Navigation.CurrentLeague _ ->
-            ( { newModel | navigation = (Navigation.CurrentLeague LeaguesPages.LeagueForm) }, Cmd.none)
-          others ->
-            ( { newModel | navigation = (Navigation.OthersLeagues LeaguesPages.LeagueForm) }, Cmd.none)
-    NavigationCreateTournament league_id ->
-        case model.navigation of
-          Navigation.CurrentLeague _ ->
-            ( { model | navigation = (Navigation.CurrentLeague (LeaguesPages.CreateTournament league_id) ) }, Cmd.none)
-          others ->
-            ( { model | navigation = (Navigation.OthersLeagues (LeaguesPages.CreateTournament league_id) ) }, Cmd.none)
-    NavigationDisplayLeague league_id ->
-        case model.navigation of
-          Navigation.CurrentLeague _ ->
-            ( { model | navigation = (Navigation.CurrentLeague (LeaguesPages.DisplayLeague league_id)) }, Cmd.none)
-          others ->
-          ( { model | navigation = (Navigation.OthersLeagues (LeaguesPages.DisplayLeague league_id)) }, Cmd.none)
-    NavigationDisplayTournament tournament_id ->
-        case model.navigation of
-          Navigation.CurrentLeague _ ->
-            ( { model | navigation = (Navigation.CurrentLeague (LeaguesPages.DisplayTournament tournament_id)) }, Cmd.none)
-          others ->
-            ( { model | navigation = (Navigation.OthersLeagues (LeaguesPages.DisplayTournament tournament_id)) }, Cmd.none)
-    NavigationHelp ->
-      ( { model | navigation = Navigation.Help }, Cmd.none)
-    {--
-
-    LOGIN
-
-    --}
+    SessionResult result ->
+      updateSession model msg
     LoginChange s ->
-      updateUserModel msg model
+      updateSession model msg
     PasswordChange s ->
-      updateUserModel msg model
-    OnProfilesLoaded result ->
-      updateUserModel msg model
+      updateSession model msg
     Login ->
-      updateUserModel msg model
+      updateSession model msg
     OnLoginResult result ->
-      updateUserModel msg model
+      updateSession model msg
     Logout ->
-      updateUserModel msg model
+      updateSession model msg
+
     {--
+    --
+    USERS
+    --
+    --}
 
+    -- Récupération de la liste des profiles
+    OnProfilesLoaded result ->
+      ( model, Cmd.none ) --updateUserModel msg model
+
+    {--
+    --
     LEAGUES
-
+    --
     --}
     LeaguesLoaded result ->
       updateLeagueInModel msg model
@@ -119,27 +93,31 @@ update msg model =
       updateLeagueForm msg model
     LeagueFormNbTournamentsChange s ->
       updateLeagueForm msg model
-    LeagueFormCreate ->
+    DisplayLeague i ->
+      ( model, Cmd.none )
+    OpenLeagueForm i ->
+      ( model, Cmd.none )
+    ValidateLeagueForm ->
       createLeagueInModel model
+    CancelLeagueForm ->
+      ( model, Cmd.none )
     OnCreateLeagueResult result ->
       case result of
-        Ok league ->
-          ( { model | navigation = (Navigation.OthersLeagues LeaguesPages.Default) }, LeaguesController.requestLeagues)
+        Ok league -> -- TODO : nettoyer le formulaire qui a été validé
+          ( { model | route = OthersLeagues }, LeaguesController.requestLeagues)
         Err err ->
           ( { model | error = (toString err) }, Cmd.none )
-    LeagueDeleteAction league_id ->
+    DeleteLeague league_id ->
       ( model, LinkToJS.requestDeleteLeagueConfirmation (toString league_id) )
     ConfirmDeleteLeague s ->
       let
         result = String.toInt s
-        league_id =
-          case result of
-            Ok l ->
-              l
-            Err err ->
-              0
       in
-        deleteLeague (league_id) model
+        case result of
+          Ok league_id ->
+            deleteLeague (league_id) model
+          Err err ->
+            ( { model | error = (toString err) }, Cmd.none )
     OnDeletedLeagueResult result ->
       case result of
         Ok _ ->
@@ -153,7 +131,15 @@ update msg model =
     --}
     TournamentsLoaded result ->
       updateLeagueInModel msg model
-    TournamentDeleteAction tournament_id ->
+    DisplayTournament i ->
+      ( model, Cmd.none )
+    OpenTournamentForm i ->
+      ( model, Cmd.none )
+    ValidateTournamentForm ->
+      ( model, Cmd.none )
+    CancelTournamentForm ->
+      ( model, Cmd.none )
+    DeleteTournament tournament_id ->
       ( model, LinkToJS.requestDeleteTournamentConfirmation (toString tournament_id) )
     ConfirmDeleteTournament s ->
       let
@@ -166,6 +152,8 @@ update msg model =
               0
       in
         deleteTournament (tournament_id) model
+    OnCreateTournamentResult result ->
+      ( model, Cmd.none )
     OnDeletedTournamentResult result ->
       case result of
         Ok _ ->
@@ -180,13 +168,68 @@ update msg model =
     HttpFail err ->
         ( { model | error = toString err }, Cmd.none)
 
-
-updateUserModel : Msg -> Model -> (Model, Cmd Msg)
-updateUserModel msg model =
+--
+--
+-- UPDATE SESSION CONTROLLER
+--
+--
+updateSession : Model -> Msg -> (Model, Cmd Msg)
+updateSession model msg =
   let
-    (umodel, cmd) = UserController.update msg model.userModel
+      session = model.session
+      input = model.sessionInput
   in
-    ( { model | userModel = umodel }, cmd )
+    case msg of
+      -- Récupération des données de session
+      SessionResult result ->
+        case result of
+          Ok s ->
+            ( { model | session = s }, Cmd.none )
+          Err error ->
+            (model, CmdExtra.createCmd (HttpFail error))
+      -- Login input changed by user
+      LoginChange s ->
+        let
+            result = { input | login = s }
+        in
+          ( { model | sessionInput = result }, Cmd.none )
+      -- Password input changed by user
+      PasswordChange s ->
+        let
+            result = { input | password = s }
+        in
+          ( { model | sessionInput = result }, Cmd.none )
+      -- Action de connection
+      Login ->
+        let
+          url = databaseUsersUrl ++ "?login=" ++ model.sessionInput.login ++ "&password=" ++ model.sessionInput.password
+        in
+          ( { model | sessionInput = (clearSessionError input) }, Http.send OnLoginResult (Http.get url decoderUserProfiles) )
+      -- Réponse du serveur sur demande de connection
+      OnLoginResult result ->
+        case result of
+          Ok userList -> -- the list must contain only one user
+            if List.isEmpty userList then
+              let --> if empty => it is a login or password error
+                result = { input | error = WrongLoginOrPassword }
+              in -- update model for error display
+                ( { model | sessionInput = result }, Cmd.none )
+            else
+              let --> if not empty =we assume there is only one (the head) > clear error
+                result = updateSessionUser session (Maybe.withDefault defaultUserProfile (List.head userList))
+              in -- update model & clear Error
+                ( { model | session = result }, Cmd.none )
+          Err error -> --> connection error
+              let
+                result = { input | error = (HttpError (toString error)) }
+              in -- update model for error display
+                ( { model | sessionInput = result }, CmdExtra.createCmd (HttpFail error))
+      -- Action de déconnection
+      Logout ->
+          ( { model | session = (clearSession model.session) }, Cmd.none )
+
+      others ->
+        ( model, Cmd.none )
 
 createLeagueInModel : Model -> (Model, Cmd Msg)
 createLeagueInModel model =

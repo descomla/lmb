@@ -1,7 +1,3 @@
-elm-package install
-elm-make src\Main.elm --output=elm.js
-
-
 rd /S /Q C:\wamp64\www\lmb\img
 rd /S /Q C:\wamp64\www\lmb\styles
 del /F /Q C:\wamp64\www\lmb\*.*

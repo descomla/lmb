@@ -3,47 +3,49 @@ module ViewUserInfo exposing (viewUserInfo)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import UserModel exposing (UserModel)
-import UserStatus exposing (..)
-import UserActionError exposing (..)
+
 import Msg exposing (..)
 
--- User info display
-viewUserInfo : UserModel -> Html Msg
-viewUserInfo userModel =
-  let
-    status = userModel.status
-  in
-    case status of
-      NotConnected ->
-        viewLoginForm userModel
-      Connected ->
-        viewConnectedUser userModel
+import SessionModel exposing (..)
+import SessionInput exposing (..)
+import SessionError exposing (..)
 
-viewLoginForm : UserModel -> Html Msg
-viewLoginForm userModel =
+-- User info display
+viewUserInfo : Session -> SessionInput -> Html Msg
+viewUserInfo session input =
+  if (isSessionConnected session) then
+    viewConnectedUser session
+  else
+    viewLoginForm input
+
+viewLoginForm : SessionInput -> Html Msg
+viewLoginForm input =
   Html.div [ class "menuLogin" ]
   [ Html.table []
     [ Html.tr []
       [ Html.td [][ Html.label [][ text "Utilisateur:" ] ]
-      , Html.td [][ Html.input [ type_ "text", id "login", onInput LoginChange, placeholder "login", value userModel.userInput.login ][] ]
+      , Html.td [][ Html.input [ type_ "text", id "login", onInput LoginChange, placeholder "login", value input.login ][] ]
       , Html.td [][ Html.label [][ text "Mot de passe:" ] ]
-      , Html.td [][ Html.input [ type_ "password", id "password", onInput PasswordChange, placeholder "password", value userModel.userInput.password ][] ]
+      , Html.td [][ Html.input [ type_ "password", id "password", onInput PasswordChange, placeholder "password", value input.password ][] ]
       , Html.td [][ Html.label [ id "loginButton", onClick Login ][ text "Se connecter"] ]
-      , Html.td [ class "messageErreur" ][ text (errorToString userModel.userError) ]
+      , Html.td [ class "messageErreur" ][ text (errorToString input.error) ]
       ]
     ]
   ]
 
-viewConnectedUser : UserModel -> Html Msg
-viewConnectedUser userModel =
+viewConnectedUser : Session -> Html Msg
+viewConnectedUser session =
   Html.div [ class "menuLogin" ]
     [ text "Connecté en tant que "
-    , label [ class "messageInfo" ][ text (userModel.profile.firstName ++ " " ++ userModel.profile.lastName ++ " (" ++ userModel.profile.login ++ ") ") ]
-    , label [ id "loginButton", onClick Logout ][ text "Se déconnecter"]
+    , label
+      [ class "messageInfo" ]
+      [ text (session.firstName  ++ " " ++ session.lastName ++ " (" ++ session.login ++ ") ") ]
+    , label
+      [ id "loginButton", onClick Logout ]
+      [ text "Se déconnecter"]
   ]
 
-errorToString : UserActionError -> String
+errorToString : SessionError -> String
 errorToString err =
   case err of
     NoError ->

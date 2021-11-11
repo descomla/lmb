@@ -1,23 +1,26 @@
-module Model exposing (..)
+module Model exposing (Model, defaultModel)
 
-import UserModel exposing (UserModel, defaultUserModel)
+import Route exposing (..)
+import SessionModel exposing (Session, defaultSession)
+import SessionInput exposing (..)
 import LeaguesModel exposing (LeaguesModel, defaultLeaguesModel)
-import Navigation exposing (..)
 
 -- MODEL
-
 type alias Model =
-  {
-    userModel : UserModel
+  { route : Route
+  , session : Session
+  , currentLeague : String
+  , sessionInput : SessionInput
   , leaguesModel : LeaguesModel
-  , navigation : Navigation
   , error : String
-}
+  }
 
 defaultModel : Model
 defaultModel =
-    { userModel = defaultUserModel
+    { route = Home
+    , session = defaultSession
+    , currentLeague = ""
+    , sessionInput = defaultSessionInput
     , leaguesModel = defaultLeaguesModel
-    , navigation = Navigation.Home
     , error = ""
   }

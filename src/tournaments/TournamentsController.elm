@@ -13,7 +13,7 @@ import Addresses exposing (..)
 update : Msg -> Tournament -> (Tournament, Cmd Msg)
 update msg model =
   case msg of
-    TournamentDeleteAction id ->
+    DeleteTournament id ->
       (model, Cmd.none)
     -- Others messages not processed
     other ->
@@ -22,7 +22,7 @@ update msg model =
 -- request a tournament for a league
 requestTournaments : Cmd Msg
 requestTournaments =
-  Http.send TournamentsLoaded (Http.get tournamentsUrl decoderTournaments)
+  Http.send TournamentsLoaded (Http.get databaseTournamentsUrl decoderTournaments)
 
 replaceTournament : Tournament -> Tournaments -> Tournaments
 replaceTournament tournament tournaments =
@@ -53,7 +53,7 @@ requestDeleteTournament tournament_id =
     request = Http.request
       { method = "DELETE"
       , headers = []
-      , url = tournamentsUrl ++ (toString tournament_id)
+      , url = databaseTournamentsUrl ++ (toString tournament_id)
       , body = Http.emptyBody
       , expect = Http.expectJson decoder
       , timeout = Maybe.Nothing

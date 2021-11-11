@@ -101,7 +101,7 @@ updateLeagueFormValue msg lf =
 -- request all leagues
 requestLeagues : Cmd Msg
 requestLeagues =
-  Http.send LeaguesLoaded (Http.get leaguesUrl decoderLeagues)
+  Http.send LeaguesLoaded (Http.get databaseLeaguesUrl decoderLeagues)
 
 -- request league creation
 requestCreateLeague : Int -> LeagueForm -> Cmd Msg
@@ -118,7 +118,7 @@ requestCreateLeague newId league =
     request = Http.request
       { method = "POST"
       , headers = []
-      , url = leaguesUrl
+      , url = databaseLeaguesUrl
       , body = jsonbody
       , expect = Http.expectJson decoderLeague
       , timeout = Maybe.Nothing
@@ -141,7 +141,7 @@ requestDeleteLeague league_id =
     request = Http.request
       { method = "DELETE"
       , headers = []
-      , url = leaguesUrl ++ (toString league_id)
+      , url = databaseLeaguesUrl ++ (toString league_id)
       , body = Http.emptyBody
       , expect = Http.expectJson decoder
       , timeout = Maybe.Nothing
