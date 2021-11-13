@@ -16,6 +16,7 @@ import ViewCommon exposing (..)
 import ViewUserInfo exposing (viewUserInfo)
 import ViewLeague exposing (viewCurrentLeague, viewOthersLeagues)
 import ViewNavigation exposing (viewNavigation)
+import ViewConfiguration exposing (viewConfiguration)
 import ViewHelp exposing (viewHelp)
 import ViewPlayers exposing (viewPlayers)
 import ViewTeams exposing (viewTeams)
@@ -48,6 +49,8 @@ viewContent model =
         viewCurrentLeague model.session.rights LeaguesPages.Default model.leaguesModel
       OthersLeagues {--subNavigation--} ->
         viewOthersLeagues LeaguesPages.Default model --subNavigation model
+      Configuration ->
+        viewConfiguration model
       Help ->
         viewHelp model
 
@@ -58,8 +61,7 @@ viewContent model =
 infoFooter : Model -> Html Msg
 infoFooter model =
   let
-    year   = String.fromInt (Time.toYear   model.zone model.time)
-
+    year = String.fromInt (Time.toYear model.zone model.time)
     month  = case (Time.toMonth  model.zone model.time) of
       Jan -> "Janvier"
       Feb -> "Février"
@@ -74,12 +76,19 @@ infoFooter model =
       Nov -> "Novembre"
       Dec -> "Décembre"
 
-    day    = String.fromInt (Time.toDay    model.zone model.time)
-    hour   = String.fromInt (Time.toHour   model.zone model.time)
-    minute = String.fromInt (Time.toMinute model.zone model.time)
-    second = String.fromInt (Time.toSecond model.zone model.time)
+    day    = formatDateTimeFigure (Time.toDay    model.zone model.time)
+    hour   = formatDateTimeFigure (Time.toHour   model.zone model.time)
+    minute = formatDateTimeFigure (Time.toMinute model.zone model.time)
+    second = formatDateTimeFigure (Time.toSecond model.zone model.time)
   in
     footer [ class "infoFooter" ]
       [ p []
-        [ text (day ++ "/" ++ month ++ "/" ++ " " ++ hour ++ ":" ++ minute ++ ":" ++ second) ]
+        [ text (day ++ " " ++ month ++ " " ++ year ++ " " ++ hour ++ ":" ++ minute ++ ":" ++ second) ]
       ]
+
+formatDateTimeFigure : Int -> String
+formatDateTimeFigure i =
+  if i < 10 then
+    "0" ++ (String.fromInt i)
+  else
+    (String.fromInt i)

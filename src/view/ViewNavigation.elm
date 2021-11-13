@@ -6,6 +6,7 @@ import Html.Attributes exposing (id, href, class, style, attribute, src)
 import Html.Events exposing (onClick, onMouseOver)
 import HtmlExtra exposing (..)
 
+import UserRights exposing (..)
 import Model exposing (..)
 import Route exposing (..)
 import Msg exposing (..)
@@ -17,27 +18,45 @@ import Debug exposing (..)
 --
 debugViewNav : String -> a -> a
 debugViewNav s a =
-    Debug.log s a
-    --a
-
+    --Debug.log s a
+    a
+--
+-- Route rights
+--
+isUpperOrEqualRightsRoute : UserRights -> Route -> Bool
+isUpperOrEqualRightsRoute rights route =
+  case route of
+    Route.Home ->
+      isUpperOrEqualRights Visitor rights
+    Route.Players ->
+      isUpperOrEqualRights Visitor rights
+    Route.Teams ->
+      isUpperOrEqualRights Visitor rights
+    Route.CurrentLeague ->
+      isUpperOrEqualRights Visitor rights
+    Route.OthersLeagues ->
+      isUpperOrEqualRights Visitor rights
+    Route.Configuration ->
+      isUpperOrEqualRights Administrator rights
+    Route.Help ->
+      isUpperOrEqualRights Visitor rights
 
 -- Navigation Toolbar
 viewNavigation : Model -> Html Msg
 viewNavigation model =
-  nav [ id "nav-toolbar" ]
-    [ div [ class "navigation" ]
-      [ Html.table []
-        [ Html.tr []
-          [ navigationItem Route.Home model
-          , navigationItem Route.Players model
-          , navigationItem Route.Teams model
-          , navigationItem Route.CurrentLeague model
-          , navigationItem Route.OthersLeagues model
-          , navigationItem Route.Help model
+  let
+    routes =
+      List.filter
+        (isUpperOrEqualRightsRoute model.session.rights)
+        [Home, Players, Teams, CurrentLeague, OthersLeagues, Configuration, Help]
+  in
+    nav [ id "nav-toolbar" ]
+      [ div [ class "navigation" ]
+        [ Html.table []
+          [ Html.tr [] (List.map (\a -> navigationItem a model ) routes)
           ]
         ]
       ]
-    ]
 
 -- Navigaton item TD
 navigationItem : Route -> Model -> Html Msg
@@ -62,6 +81,7 @@ routeDisplayName route model =
       Teams -> "Les équipes"
       CurrentLeague -> model.currentLeague
       OthersLeagues -> "Les autres ligues"
+      Configuration -> "Configuration"
       Help -> "Aide"
 
 -- Navigaton item display image from Route
@@ -73,6 +93,7 @@ route2img route =
       Teams -> "team-32x32.png"
       CurrentLeague -> "progress-icon-32x32.png"
       OthersLeagues -> "database-worldwide-32x32.png"
+      Configuration -> "gears-32x32.png"
       Help -> "icon-help-32x32.png"
 
 -- Choose selected or not selected item display class

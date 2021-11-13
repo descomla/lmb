@@ -35,14 +35,14 @@
   ],
   "currentLeague": {
     "id": 9,
-    "name": "Ligue de Monobasket 2017-2018",
+    "name": "LMB 2017-2018",
     "kind": "LeagueWithRanking",
     "nbRankingTournaments": 5
   },
   "leagues": [
     {
       "id": 1,
-      "name": "Ligue de Monobasket 2013-2014",
+      "name": "LMB 2013-2014",
       "kind": "LeagueWithRanking",
       "nbRankingTournaments": 4
     },
@@ -54,13 +54,13 @@
     },
     {
       "id": 3,
-      "name": "Ligue de Monobasket 2014-2015",
+      "name": "LMB 2014-2015",
       "kind": "LeagueWithRanking",
       "nbRankingTournaments": 5
     },
     {
       "id": 4,
-      "name": "Ligue de Monobasket 2015-2016",
+      "name": "LMB 2015-2016",
       "kind": "LeagueWithRanking",
       "nbRankingTournaments": 4
     },
@@ -78,7 +78,7 @@
     },
     {
       "id": 7,
-      "name": "Ligue de Monobasket 2016-2017",
+      "name": "LMB 2016-2017",
       "kind": "LeagueWithRanking",
       "nbRankingTournaments": 4
     },
@@ -90,7 +90,7 @@
     },
     {
       "id": 9,
-      "name": "Ligue de Monobasket 2017-2018",
+      "name": "LMB 2017-2018",
       "kind": "LeagueWithRanking",
       "nbRankingTournaments": 5
     },

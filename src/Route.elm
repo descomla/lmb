@@ -13,6 +13,7 @@ type Route
   | Teams
   | CurrentLeague
   | OthersLeagues
+  | Configuration
   | Help
 
 
@@ -58,6 +59,7 @@ route2PathName route =
         Teams -> "teams"
         CurrentLeague -> "current"
         OthersLeagues -> "leagues"
+        Configuration -> "config"
         Help -> "help"
 
 --
@@ -80,7 +82,7 @@ path2Route p =
 
 --parser : UrlParser.Parser (Route -> a) a
 --parser =
---    UrlParser.oneOf ((List.map parseCase [Home, Players, Teams, CurrentLeague, OthersLeagues, Help]) :: (UrlParser.map Home <| UrlParser.top))
+--    UrlParser.oneOf ((List.map parseCase [Home, Players, Teams, CurrentLeague, OthersLeagues, Configuration Help]) :: (UrlParser.map Home <| UrlParser.top))
 --
 --parseCase : Route -> (parser a b)
 --parseCase route =
@@ -94,5 +96,6 @@ parser =
         , Url.Parser.map Teams <| Url.Parser.s "teams"
         , Url.Parser.map CurrentLeague <| Url.Parser.s "current"
         , Url.Parser.map OthersLeagues <| Url.Parser.s "leagues"
+        , Url.Parser.map Configuration <| Url.Parser.s "config"
         , Url.Parser.map Help <| Url.Parser.s "help"
         ]

@@ -1,26 +1,29 @@
 
 .navigation
 {
-	width: 100%;
-	background-color: #C6D8E5;
+	/*width: 100%;
+	/*background-color: #C6D8E5;*/
 }
 
 .navigation table
 {
+    /* vertical | horizontal */
     padding: 2px 2px;
     position: relative;
     margin: auto auto;
-	width: 100%;
+		width: 100%;
 }
 
 .navigation table tr
 {
-		height: 16px;
+		height: 100px;
 }
 
 .navigation table td
 {
-		width: 16px;
+    /* vertical | horizontal */
+    padding: 2px 2px;
+		width: 64px;
 		text-align: center;
 		font-size: 0.8em;
 	  font-variant: small-caps;
@@ -127,6 +130,7 @@
 	font-weight: bold;
 	font-size: 10px;
 	text-align: center;
+  vertical-align: bottom;
 }
 
 .titre
