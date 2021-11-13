@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <title>MONOBASKET - Le site de gestion et de statistiue du monobasket</title>
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
     <!-- import ELM script : main application -->
     <script type="text/javascript" src="elm.js"></script>
     <link rel="stylesheet" type="text/css" href="styles/global.css">
@@ -14,8 +15,8 @@
 
     <script type="text/javascript">
       var div = document.getElementById('elm-app');
-      var app = Elm.Main.embed(div);
-
+      //var app = Elm.Main.embed(div);
+      var app = Elm.Main.init();
       // Définition des ports de connexion pour LinkToJS (sens ELM vers JS)
       app.ports.requestDeleteLeagueConfirmation.subscribe(function(word) {
         if( confirm("Voulez-vous vraiment supprimer cette ligue?"/*""(id="+word+")"*/) == true ) {

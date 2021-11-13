@@ -1,7 +1,7 @@
 module TournamentsDecoder exposing (decoderTournament, decoderTournaments)
 
-import Json.Decode exposing (Decoder, string)
-import Json.Decode.Pipeline exposing (decode, required)
+import Json.Decode exposing (Decoder, string, succeed)
+import Json.Decode.Pipeline exposing (required)
 
 import TournamentsModel exposing (..)
 
@@ -10,7 +10,7 @@ import TournamentsModel exposing (..)
 --
 decoderTournament : Decoder Tournament
 decoderTournament =
-  Json.Decode.Pipeline.decode Tournament
+  Json.Decode.succeed Tournament
     |> Json.Decode.Pipeline.required "id" (Json.Decode.int)
     |> Json.Decode.Pipeline.required "name" (Json.Decode.string)
     |> Json.Decode.Pipeline.required "location" (Json.Decode.string)

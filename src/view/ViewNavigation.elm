@@ -43,8 +43,8 @@ viewNavigation model =
 navigationItem : Route -> Model -> Html Msg
 navigationItem route model =
   Html.td [class (navigationTdClass model.route route)]
-    [ div [ onClickPreventDefault (UrlChange route) ]
-      [ div [ style [("text-align","center")] ]
+    [ div [ onClickPreventDefault (RouteChanged route) ]
+      [ div [ style "text-align" "center" ]
         [ img [ src ("img/" ++ (route2img route)) ][] ]
       , text (routeDisplayName route model)
       --a

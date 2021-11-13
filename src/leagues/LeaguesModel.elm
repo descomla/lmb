@@ -32,7 +32,7 @@ type alias League =
   , kind : LeagueType
   , nbRankingTournaments: Int
   , tournaments : Tournaments
-}
+  }
 
 type alias Leagues = List League
 
@@ -42,7 +42,8 @@ defaultLeague =
   , name = ""
   , kind = SingleEvent
   , nbRankingTournaments = 0
-  , tournaments = [] }
+  , tournaments = []
+  }
 
 type alias LeagueForm =
   { id : Int

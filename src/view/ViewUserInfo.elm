@@ -54,6 +54,7 @@ errorToString err =
       "Profile utilisateur inconnu."
     WrongLoginOrPassword ->
       "Login ou Mot de passe erroné."
+{--
     ExistingLogin ->
       "L'utilisateur existe déjà."
     IncorrectLogin ->
@@ -64,5 +65,6 @@ errorToString err =
       "Prénom vide."
     EmptyLastName ->
       "Nom de famille vide."
-    HttpError err ->
-      "Http error : " ++ err
+--}
+    HttpError error ->
+      "Http error : " ++ error

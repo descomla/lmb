@@ -11,7 +11,7 @@ import UserRightsDecoder exposing (..)
 --
 decoderSession : Decoder Session
 decoderSession =
-  Json.Decode.Pipeline.decode Session
+  Json.Decode.succeed Session
     |> Json.Decode.Pipeline.required "sessionId" (Json.Decode.string)
     |> Json.Decode.Pipeline.required "login" (Json.Decode.string)
     |> Json.Decode.Pipeline.required "rights" decodeUserRights

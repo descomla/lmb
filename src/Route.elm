@@ -1,8 +1,8 @@
 module Route exposing (..)
 
 import Addresses exposing (siteMainUrl)
-import Navigation exposing (Location)
-import UrlParser exposing ((</>), (<?>), s, top)
+import Url exposing (..)
+import Url.Parser exposing ((</>), (<?>), s, top)
 
 import Debug exposing (..)
 
@@ -27,12 +27,12 @@ debugRoute s a =
 --
 -- parse URL and get the Route from Location
 --
-parseURL : Location -> Route
-parseURL location =
+parseURL : Url.Url -> Route
+parseURL url =
   let
-      l = debugRoute "parseURL location.pathname = " location.pathname
-      p = debugRoute "parseURL pathname = " (UrlParser.parsePath UrlParser.string location)
-      r = UrlParser.parsePath parser location
+      l = debugRoute "parseURL location.pathname = " url.path
+--      p = debugRoute "parseURL pathname = " (Url.Parser.parsePath Url.Parser.string url.path)
+      r = Url.Parser.parse parser url
   in
       case r of
         Just route ->
@@ -85,14 +85,14 @@ path2Route p =
 --parseCase : Route -> (parser a b)
 --parseCase route =
 --   (UrlParser.map route <| UrlParser.s (routeToPath route))
-parser : UrlParser.Parser (Route -> a) a
+parser : Url.Parser.Parser (Route -> a) a
 parser =
-      UrlParser.oneOf
-        [ UrlParser.map Home <| UrlParser.top
-        , UrlParser.map Home <| UrlParser.s "home"
-        , UrlParser.map Players <| UrlParser.s "players"
-        , UrlParser.map Teams <| UrlParser.s "teams"
-        , UrlParser.map CurrentLeague <| UrlParser.s "current"
-        , UrlParser.map OthersLeagues <| UrlParser.s "leagues"
-        , UrlParser.map Help <| UrlParser.s "help"
+      Url.Parser.oneOf
+        [ Url.Parser.map Home <| Url.Parser.top
+        , Url.Parser.map Home <| Url.Parser.s "home"
+        , Url.Parser.map Players <| Url.Parser.s "players"
+        , Url.Parser.map Teams <| Url.Parser.s "teams"
+        , Url.Parser.map CurrentLeague <| Url.Parser.s "current"
+        , Url.Parser.map OthersLeagues <| Url.Parser.s "leagues"
+        , Url.Parser.map Help <| Url.Parser.s "help"
         ]

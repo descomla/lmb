@@ -1,6 +1,6 @@
 module TournamentsController exposing (update, delete, requestTournaments)
 
-import Http exposing (send, get)
+import Http exposing (get)
 import Json.Decode exposing (..)
 
 import Msg exposing (..)
@@ -22,7 +22,10 @@ update msg model =
 -- request a tournament for a league
 requestTournaments : Cmd Msg
 requestTournaments =
-  Http.send TournamentsLoaded (Http.get databaseTournamentsUrl decoderTournaments)
+  Http.get
+    { url = databaseTournamentsUrl
+    , expect = Http.expectJson TournamentsLoaded decoderTournaments
+    }
 
 replaceTournament : Tournament -> Tournaments -> Tournaments
 replaceTournament tournament tournaments =
@@ -49,15 +52,13 @@ requestDeleteTournament tournament_id =
       -- passed in originally so it can be used elsewhere
       -- to remove itself
       Json.Decode.succeed defaultTournament
-
-    request = Http.request
+  in
+    Http.request
       { method = "DELETE"
       , headers = []
-      , url = databaseTournamentsUrl ++ (toString tournament_id)
+      , url = databaseTournamentsUrl ++ (String.fromInt tournament_id)
       , body = Http.emptyBody
-      , expect = Http.expectJson decoder
-      , timeout = Maybe.Nothing
-      , withCredentials = False
+      , expect = Http.expectJson OnDeletedTournamentResult decoder
+      , timeout = Nothing
+      , tracker = Nothing
       }
-  in
-    Http.send OnDeletedTournamentResult request

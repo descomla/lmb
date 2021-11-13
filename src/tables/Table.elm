@@ -220,8 +220,8 @@ simpleThead headers =
 
 
 simpleTheadHelp : ( String, Status, Attribute msg ) -> Html msg
-simpleTheadHelp (name, status, onClick) =
-    Html.th [ onClick ] (simpleTheadContent name status)
+simpleTheadHelp (name, status, onClicked) =
+    Html.th [ onClicked ] (simpleTheadContent name status)
 
 simpleTheadContent : String -> Status -> List (Html msg)
 simpleTheadContent name status =
@@ -243,12 +243,12 @@ simpleTheadContent name status =
 
 darkGrey : String -> Html msg
 darkGrey symbol =
-  Html.span [ Attr.style [("color", "#555")] ] [ Html.text (" " ++ symbol) ]
+  Html.span [ Attr.style "color" "#555" ] [ Html.text (" " ++ symbol) ]
 
 
 lightGrey : String -> Html msg
 lightGrey symbol =
-  Html.span [ Attr.style [("color", "#ccc")] ] [ Html.text (" " ++ symbol) ]
+  Html.span [ Attr.style "color" "#ccc" ] [ Html.text (" " ++ symbol) ]
 
 
 simpleRowAttrs : data -> List (Attribute msg)
@@ -328,7 +328,7 @@ intColumn : String -> (data -> Int) -> Column data msg
 intColumn name toInt =
   Column
     { name = name
-    , viewData = textDetails << toString << toInt
+    , viewData = textDetails << String.fromInt << toInt
     , sorter = increasingOrDecreasingBy toInt
     }
 
@@ -338,7 +338,7 @@ floatColumn : String -> (data -> Float) -> Column data msg
 floatColumn name toFloat =
   Column
     { name = name
-    , viewData = textDetails << toString << toFloat
+    , viewData = textDetails << String.fromFloat << toFloat
     , sorter = increasingOrDecreasingBy toFloat
     }
 
@@ -533,17 +533,23 @@ applySorter isReversed sorter data =
     None ->
       data
 
-    Increasing sort ->
-      sort data
+    Increasing fsort ->
+      fsort data
 
-    Decreasing sort ->
-      List.reverse (sort data)
+    Decreasing fsort ->
+      List.reverse (fsort data)
 
-    IncOrDec sort ->
-      if isReversed then List.reverse (sort data) else sort data
+    IncOrDec fsort ->
+      if isReversed then
+        List.reverse (fsort data)
+      else
+        fsort data
 
-    DecOrInc sort ->
-      if isReversed then sort data else List.reverse (sort data)
+    DecOrInc fsort ->
+      if isReversed then
+        fsort data
+      else
+        List.reverse (fsort data)
 
 
 findSorter : String -> List (ColumnData data msg) -> Maybe (Sorter data)

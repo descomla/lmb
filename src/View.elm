@@ -3,10 +3,12 @@ module View exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Lazy exposing (lazy, lazy2)
+import Browser exposing(Document)
 
 import Msg exposing (..)
 import Model exposing (..)
 import Route exposing (..)
+import Time exposing (..)
 
 import LeaguesPages exposing (..)
 
@@ -20,15 +22,18 @@ import ViewTeams exposing (viewTeams)
 import ViewHome exposing (viewHome)
 import ViewError exposing (viewError)
 
-view : Model -> Html Msg
+view : Model -> Document Msg
 view model =
-    div []
-      [ lazy ViewNavigation.viewNavigation model
-      , lazy2 ViewUserInfo.viewUserInfo model.session model.sessionInput
-      , lazy ViewError.viewError model
-      , lazy ViewCommon.viewContainer (viewContent model)
-      , infoFooter
+    { title = "Ligue de Monobasket"
+    , body = [ div []
+        [ lazy ViewNavigation.viewNavigation model
+        , lazy2 ViewUserInfo.viewUserInfo model.session model.sessionInput
+        , lazy ViewError.viewError model
+        , lazy ViewCommon.viewContainer (viewContent model)
+        , infoFooter model
+        ]
       ]
+    }
 
 viewContent : Model -> Html Msg
 viewContent model =
@@ -50,6 +55,31 @@ viewContent model =
 -- Bas de page
 --
 
-infoFooter : Html Msg
-infoFooter =
-    footer [ class "infoFooter" ] [ p [] [ text "Copyright Julien Perrot 2017" ] ]
+infoFooter : Model -> Html Msg
+infoFooter model =
+  let
+    year   = String.fromInt (Time.toYear   model.zone model.time)
+
+    month  = case (Time.toMonth  model.zone model.time) of
+      Jan -> "Janvier"
+      Feb -> "Février"
+      Mar -> "Mars"
+      Apr -> "Avril"
+      May -> "Mai"
+      Jun -> "Juin"
+      Jul -> "Juillet"
+      Aug -> "Août"
+      Sep -> "Septembre"
+      Oct -> "Octobre"
+      Nov -> "Novembre"
+      Dec -> "Décembre"
+
+    day    = String.fromInt (Time.toDay    model.zone model.time)
+    hour   = String.fromInt (Time.toHour   model.zone model.time)
+    minute = String.fromInt (Time.toMinute model.zone model.time)
+    second = String.fromInt (Time.toSecond model.zone model.time)
+  in
+    footer [ class "infoFooter" ]
+      [ p []
+        [ text (day ++ "/" ++ month ++ "/" ++ " " ++ hour ++ ":" ++ minute ++ ":" ++ second) ]
+      ]

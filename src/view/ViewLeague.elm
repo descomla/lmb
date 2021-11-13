@@ -115,7 +115,7 @@ toolbarButtonBackToLeaguesList : ToolbarButton
 toolbarButtonBackToLeaguesList =
   { buttonId = "ligue.retour.ligues"
   , labelId = "backToLeaguesListButton"
-  , msg = UrlChange OthersLeagues
+  , msg = RouteChanged OthersLeagues
   , caption = "Retour à la liste des ligues"
   , minimalRights = Visitor
   }
@@ -162,7 +162,7 @@ tournamentNameToHtmlDetails tournois =
 
 tournamentMaxTeamsToHtmlDetails : Tournament -> HtmlDetails msg
 tournamentMaxTeamsToHtmlDetails tournois =
-    stringToHtmlDetails (toString tournois.maxTeams)
+    stringToHtmlDetails (String.fromInt tournois.maxTeams)
 
 tournamentImgActionList : UserRights -> String -> (data -> Int) -> Column data Msg
 tournamentImgActionList rights name toInt =
@@ -198,7 +198,7 @@ viewOthersLeagues page model =
     case page of
       Default ->
         viewLeaguesList model.session.rights model.leaguesModel
-      LeagueForm ->
+      LeagueInputForm ->
         viewLeagueForm model.leaguesModel
       CreateTournament league_id ->
         viewCreateTournament league_id
@@ -218,21 +218,24 @@ viewLeaguesList rights model =
     [ div [ class "fullWidth" ]
       [ div [ class "titre" ] [ text "Les ligues / matchs" ] ]
     , div [ class "fullWidth" ]
-      [ div [ class "texte" ] [
-        label [][ text "Chercher une ligue :" ]
-        , input [
-          class "champTexte"
-          , id "ligues.recherche.ligue"
-          , maxlength 255
-          , size 8
-          , style [("min-width", "300px")]
-          , onInput LeaguesFilterChange
-          , type_ "text"
-          , placeholder "nom de la ligue"
+      [ div [ class "texte" ]
+        [
+          label [][ text "Chercher une ligue :" ]
+        , input
+          [
+            class "champTexte"
+            , id "ligues.recherche.ligue"
+            , maxlength 255
+            , size 8
+            , style "min-width" "300px"
+            , onInput LeaguesFilterChange
+            , type_ "text"
+            , placeholder "nom de la ligue"
           ] []
         ]
         , br [][]
-        , div [ id "ligues.liste", class "texte" ] [ lazy2 viewLeagueTable rights model ]
+        , div [ id "ligues.liste", class "texte" ]
+          [ lazy2 viewLeagueTable rights model ]
         , br [][]
         , lazy2 viewToolbar rights [ toolbarButtonCreateLeague  ] -- Create tournament action button
       ]
@@ -284,7 +287,7 @@ leagueTypeToHtmlDetails league =
 -- Handle conversion from List to number of its elements as a string
 leagueTournamentsToHtmlDetails : League -> HtmlDetails Msg
 leagueTournamentsToHtmlDetails league =
-    stringToHtmlDetails (toString (leagueTournamentsToInt league))
+    stringToHtmlDetails (String.fromInt (leagueTournamentsToInt league))
 
 -- Handle conversion from List to number of its elements as a string
 leagueTournamentsToInt : League -> Int
@@ -341,7 +344,10 @@ League Form
 viewLeagueForm : LeaguesModel -> Html Msg
 viewLeagueForm model =
   div [ class "corps" ]
-  [ div [ class "fullWidth" ][ div [class "titre"][text "Création / Edition d'une ligue"] ]
+  [ div [ class "fullWidth" ]
+    [ div [class "titre"]
+      [ text "Création / Edition d'une ligue" ]
+    ]
   , div [ class "fullWidth" ]
     [ div [ ]--class "texte" ]
       [ text "Libellé de la ligue :"
@@ -355,11 +361,12 @@ viewLeagueForm model =
         , type_ "text" ][]
       , br [][]
       , text "Type de ligue :"
-      , select [ id "ligue.creamodi.type"
-        , style [("width", "50%")]
+      , select
+        [ id "ligue.creamodi.type"
+        , style "width" "50%"
         , onInput LeagueFormKindChange
         ]
-         (List.map leagueTypeOption [SingleEvent, LeagueWithRanking, LeagueWithoutRanking])
+        ( List.map leagueTypeOption [SingleEvent, LeagueWithRanking, LeagueWithoutRanking] )
       , br [][]
       , text "Nombre de tournois comptants pour le classement, sur la totalité :"
       , input [ --class "champTexte"
@@ -367,21 +374,21 @@ viewLeagueForm model =
         , onInput LeagueFormNbTournamentsChange
         , maxlength 2
         , size 5
-        , value (toString model.leagueForm.nbRankingTournaments)
+        , value (String.fromInt model.leagueForm.nbRankingTournaments)
         , type_ "number"][]
       , br [][]
-      , div [ class "champ_a_cliquer"
-        {--, onmouseover "this.style.cursor='pointer'"--}
+      , div
+        [ class "champ_a_cliquer"
         , onClick ValidateLeagueForm
-        , style [("cursor","pointer")]
+        , style "cursor" "pointer"
         ]
         [ text "Créer la ligue"]
-      , div [ class "champ_a_cliquer"
-        {--, onmouseover "this.style.cursor='pointer'"--}
+      , div
+        [ class "champ_a_cliquer"
         , onClick CancelLeagueForm
-        , style [("cursor","pointer")]
+        , style "cursor" "pointer"
         ]
-        [text "Annuler"]
+        [ text "Annuler" ]
       ]
     ]
   ]

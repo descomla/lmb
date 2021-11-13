@@ -1,5 +1,7 @@
-elm-package install
-elm-make src\Main.elm --output=elm.js
+elm init
+elm install elm/http
+elm install elm/json
+elm make src\Main.elm --output=elm.js
 
 
 rd /S /Q C:\wamp64\www\lmb\img

@@ -9,7 +9,7 @@ type alias Tournament =
   , location : String
   , maxTeams : Int
   , league_id : Int
-}
+  }
 
 type alias Tournaments = List Tournament
 
@@ -19,4 +19,5 @@ defaultTournament =
   , name = ""
   , location = ""
   , maxTeams = 0
-  , league_id = 0 }
+  , league_id = 0
+  }

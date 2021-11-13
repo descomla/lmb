@@ -1,6 +1,9 @@
 module Actions exposing (..)
 
 import Http exposing (..)
+import Url exposing (..)
+import Browser exposing (..)
+import Browser.Navigation exposing (..)
 
 import Model exposing (..)
 import Route exposing (..)
@@ -16,7 +19,6 @@ import TournamentsController exposing (..)
 import UserDecoder exposing (decoderUserProfiles)
 
 import Msg exposing (..)
-import Navigation exposing (..)
 import LeaguesPages exposing (..)
 import LeaguesModel exposing (..)
 import UserModel exposing (..)
@@ -28,17 +30,27 @@ update msg model =
   case msg of
     NoOp ->
       (model, Cmd.none)
-    InitTime time ->
-      (model, Cmd.none)
-    TickTime time ->
-      (model, Cmd.none)
+    AdjustZone z ->
+      ( { model | zone = z }, Cmd.none)
+    TickTime t ->
+      ( { model | time = t }, Cmd.none)
     --
     -- Récupération de l'URL
     --
-    UrlChange route ->
-      ( { model  | route = route }, Navigation.newUrl (route2URL route) )
-    LocationChange location ->
-      ( { model  | route = parseURL location }, Cmd.none )
+    RouteChanged route ->
+      ( { model  | route = route }, Browser.Navigation.pushUrl model.key (route2URL route) )
+    UrlChanged url ->
+      ( { model  | route = parseURL url }, Cmd.none )
+    LinkClicked urlRequest ->
+      let
+        r = Debug.log "LinkClicked " urlRequest
+      in
+      case urlRequest of
+        Browser.Internal url ->
+          ( model, Browser.Navigation.pushUrl model.key (Url.toString url) )
+
+        Browser.External href ->
+          ( model, Browser.Navigation.load href )
     --
     -- Récupération de la ligue courante
     --
@@ -106,24 +118,22 @@ update msg model =
         Ok league -> -- TODO : nettoyer le formulaire qui a été validé
           ( { model | route = OthersLeagues }, LeaguesController.requestLeagues)
         Err err ->
-          ( { model | error = (toString err) }, Cmd.none )
+          ( { model | error = (httpError2String err) }, Cmd.none )
     DeleteLeague league_id ->
-      ( model, LinkToJS.requestDeleteLeagueConfirmation (toString league_id) )
+      ( model, LinkToJS.requestDeleteLeagueConfirmation (String.fromInt league_id) )
     ConfirmDeleteLeague s ->
-      let
-        result = String.toInt s
-      in
-        case result of
-          Ok league_id ->
-            deleteLeague (league_id) model
-          Err err ->
-            ( { model | error = (toString err) }, Cmd.none )
+      case (String.toInt s) of
+        Just league_id ->
+          deleteLeague (league_id) model
+        Nothing ->
+          ( { model | error = "League_id reçu ("++s++") pour confirmation invalide !" }
+            , Cmd.none )
     OnDeletedLeagueResult result ->
       case result of
         Ok _ ->
           ( model, LeaguesController.requestLeagues )
         Err err ->
-          ( { model | error = (toString err) }, Cmd.none )
+          ( { model | error = (httpError2String err) }, Cmd.none )
     {--
 
     TOURNAMENTS
@@ -140,18 +150,15 @@ update msg model =
     CancelTournamentForm ->
       ( model, Cmd.none )
     DeleteTournament tournament_id ->
-      ( model, LinkToJS.requestDeleteTournamentConfirmation (toString tournament_id) )
+      ( model
+      , LinkToJS.requestDeleteTournamentConfirmation (String.fromInt tournament_id) )
     ConfirmDeleteTournament s ->
-      let
-        result = String.toInt s
-        tournament_id =
-          case result of
-            Ok l ->
-              l
-            Err err ->
-              0
-      in
-        deleteTournament (tournament_id) model
+      case (String.toInt s) of
+        Just tournament_id ->
+          deleteTournament (tournament_id) model
+        Nothing ->
+          ( { model | error = "Tournament_id reçu ("++s++") pour confirmation invalide !" }
+          , Cmd.none )
     OnCreateTournamentResult result ->
       ( model, Cmd.none )
     OnDeletedTournamentResult result ->
@@ -159,14 +166,14 @@ update msg model =
         Ok _ ->
           ( model, LeaguesController.requestLeagues )
         Err err ->
-          ( { model | error = (toString err) }, Cmd.none )
+          ( { model | error = (httpError2String err) }, Cmd.none )
     {--
 
     GLOBAL HTTP ERROR
 
     --}
     HttpFail err ->
-        ( { model | error = toString err }, Cmd.none)
+        ( { model | error = httpError2String err }, Cmd.none)
 
 --
 --
@@ -202,28 +209,29 @@ updateSession model msg =
       -- Action de connection
       Login ->
         let
-          url = databaseUsersUrl ++ "?login=" ++ model.sessionInput.login ++ "&password=" ++ model.sessionInput.password
+          cmd = requestLogin model.sessionInput
+          result = clearSessionError model.sessionInput
         in
-          ( { model | sessionInput = (clearSessionError input) }, Http.send OnLoginResult (Http.get url decoderUserProfiles) )
+          ( { model | sessionInput = result }, cmd )
       -- Réponse du serveur sur demande de connection
       OnLoginResult result ->
         case result of
           Ok userList -> -- the list must contain only one user
             if List.isEmpty userList then
               let --> if empty => it is a login or password error
-                result = { input | error = WrongLoginOrPassword }
+                r = { input | error = WrongLoginOrPassword }
               in -- update model for error display
-                ( { model | sessionInput = result }, Cmd.none )
+                ( { model | sessionInput = r }, Cmd.none )
             else
               let --> if not empty =we assume there is only one (the head) > clear error
-                result = updateSessionUser session (Maybe.withDefault defaultUserProfile (List.head userList))
+                r = updateSessionUser session (Maybe.withDefault defaultUserProfile (List.head userList))
               in -- update model & clear Error
-                ( { model | session = result }, Cmd.none )
+                ( { model | session = r }, Cmd.none )
           Err error -> --> connection error
               let
-                result = { input | error = (HttpError (toString error)) }
+                r = { input | error = (HttpError (httpError2String error)) }
               in -- update model for error display
-                ( { model | sessionInput = result }, CmdExtra.createCmd (HttpFail error))
+                ( { model | sessionInput = r }, CmdExtra.createCmd (HttpFail error))
       -- Action de déconnection
       Logout ->
           ( { model | session = (clearSession model.session) }, Cmd.none )
@@ -280,3 +288,18 @@ updateLeagueInModel msg model =
     (lmodel, cmd) = LeaguesController.update msg model.leaguesModel
   in
     ( { model | leaguesModel = lmodel }, cmd )
+
+
+httpError2String : Http.Error -> String
+httpError2String error =
+  case error of
+    BadUrl s ->
+      "Mauvaise URL (" ++ s ++ ")"
+    Timeout ->
+      "Timeout"
+    NetworkError ->
+      "Erreur réseau"
+    BadStatus i ->
+      "Mauvais statut"
+    BadBody s ->
+      "Erreur dans le corps de requête \n"++s

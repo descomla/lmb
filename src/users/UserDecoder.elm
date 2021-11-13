@@ -1,7 +1,7 @@
 module UserDecoder exposing (decoderUserProfile, decoderUserProfiles)
 
 import Json.Decode exposing (Decoder, string, map)
-import Json.Decode.Pipeline exposing (decode, required)
+import Json.Decode.Pipeline exposing (required)
 
 import UserModel exposing (..)
 import UserRights exposing (..)
@@ -11,7 +11,7 @@ import UserRights exposing (..)
 --
 decoderUserProfile : Decoder UserProfile
 decoderUserProfile =
-  Json.Decode.Pipeline.decode UserProfile
+  Json.Decode.succeed UserProfile
     |> Json.Decode.Pipeline.required "login" (Json.Decode.string)
     |> Json.Decode.Pipeline.required "password" (Json.Decode.string)
     |> Json.Decode.Pipeline.required "rights" decodeUserRights

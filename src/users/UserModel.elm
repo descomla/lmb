@@ -11,15 +11,15 @@ type alias UserProfile =
   , rights : UserRights
   , firstName : String
   , lastName : String
-}
+  }
 
 type alias UserProfiles = List UserProfile
 
 defaultUserProfile : UserProfile
 defaultUserProfile =
-    { login = ""
-    , password = ""
-    , rights = Visitor
-    , firstName = ""
-    , lastName = ""
+  { login = ""
+  , password = ""
+  , rights = Visitor
+  , firstName = ""
+  , lastName = ""
   }

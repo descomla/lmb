@@ -1,6 +1,6 @@
-module SessionController exposing (..)
+module SessionController exposing (createSession, requestLogin, clearSessionError, clearSession, updateSessionUser)
 
-import Http exposing (get, send)
+import Http exposing (post)
 import Time exposing (..)
 import Json.Encode exposing (encode)
 
@@ -12,14 +12,15 @@ import SessionDecoder exposing (decoderSession, encoderSession)
 import SessionError exposing (..)
 
 import UserModel exposing (..)
+import UserDecoder exposing (decoderUserProfiles)
 
 --
 -- Create a new session
 --
-createSession : Time -> Cmd Msg
+createSession : Posix -> Cmd Msg
 createSession time =
   let
-    m = toString (Time.inMilliseconds time)
+    m = String.fromInt (Time.toMillis utc time)
   in
     requestCreateSession (newSession m)
 
@@ -29,18 +30,23 @@ requestCreateSession session =
   let
     json = encoderSession session
     jsonbody = Http.stringBody "application/json" (Json.Encode.encode 0 json)
-
-    request = Http.request
-      { method = "POST"
-      , headers = []
-      , url = databaseSessionUrl
-      , body = jsonbody
-      , expect = Http.expectJson decoderSession
-      , timeout = Maybe.Nothing
-      , withCredentials = False
-      }
   in
-    Http.send SessionResult request
+    Http.post
+      { url = databaseSessionUrl
+      , body = jsonbody
+      , expect = Http.expectJson SessionResult decoderSession
+      }
+
+-- request Login
+requestLogin : SessionInput -> Cmd Msg
+requestLogin input =
+  let
+    url = databaseUsersUrl ++ "?login=" ++ input.login ++ "&password=" ++ input.password
+  in
+    Http.get
+      { url = url
+      , expect = Http.expectJson OnLoginResult decoderUserProfiles
+      }
 
 -- clear session error
 clearSessionError : SessionInput -> SessionInput

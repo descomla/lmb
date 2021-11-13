@@ -10,7 +10,7 @@ viewHome : Model -> Html Msg
 viewHome model =
   div [ class "fullWidth" ]
     [ div [ class "titre" ] [ text "Accueil" ]
-    , div [ class "texte", style [("text-align","center")] ]
+    , div [ class "texte", style "text-align" "center" ]
       [ text " Bienvenue sur le site du monobasket français."
       , br [][]
       , text "Le but de celui-ci est de rassembler les documents, et les résultats des championnats, matchs, tournois de monobasket en France"

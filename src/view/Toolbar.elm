@@ -36,7 +36,7 @@ viewToolbarButton button =
     div [ id button.buttonId
         , class "champ_a_cliquer"
         --, onMouseOver "this.style.cursor='pointer'"
-        , style [("cursor", "pointer")]
+        , style "cursor" "pointer"
         ]
         [ label [ id button.labelId, onClick button.msg ]
           [ text button.caption ]

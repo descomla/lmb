@@ -1,9 +1,9 @@
 module Msg exposing (..)
 
 import Http exposing (..)
+import Url exposing (..)
 import Time exposing (..)
-
-import Navigation exposing (Location)
+import Browser exposing (..)
 
 import SessionModel exposing (Session)
 import UserModel exposing (UserProfile, UserProfiles)
@@ -17,10 +17,11 @@ type Msg
   = NoOp
   | HttpFail Error
   -- Init
-  | InitTime Time
-  | TickTime Time
-  | UrlChange Route
-  | LocationChange Location
+  | AdjustZone Time.Zone
+  | TickTime Time.Posix
+  | UrlChanged Url
+  | RouteChanged Route
+  | LinkClicked Browser.UrlRequest
   | SessionResult (Result Error Session)
   | CurrentLeagueLoaded (Result Error League)
   -- Users

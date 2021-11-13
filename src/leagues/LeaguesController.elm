@@ -1,6 +1,6 @@
 module LeaguesController exposing (create, update, delete, requestLeagues, updateLeagueFormValue, checkLeagueForm, checkLeagueFormInput)
 
-import Http exposing (get, send)
+import Http exposing (get)
 import CmdExtra exposing (createCmd)
 import Json.Encode exposing (..)
 import Json.Decode exposing (..)
@@ -64,8 +64,8 @@ checkLeagueFormInput msg =
         Just kind -> ""
     LeagueFormNbTournamentsChange s ->
       case (String.toInt s) of
-        Ok n -> ""
-        Err err -> "Valeur '" ++ s ++ "' invalide !"
+        Just n -> ""
+        Nothing -> "Valeur '" ++ s ++ "' invalide !"
     -- Others messages not processed
     other ->
       ""
@@ -91,8 +91,8 @@ updateLeagueFormValue msg lf =
       let
         nb =
           case (String.toInt s) of
-            Ok n -> n
-            Err err -> 0
+            Just n -> n
+            Nothing -> 0 --TODO ajouter un log d'erreur
       in
       { lf | nbRankingTournaments = nb }
     -- Others messages not processed
@@ -101,7 +101,10 @@ updateLeagueFormValue msg lf =
 -- request all leagues
 requestLeagues : Cmd Msg
 requestLeagues =
-  Http.send LeaguesLoaded (Http.get databaseLeaguesUrl decoderLeagues)
+  Http.get
+    { url = databaseLeaguesUrl
+    , expect = Http.expectJson LeaguesLoaded decoderLeagues
+    }
 
 -- request league creation
 requestCreateLeague : Int -> LeagueForm -> Cmd Msg
@@ -114,18 +117,12 @@ requestCreateLeague newId league =
       , ("nbRankingTournaments", Json.Encode.int league.nbRankingTournaments)
       ]
     jsonbody = Http.stringBody "application/json" (Json.Encode.encode 0 json)
-
-    request = Http.request
-      { method = "POST"
-      , headers = []
-      , url = databaseLeaguesUrl
-      , body = jsonbody
-      , expect = Http.expectJson decoderLeague
-      , timeout = Maybe.Nothing
-      , withCredentials = False
-      }
   in
-    Http.send OnCreateLeagueResult request
+    Http.post
+      { url = databaseLeaguesUrl
+      , body = jsonbody
+      , expect = Http.expectJson OnCreateLeagueResult decoderLeague
+      }
 
 -- request league creation
 requestDeleteLeague : Int -> Cmd Msg
@@ -137,18 +134,16 @@ requestDeleteLeague league_id =
       -- passed in originally so it can be used elsewhere
       -- to remove itself
       Json.Decode.succeed defaultLeague
-
-    request = Http.request
+  in
+    Http.request
       { method = "DELETE"
       , headers = []
-      , url = databaseLeaguesUrl ++ (toString league_id)
+      , url = databaseLeaguesUrl ++ (String.fromInt league_id)
       , body = Http.emptyBody
-      , expect = Http.expectJson decoder
-      , timeout = Maybe.Nothing
-      , withCredentials = False
+      , expect = Http.expectJson OnDeletedLeagueResult decoder
+      , timeout = Nothing
+      , tracker = Nothing
       }
-  in
-    Http.send OnDeletedLeagueResult request
 
 -- get the last free id for a new league
 retrieveFreeId : Leagues -> Int

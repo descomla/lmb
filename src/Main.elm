@@ -1,9 +1,12 @@
 module Main exposing (..)
 
 import Html exposing (..)
-import Http exposing (send)
+import Http exposing (get)
 import Time exposing (..)
 import Task exposing (..)
+import Url exposing (..)
+import Browser exposing (..)
+import Browser.Navigation exposing (..)
 
 import Json.Decode exposing (..)
 
@@ -18,16 +21,18 @@ import LeaguesDecoder exposing (decoderLeague)
 
 import Addresses exposing (..)
 
-import Navigation exposing (..)
 import LinkToJS exposing (..)
 
 -- Main
+main : Program () Model Msg
 main =
-  Navigation.program LocationChange
+  Browser.application
   { init = init
-  , update = update
   , view = view
+  , update = update
   , subscriptions = subscriptions
+  , onUrlChange = UrlChanged
+  , onUrlRequest = LinkClicked
   }
 
 -- SUBSCRIPTIONS
@@ -35,18 +40,21 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     --Sub.none
     Sub.batch
-        [ Time.every Time.second TickTime
+        [ Time.every 1000 TickTime
         , LinkToJS.confirmDeleteLeague ConfirmDeleteLeague
         , LinkToJS.confirmDeleteTournament ConfirmDeleteTournament
           --, WebSocket.listen (model.modelURL) (NewSimuState << Json.Decode.decodeString Decoders.timerResponseDecode)--, LinkToJS.scenarioSelected ScenarioSelected
         ]
 
 -- INIT
-init : Navigation.Location -> (Model, Cmd Msg)
-init location =
-  ( { defaultModel | route = parseURL location }
-    , Cmd.batch [
-      Task.perform InitTime Time.now
-      , Http.send CurrentLeagueLoaded (Http.get databaseCurrentLeagueUrl decoderLeague )
+init : () -> Url.Url -> Browser.Navigation.Key -> (Model, Cmd Msg)
+init flags url key =
+  ( initModel url key
+    , Cmd.batch
+      [ Task.perform AdjustZone Time.here
+      , Http.get
+        { url = databaseCurrentLeagueUrl
+        , expect = Http.expectJson CurrentLeagueLoaded decoderLeague
+        }
       ]
   )

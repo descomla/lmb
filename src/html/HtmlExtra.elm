@@ -1,15 +1,13 @@
 module HtmlExtra exposing (onClickPreventDefault)
 
 import Html exposing (Attribute)
-import Html.Events exposing (onWithOptions)
+import Html.Events exposing (custom)
 
 import Json.Decode exposing (succeed)
 
 onClickPreventDefault : msg -> Attribute msg
 onClickPreventDefault msg =
-  onWithOptions
+  custom
     "click"
-    { preventDefault = True
-    , stopPropagation = False
-    }
-    (Json.Decode.succeed msg)
+    ( Json.Decode.succeed
+      { message = msg, preventDefault = True, stopPropagation = False } )

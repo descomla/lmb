@@ -3,7 +3,7 @@ module LeaguesPages exposing (LeaguesPages(..))
 
 type LeaguesPages
   = Default
-  | LeagueForm
+  | LeagueInputForm
   | CreateTournament Int -- League ID
   | LeagueContent Int -- League ID
   | TournamentContent Int -- League ID
