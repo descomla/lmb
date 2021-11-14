@@ -11,6 +11,8 @@ import Model exposing (..)
 import Route exposing (..)
 import Msg exposing (..)
 
+import LeaguesModel exposing (getCurrentLeagueName)
+
 import Debug exposing (..)
 
 --
@@ -79,7 +81,7 @@ routeDisplayName route model =
       Home -> "Accueil"
       Players -> "Les joueurs"
       Teams -> "Les équipes"
-      CurrentLeague -> model.currentLeague
+      CurrentLeague -> getCurrentLeagueName model.leaguesModel
       OthersLeagues -> "Les autres ligues"
       Configuration -> "Configuration"
       Help -> "Aide"

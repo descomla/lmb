@@ -7,7 +7,8 @@ import Browser exposing (..)
 
 import SessionModel exposing (Session)
 import UserModel exposing (UserProfile, UserProfiles)
-import LeaguesModel exposing (League, Leagues)
+
+import League exposing (League, Leagues)
 import TournamentsModel exposing (Tournament, Tournaments)
 
 import Table exposing (State)
@@ -36,23 +37,25 @@ type Msg
   -- Leagues
   --
   -------------------------------------
-  | LeaguesLoaded (Result Error Leagues)
-  | LeaguesSortChange Table.State
-  | LeaguesFilterChange String
-  | DisplayLeague Int
+  | OnLeaguesLoaded (Result Error Leagues)
+  -- Leagues table events
+  | LeagueSortChange Table.State
+  | LeagueFilterChange String
+  -- Display a league
+  | LeagueDisplay Int
   -- League Form
   | LeagueFormNameChange String
   | LeagueFormKindChange String
   | LeagueFormNbTournamentsChange String
   -- League Creation
-  | OpenLeagueForm Int -- 0 for creation / id for update
-  | ValidateLeagueForm
-  | CancelLeagueForm
-  | OnCreateLeagueResult (Result Error League)
+  | LeagueOpenForm Int -- 0 for creation / id for update
+  | LeagueValidateForm
+  | LeagueCancelForm
+  | LeagueValidateFormResult (Result Error League)
   -- League Deletion
-  | DeleteLeague Int
-  | ConfirmDeleteLeague String
-  | OnDeletedLeagueResult (Result Error League)
+  | LeagueDelete Int
+  | LeagueConfirmDelete String
+  | LeagueDeleteResult (Result Error League)
   ---------------------------------------
   --
   -- Tournaments

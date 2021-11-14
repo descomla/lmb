@@ -5,6 +5,7 @@ import Url exposing (..)
 import Browser exposing (..)
 import Browser.Navigation exposing (..)
 
+import Msg exposing (..)
 import Model exposing (..)
 import Route exposing (..)
 import SessionError exposing (..)
@@ -18,9 +19,10 @@ import LeaguesController exposing (..)
 import TournamentsController exposing (..)
 import UserDecoder exposing (decoderUserProfiles)
 
-import Msg exposing (..)
 import LeaguesPages exposing (..)
+import LeagueType exposing (..)
 import LeaguesModel exposing (..)
+import LeagueFormData exposing (..)
 import UserModel exposing (..)
 
 import LinkToJS exposing (..)
@@ -45,19 +47,19 @@ update msg model =
       let
         r = Debug.log "LinkClicked " urlRequest
       in
-      case urlRequest of
-        Browser.Internal url ->
-          ( model, Browser.Navigation.pushUrl model.key (Url.toString url) )
+        case urlRequest of
+          Browser.Internal url ->
+            ( model, Browser.Navigation.pushUrl model.key (Url.toString url) )
 
-        Browser.External href ->
-          ( model, Browser.Navigation.load href )
+          Browser.External href ->
+            ( model, Browser.Navigation.load href )
     --
     -- Récupération de la ligue courante
     --
     CurrentLeagueLoaded result ->
-      case result of
+      case (Debug.log "CurrentLeagueLoaded " result) of
         Ok league ->
-          ( { model | currentLeague = league.name }, Cmd.none )
+          ( { model | leaguesModel = setCurrentLeague league model.leaguesModel }, Cmd.none )
         Err error ->
           (model, CmdExtra.createCmd (HttpFail error))
     {--
@@ -66,17 +68,17 @@ update msg model =
     --
     --}
     SessionResult result ->
-      updateSession model msg
+      update_session model msg
     LoginChange s ->
-      updateSession model msg
+      update_session model msg
     PasswordChange s ->
-      updateSession model msg
+      update_session model msg
     Login ->
-      updateSession model msg
+      update_session model msg
     OnLoginResult result ->
-      updateSession model msg
+      update_session model msg
     Logout ->
-      updateSession model msg
+      update_session model msg
 
     {--
     --
@@ -93,45 +95,70 @@ update msg model =
     LEAGUES
     --
     --}
-    LeaguesLoaded result ->
-      updateLeagueInModel msg model
-    LeaguesSortChange s ->
-      updateLeagueInModel msg model
-    LeaguesFilterChange s ->
-      updateLeagueInModel msg model
-    LeagueFormNameChange s ->
-      updateLeagueForm msg model
-    LeagueFormKindChange s ->
-      updateLeagueForm msg model
-    LeagueFormNbTournamentsChange s ->
-      updateLeagueForm msg model
-    DisplayLeague i ->
-      ( model, Cmd.none )
-    OpenLeagueForm i ->
-      ( model, Cmd.none )
-    ValidateLeagueForm ->
-      createLeagueInModel model
-    CancelLeagueForm ->
-      ( model, Cmd.none )
-    OnCreateLeagueResult result ->
+
+    -- Récupération de la liste des leagues
+    OnLeaguesLoaded result ->
       case result of
-        Ok league -> -- TODO : nettoyer le formulaire qui a été validé
-          ( { model | route = OthersLeagues }, LeaguesController.requestLeagues)
+        Ok leagues ->
+          ( { model | leaguesModel = (setLeagues leagues model.leaguesModel) }
+            , Cmd.none )
         Err err ->
           ( { model | error = (httpError2String err) }, Cmd.none )
-    DeleteLeague league_id ->
+
+    -- Display the league form
+    LeagueOpenForm i ->
+      update_league_form_data msg model
+    -- League form real-time input update
+    LeagueFormNameChange s ->
+      update_league_form_data msg model
+    -- League form real-time input update
+    LeagueFormKindChange s ->
+      update_league_form_data msg model
+    -- League form real-time input update
+    LeagueFormNbTournamentsChange s ->
+      update_league_form_data msg model
+    -- League form validation request
+    LeagueValidateForm ->
+      update_league_form_data msg model
+    -- League form cancel, error clear & close
+    LeagueCancelForm ->
+      update_league_form_data msg model
+    -- League form validation result & close (if ok)
+    LeagueValidateFormResult result ->
+      update_league_form_data msg model
+
+    -- League table sort change
+    LeagueSortChange s ->
+      ( { model | leaguesModel = setLeaguesSortState s model.leaguesModel }, Cmd.none )
+    -- League table filter change
+    LeagueFilterChange s ->
+      ( { model | leaguesModel = setLeaguesFilter s model.leaguesModel }, Cmd.none )
+
+    -- Display a specific league
+    LeagueDisplay i ->
+    -- TODO set the query for displaying a league
+    -- ( { model  | route = route }, Browser.Navigation.pushUrl model.key (route2URL route) )
+      ( model, Cmd.none )
+
+    -- Ask for league deletion to user
+    LeagueDelete league_id ->
       ( model, LinkToJS.requestDeleteLeagueConfirmation (String.fromInt league_id) )
-    ConfirmDeleteLeague s ->
+    -- League deletion confirmation received from user
+    LeagueConfirmDelete s ->
       case (String.toInt s) of
-        Just league_id ->
-          deleteLeague (league_id) model
         Nothing ->
           ( { model | error = "League_id reçu ("++s++") pour confirmation invalide !" }
             , Cmd.none )
-    OnDeletedLeagueResult result ->
+        Just league_id ->
+          let
+            league = getLeague league_id model.leaguesModel
+            ( m, c ) = LeaguesController.deleteLeague league model.leaguesModel
+          in
+            ( { model | leaguesModel = m }, c )
+    LeagueDeleteResult result ->
       case result of
         Ok _ ->
-          ( model, LeaguesController.requestLeagues )
+          ( clearError model, LeaguesController.retrieveLeagues)
         Err err ->
           ( { model | error = (httpError2String err) }, Cmd.none )
     {--
@@ -140,33 +167,40 @@ update msg model =
 
     --}
     TournamentsLoaded result ->
-      updateLeagueInModel msg model
+      ( model, Cmd.none ) -- TODO
     DisplayTournament i ->
-      ( model, Cmd.none )
+      ( model, Cmd.none )-- TODO
     OpenTournamentForm i ->
-      ( model, Cmd.none )
+      ( model, Cmd.none )-- TODO
     ValidateTournamentForm ->
-      ( model, Cmd.none )
+      ( model, Cmd.none )-- TODO
     CancelTournamentForm ->
-      ( model, Cmd.none )
+      ( model, Cmd.none )-- TODO
     DeleteTournament tournament_id ->
-      ( model
-      , LinkToJS.requestDeleteTournamentConfirmation (String.fromInt tournament_id) )
+      ( model, Cmd.none )-- TODO
+      --( model, LinkToJS.requestDeleteTournamentConfirmation (String.fromInt tournament_id) )
     ConfirmDeleteTournament s ->
-      case (String.toInt s) of
+      ( model, Cmd.none )-- TODO
+{--      case (String.toInt s) of
         Just tournament_id ->
           deleteTournament (tournament_id) model
         Nothing ->
           ( { model | error = "Tournament_id reçu ("++s++") pour confirmation invalide !" }
           , Cmd.none )
+--}
     OnCreateTournamentResult result ->
-      ( model, Cmd.none )
+      ( model, Cmd.none )-- TODO
     OnDeletedTournamentResult result ->
-      case result of
+      ( model, Cmd.none )-- TODO
+{--      case result of
         Ok _ ->
-          ( model, LeaguesController.requestLeagues )
+          let
+            ( m, c ) = LeaguesController.requestLeagues model.leaguesModel
+          in
+            ( { model | leaguesModel = m }, c )
         Err err ->
           ( { model | error = (httpError2String err) }, Cmd.none )
+--}
     {--
 
     GLOBAL HTTP ERROR
@@ -180,8 +214,8 @@ update msg model =
 -- UPDATE SESSION CONTROLLER
 --
 --
-updateSession : Model -> Msg -> (Model, Cmd Msg)
-updateSession model msg =
+update_session : Model -> Msg -> (Model, Cmd Msg)
+update_session model msg =
   let
       session = model.session
       input = model.sessionInput
@@ -209,7 +243,7 @@ updateSession model msg =
       -- Action de connection
       Login ->
         let
-          cmd = requestLogin model.sessionInput
+          cmd = SessionController.requestLogin model.sessionInput
           result = clearSessionError model.sessionInput
         in
           ( { model | sessionInput = result }, cmd )
@@ -239,57 +273,77 @@ updateSession model msg =
       others ->
         ( model, Cmd.none )
 
-createLeagueInModel : Model -> (Model, Cmd Msg)
-createLeagueInModel model =
-  let
-    error = checkLeagueForm model.leaguesModel.leagueForm
-  in
-    if error == "" then
+--
+--
+-- UPDATE LEAGUES FORM CONTROLLER
+--
+--
+update_league_form_data : Msg -> Model -> (Model, Cmd Msg)
+update_league_form_data msg model =
+  case msg of
+    -- Display the league form
+    LeagueOpenForm i ->
       let
-        (lm, cmd) = LeaguesController.create model.leaguesModel
+        league = getLeague i model.leaguesModel
+        formData = fillFromLeague league
       in
-        ( { model | leaguesModel = lm }, cmd )
-    else
-      ( { model | error = error }, Cmd.none )
+        ( { model | leaguesModel = setLeagueFormData formData  model.leaguesModel }, Cmd.none )
+    -- League form real-time input update
+    LeagueFormNameChange s ->
+      if String.isEmpty s then
+        ({ model | error = "Le nom de la ligue ne doit pas être vide !" }, Cmd.none )
+      else
+        let
+          formData = LeagueFormData.setName s model.leaguesModel.leagueForm
+        in
+          ({ model | leaguesModel = (setLeagueFormData formData model.leaguesModel) }, Cmd.none )
+    LeagueFormKindChange s ->
+      case (leagueTypeFromDatabaseString s) of
+        Nothing ->
+          ({ model | error = "Le type de ligue (" ++ s ++ ") est invalide !" }, Cmd.none )
+        Just kind ->
+          let
+            formData = LeagueFormData.setKind kind model.leaguesModel.leagueForm
+          in
+            ({ model | leaguesModel = (setLeagueFormData formData model.leaguesModel) }, Cmd.none )
+    LeagueFormNbTournamentsChange s ->
+      case (String.toInt s) of
+        Nothing ->
+          ({ model | error = "Valeur '" ++ s ++ "' invalide !" }, Cmd.none )
+        Just n ->
+          let
+            formData = LeagueFormData.setNbRanklingTournaments n model.leaguesModel.leagueForm
+          in
+            ({ model | leaguesModel = (setLeagueFormData formData model.leaguesModel) }, Cmd.none )
+    -- League form validation request
+    LeagueValidateForm ->
+          let
+            ( m, c ) = LeaguesController.validateLeagueForm model.leaguesModel.leagueForm  model.leaguesModel
+          in
+        ({ model | leaguesModel = m }, c )
+    -- League form cancel, error clear & close
+    LeagueCancelForm ->
+      ({ model | leaguesModel = clearLeagueFormData model.leaguesModel }, Cmd.none )
+    -- League form validation result & close (if ok)
+    LeagueValidateFormResult result ->
+      case result of
+        Ok league ->
+            ( clearError { model | leaguesModel = clearLeagueFormData model.leaguesModel }, LeaguesController.retrieveLeagues )
+        Err err ->
+          ( { model | error = (httpError2String err) }, Cmd.none )
+    others ->
+      ( model, Cmd.none )
 
-deleteLeague : Int -> Model -> (Model, Cmd Msg)
-deleteLeague league_id model =
-  let
-    (lm, cmd) = LeaguesController.delete league_id model.leaguesModel
-  in
-    ( { model | leaguesModel = lm }, cmd )
-deleteTournament : Int -> Model -> (Model, Cmd Msg)
-deleteTournament tournament_id model =
-  let
-    cmd = TournamentsController.delete tournament_id
-  in
-    ( model, cmd )
+--
+-- Clear error
+--
+clearError : Model -> Model
+clearError model =
+  { model | error = "" }
 
-
-updateLeagueForm : Msg -> Model -> (Model, Cmd Msg)
-updateLeagueForm msg model =
-  let
-    err = checkLeagueFormInput msg
-  in
-    if err == "" then
-      let
-        lf = LeaguesController.updateLeagueFormValue msg model.leaguesModel.leagueForm
-        lm = model.leaguesModel
-        nlm = { lm | leagueForm = lf}
-        nm = { model | leaguesModel = nlm }
-      in
-      ( { nm | error = "" }, Cmd.none)
-    else
-      ( { model | error = err }, Cmd.none )
-
-updateLeagueInModel : Msg -> Model -> (Model, Cmd Msg)
-updateLeagueInModel msg model =
-  let
-    (lmodel, cmd) = LeaguesController.update msg model.leaguesModel
-  in
-    ( { model | leaguesModel = lmodel }, cmd )
-
-
+--
+-- Http Error conversion to displayed error string
+--
 httpError2String : Http.Error -> String
 httpError2String error =
   case error of

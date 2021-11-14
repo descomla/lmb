@@ -17,7 +17,7 @@ import Route exposing (..)
 import Actions exposing (..)
 
 import SessionController exposing (..)
-import LeaguesDecoder exposing (decoderLeague)
+import LeaguesController exposing (..)
 
 import Addresses exposing (..)
 
@@ -41,7 +41,7 @@ subscriptions model =
     --Sub.none
     Sub.batch
         [ Time.every 1000 TickTime
-        , LinkToJS.confirmDeleteLeague ConfirmDeleteLeague
+        , LinkToJS.confirmDeleteLeague LeagueConfirmDelete
         , LinkToJS.confirmDeleteTournament ConfirmDeleteTournament
           --, WebSocket.listen (model.modelURL) (NewSimuState << Json.Decode.decodeString Decoders.timerResponseDecode)--, LinkToJS.scenarioSelected ScenarioSelected
         ]
@@ -52,9 +52,7 @@ init flags url key =
   ( initModel url key
     , Cmd.batch
       [ Task.perform AdjustZone Time.here
-      , Http.get
-        { url = databaseCurrentLeagueUrl
-        , expect = Http.expectJson CurrentLeagueLoaded decoderLeague
-        }
+      , LeaguesController.retrieveLeagues
+      , LeaguesController.retrieveCurrentLeague
       ]
   )

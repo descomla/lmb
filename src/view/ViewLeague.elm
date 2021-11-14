@@ -7,19 +7,21 @@ import Html.Lazy exposing (lazy, lazy2)
 
 import Table exposing (..)
 import TableActionButtons exposing (..)
+
 import Toolbar exposing (..)
 
 import Msg exposing (..)
 import Model exposing (..)
 import Route exposing (..)
 
-import LeaguesPages exposing (..)
-import TournamentsModel exposing (..)
-
 import UserRights exposing (..)
 
-import LeaguesModel exposing (..)
+import League exposing (League)
 import LeagueType exposing (..)
+import LeaguesPages exposing (..)
+import LeaguesModel exposing (LeaguesModel, getLeague, getCurrentLeague)
+
+import TournamentsModel exposing (Tournament, Tournaments)
 
 -- debugString : LeaguesModel -> String
 -- debugString model =
@@ -63,8 +65,7 @@ viewLeagueDisplay rights league isCurrentLeague =
         [ div [ class "soustitre" ][ text "Tournois" ] -- Sous-titre
         , br [][]
         , div [ id "tournois.liste", class "texte" ]
-          [ -- Debug -- text ("Nb Tournaments = " ++ (toString (List.length currentLeague.tournaments)))]
-          lazy2 viewTournamentTable rights league.tournaments ]
+          [ ]--lazy2 viewTournamentTable rights league.tournaments ]
         ]
       , br [][]
       , lazy2 viewToolbar rights [ toolbarButtonCreateTournament league.id  ] -- Create tournament action button
@@ -73,8 +74,7 @@ viewLeagueDisplay rights league isCurrentLeague =
         [ div [ class "soustitre" ][ text "Classement" ] -- Sous-titre
         , br [][]
         , div [ id "classement", class "texte" ]
-          [ -- Debug -- text "Classement = "
-          lazy viewClassementTable league ]
+          [ ]--lazy viewClassementTable league ]
         ]
       , br [][]
       , if isCurrentLeague then
@@ -97,7 +97,7 @@ toolbarButtonModifyLeague : Int -> ToolbarButton
 toolbarButtonModifyLeague league_id =
   { buttonId = "ligue.modifie.ligue"
   , labelId = "modifyLeagueButton"
-  , msg = OpenLeagueForm league_id
+  , msg = LeagueOpenForm league_id
   , caption = "Modification de la ligue"
   , minimalRights = Director
   }
@@ -106,7 +106,7 @@ toolbarButtonCreateLeague : ToolbarButton
 toolbarButtonCreateLeague =
   { buttonId = "ligue.creation.ligue"
   , labelId = "createLeagueButton"
-  , msg = OpenLeagueForm 0
+  , msg = LeagueOpenForm 0
   , caption = "Création d'une nouvelle ligue"
   , minimalRights = Director
   }
@@ -175,8 +175,8 @@ tournamentImgActionList rights name toInt =
 tournamentActionsDetails : UserRights -> Int -> HtmlDetails Msg
 tournamentActionsDetails rights i =
   renderActionButtons rights
-    [ actionButton "EditTournament" (DisplayTournament i) "img/validate.png" Visitor
-    , actionButton "DeleteTournament" (DeleteTournament i) "img/delete.png" Director
+    [ actionButton "EditTournament" (DisplayTournament i) "img/arrow-left-16x16.png" Visitor
+    , actionButton "DeleteTournament" (DeleteTournament i) "img/delete-16x16.png" Director
     ]
 
 {--
@@ -228,7 +228,7 @@ viewLeaguesList rights model =
             , maxlength 255
             , size 8
             , style "min-width" "300px"
-            , onInput LeaguesFilterChange
+            , onInput LeagueFilterChange
             , type_ "text"
             , placeholder "nom de la ligue"
           ] []
@@ -260,7 +260,7 @@ leagueTableConfig : UserRights -> Table.Config League Msg
 leagueTableConfig rights =
   Table.customConfig
   { toId = .name
-  , toMsg = LeaguesSortChange
+  , toMsg = LeagueSortChange
   , columns =
     [ Table.dataToStringColumn "NOM DE LA LIGUE" leagueNameToHtmlDetails .name
     , Table.dataToStringColumn "TYPE DE LIGUE" leagueTypeToHtmlDetails leagueToLeagueTypeString
@@ -332,8 +332,8 @@ leagueImgActionList rights name toInt =
 leagueActionsDetails : UserRights -> Int -> HtmlDetails Msg
 leagueActionsDetails rights i =
   renderActionButtons rights
-    [ actionButton "EditLeague" (DisplayLeague i) "img/validate.png" Visitor
-    , actionButton "DeleteLeague" (DeleteLeague i) "img/delete.png" Director
+    [ actionButton "EditLeague" (LeagueDisplay i) "img/arrow-left-16x16.png" Visitor
+    , actionButton "DeleteLeague" (LeagueDelete i) "img/delete-16x16.png" Director
     ]
 
 {--
@@ -379,13 +379,13 @@ viewLeagueForm model =
       , br [][]
       , div
         [ class "champ_a_cliquer"
-        , onClick ValidateLeagueForm
+        , onClick LeagueValidateForm
         , style "cursor" "pointer"
         ]
         [ text "Créer la ligue"]
       , div
         [ class "champ_a_cliquer"
-        , onClick CancelLeagueForm
+        , onClick LeagueCancelForm
         , style "cursor" "pointer"
         ]
         [ text "Annuler" ]

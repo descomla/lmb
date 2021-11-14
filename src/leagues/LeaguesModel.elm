@@ -1,77 +1,58 @@
-module LeaguesModel
-  exposing
-    (LeaguesModel, defaultLeaguesModel, League, Leagues, defaultLeague, LeagueForm, defaultLeagueForm, fillForm, getCurrentLeague, getLeague)
+module LeaguesModel exposing (LeaguesModel, defaultLeaguesModel
+  , getCurrentLeague, getCurrentLeagueName, setCurrentLeague
+  , getLeague, setLeagues
+  , setLeagueFormData, clearLeagueFormData
+  , setLeaguesSortState, setLeaguesFilter )
 
 import Table exposing (State)
 
-import LeagueType exposing (..)
-import TournamentsModel exposing (..)
+import League exposing (League, Leagues, compareLeagueId, defaultLeague)
+import LeagueFormData exposing (LeagueFormData, defaultLeagueFormData)
 
+--
+-- Leagues Model
+--
 type alias LeaguesModel =
   { sortState : Table.State -- table current sort
   , leagueFilter : String -- search text by name
+  , leagueForm : LeagueFormData
+  , currentLeague_id : Int
   , leagues : Leagues
-  , currentLeague : League
-  , leagueForm : LeagueForm
   }
 
 defaultLeaguesModel : LeaguesModel
 defaultLeaguesModel =
   { sortState = Table.initialSort "name"
   , leagueFilter = ""
+  , leagueForm = defaultLeagueFormData
+  , currentLeague_id = 0
   , leagues = []
-  , currentLeague = defaultLeague
-  , leagueForm = defaultLeagueForm }
-
---
--- League
---
-type alias League =
-  { id : Int
-  , name : String
-  , kind : LeagueType
-  , nbRankingTournaments: Int
-  , tournaments : Tournaments
   }
 
-type alias Leagues = List League
-
-defaultLeague : League
-defaultLeague =
-  { id = 0
-  , name = ""
-  , kind = SingleEvent
-  , nbRankingTournaments = 0
-  , tournaments = []
-  }
-
-type alias LeagueForm =
-  { id : Int
-  , name : String
-  , kind : Maybe LeagueType
-  , nbRankingTournaments : Int }
-
-defaultLeagueForm : LeagueForm
-defaultLeagueForm =
-  { id = 0
-  , name = ""
-  , kind = Nothing
-  , nbRankingTournaments = 0 }
-
-fillForm : League -> LeagueForm
-fillForm league =
-  { id = league.id
-  , name = league.name
-  , kind = Just league.kind
-  , nbRankingTournaments = league.nbRankingTournaments
-  }
-
-  -- get the current league data
+-- get the current league
 getCurrentLeague : LeaguesModel -> League
 getCurrentLeague model =
-  getLeague model.currentLeague.id model
+  getLeague model.currentLeague_id model
 
-  -- get the current league data
+-- get the current league name
+getCurrentLeagueName : LeaguesModel -> String
+getCurrentLeagueName model =
+  let
+    league = getCurrentLeague model
+  in
+    league.name
+
+-- set the current league
+setCurrentLeague : League -> LeaguesModel -> LeaguesModel
+setCurrentLeague league model =
+  { model | currentLeague_id = league.id }
+
+-- set the current league
+setLeagues : Leagues -> LeaguesModel -> LeaguesModel
+setLeagues l model =
+  { model | leagues = l }
+
+-- get the current league data
 getLeague : Int -> LeaguesModel -> League
 getLeague league_id model =
   let
@@ -84,7 +65,23 @@ getLeague league_id model =
     else
       Maybe.withDefault defaultLeague (List.head temp)
 
-  -- compare current league id with others leagues ids
-compareLeagueId : Int -> League -> Bool
-compareLeagueId i league =
-  i == league.id
+-- update the league form data
+setLeagueFormData : LeagueFormData -> LeaguesModel -> LeaguesModel
+setLeagueFormData data model =
+  { model | leagueForm = data }
+
+-- Toggle show/hide form
+clearLeagueFormData : LeaguesModel -> LeaguesModel
+clearLeagueFormData model =
+  { model | leagueForm = defaultLeagueFormData }
+
+
+-- update the league table sorting state
+setLeaguesSortState : Table.State -> LeaguesModel -> LeaguesModel
+setLeaguesSortState state model =
+  { model | sortState = state }
+
+-- update the league table filter
+setLeaguesFilter : String -> LeaguesModel -> LeaguesModel
+setLeaguesFilter s model =
+  { model | leagueFilter = s }

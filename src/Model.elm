@@ -16,7 +16,6 @@ type alias Model =
   , zone : Time.Zone
   , time : Time.Posix
   , session : Session
-  , currentLeague : String
   , sessionInput : SessionInput
   , leaguesModel : LeaguesModel
   , error : String
@@ -29,7 +28,6 @@ initModel url key =
     , zone = Time.utc
     , time = (Time.millisToPosix 0)
     , session = defaultSession
-    , currentLeague = ""
     , sessionInput = defaultSessionInput
     , leaguesModel = defaultLeaguesModel
     , error = ""
