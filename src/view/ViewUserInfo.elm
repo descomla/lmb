@@ -6,7 +6,7 @@ import Html.Events exposing (..)
 
 import Msg exposing (..)
 
-import SessionModel exposing (..)
+import Session exposing (..)
 import SessionInput exposing (..)
 import SessionError exposing (..)
 
@@ -36,13 +36,14 @@ viewLoginForm input =
 viewConnectedUser : Session -> Html Msg
 viewConnectedUser session =
   Html.div [ class "menuLogin" ]
-    [ text "Connecté en tant que "
-    , label
-      [ class "messageInfo" ]
-      [ text (session.firstName  ++ " " ++ session.lastName ++ " (" ++ session.login ++ ") ") ]
-    , label
-      [ id "loginButton", onClick Logout ]
-      [ text "Se déconnecter"]
+  [ Html.table []
+    [ Html.tr []
+      [ Html.td [][ Html.label [][ text "Connecté en tant que " ] ]
+      , Html.td [][ Html.label [ class "messageInfo" ]
+        [ text (session.firstName  ++ " " ++ session.lastName ++ " (" ++ session.login ++ ") ") ] ]
+      , Html.td [][ Html.label [ id "loginButton", onClick Logout ][ text "Se déconnecter"] ]
+      ]
+    ]
   ]
 
 errorToString : SessionError -> String

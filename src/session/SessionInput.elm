@@ -14,3 +14,8 @@ defaultSessionInput =
   , password = ""
   , error = NoError
   }
+
+-- clear session error
+clearSessionError : SessionInput -> SessionInput
+clearSessionError input =
+   { input | error = NoError }

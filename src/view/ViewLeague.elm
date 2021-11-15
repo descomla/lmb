@@ -57,9 +57,8 @@ viewCurrentLeagueDefault rights model =
 
 viewLeagueDisplay : UserRights -> League -> Bool -> Html Msg
 viewLeagueDisplay rights league isCurrentLeague =
-  div [ class "corps" ]
-    [ div [ class "fullWidth" ]
-      [ div [ class "titre" ] [ text league.name ] ] -- Titre
+  div [ class "fullWidth" ]
+    [ div [ class "titre" ] [ text league.name ] -- Titre
     , div [ class "fullWidth" ] -- Content
       [ div [ class "texte "]
         [ div [ class "soustitre" ][ text "Tournois" ] -- Sous-titre

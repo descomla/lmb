@@ -16,10 +16,7 @@ import View exposing (..)
 import Route exposing (..)
 import Actions exposing (..)
 
-import SessionController exposing (..)
-import LeaguesController exposing (..)
-
-import Addresses exposing (..)
+import DatabaseRequests exposing (retrieveLeagues, retrieveCurrentLeague)
 
 import LinkToJS exposing (..)
 
@@ -52,7 +49,7 @@ init flags url key =
   ( initModel url key
     , Cmd.batch
       [ Task.perform AdjustZone Time.here
-      , LeaguesController.retrieveLeagues
-      , LeaguesController.retrieveCurrentLeague
+      , DatabaseRequests.retrieveLeagues
+      , DatabaseRequests.retrieveCurrentLeague
       ]
   )

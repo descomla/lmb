@@ -1,6 +1,8 @@
-module SessionModel exposing (Session, newSession, defaultSession, isSessionConnected)
+module Session exposing (Session, newSession, defaultSession, isSessionConnected,
+  clearSession, updateSessionUser)
 
 import UserRights exposing (..)
+import UserModel exposing (UserProfile)
 
 type alias Session =
   { sessionId : String
@@ -34,3 +36,18 @@ isSessionConnected session =
       False
     else
       True
+
+-- Clear session user
+clearSession : Session -> Session
+clearSession session =
+  { defaultSession | sessionId = session.sessionId }
+
+-- Update session user
+updateSessionUser : Session -> UserProfile -> Session
+updateSessionUser session profile =
+  { sessionId = session.sessionId
+  , login = profile.login
+  , rights = profile.rights
+  , firstName = profile.firstName
+  , lastName = profile.lastName
+  }

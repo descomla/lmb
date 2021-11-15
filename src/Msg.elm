@@ -5,7 +5,7 @@ import Url exposing (..)
 import Time exposing (..)
 import Browser exposing (..)
 
-import SessionModel exposing (Session)
+import Session exposing (Session)
 import UserModel exposing (UserProfile, UserProfiles)
 
 import League exposing (League, Leagues)
@@ -14,9 +14,14 @@ import TournamentsModel exposing (Tournament, Tournaments)
 import Table exposing (State)
 import Route exposing (Route)
 
+type RequestErrorType
+  = InvalidLeagueType
+  | HttpFail Error
+
+
 type Msg
   = NoOp
-  | HttpFail Error
+  | DatabaseRequestResult RequestErrorType
   -- Init
   | AdjustZone Time.Zone
   | TickTime Time.Posix

@@ -12,7 +12,6 @@ import Time exposing (..)
 
 import LeaguesPages exposing (..)
 
-import ViewCommon exposing (..)
 import ViewUserInfo exposing (viewUserInfo)
 import ViewLeague exposing (viewCurrentLeague, viewOthersLeagues)
 import ViewNavigation exposing (viewNavigation)
@@ -26,15 +25,18 @@ import ViewError exposing (viewError)
 view : Model -> Document Msg
 view model =
     { title = "Ligue de Monobasket"
-    , body = [ div []
-        [ lazy ViewNavigation.viewNavigation model
-        , lazy2 ViewUserInfo.viewUserInfo model.session model.sessionInput
-        , lazy ViewError.viewError model
-        , lazy ViewCommon.viewContainer (viewContent model)
-        , infoFooter model
-        ]
+    , body =
+      [ lazy ViewNavigation.viewNavigation model
+      , lazy2 ViewUserInfo.viewUserInfo model.session model.sessionInput
+      , lazy ViewError.viewError model
+      , lazy viewContainer (viewContent model)
+      , infoFooter model
       ]
     }
+
+viewContainer : Html Msg -> Html Msg
+viewContainer content =
+    div [ id "div-container" ] [ content ]
 
 viewContent : Model -> Html Msg
 viewContent model =

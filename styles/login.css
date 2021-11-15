@@ -1,0 +1,29 @@
+#loginButton
+{
+		background-color: #C6D8E5;
+		font-size: 0.8em;
+	  font-variant: small-caps;
+		font-family: Verdana,Helvetica,Arial,sans-serif;
+		text-decoration: none;
+	  color : #333333;
+		padding: 5px 5px 5px 5px;
+}
+#loginButton:hover
+{
+	color : #FFA500;
+	cursor : pointer;
+}
+
+.menuLogin
+{
+  padding: 5px 5px 15px 0px;
+  margin: auto auto;
+
+	vertical-align: middle;
+	font-size: 0.8em;
+}
+
+.menuLogin table, .menuLogin tr, .menuLogin td
+{
+	height:20px;
+}

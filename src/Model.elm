@@ -1,11 +1,11 @@
-module Model exposing (Model, initModel)
+module Model exposing (Model, initModel, clearError)
 
 import Browser.Navigation exposing (..)
 import Url exposing (..)
 import Time exposing (Posix, Zone)
 
 import Route exposing (..)
-import SessionModel exposing (Session, defaultSession)
+import Session exposing (Session, defaultSession)
 import SessionInput exposing (..)
 import LeaguesModel exposing (LeaguesModel, defaultLeaguesModel)
 
@@ -32,3 +32,10 @@ initModel url key =
     , leaguesModel = defaultLeaguesModel
     , error = ""
   }
+
+--
+-- Clear error
+--
+clearError : Model -> Model
+clearError model =
+  { model | error = "" }

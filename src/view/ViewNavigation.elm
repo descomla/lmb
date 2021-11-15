@@ -53,26 +53,35 @@ viewNavigation model =
         [Home, Players, Teams, CurrentLeague, OthersLeagues, Configuration, Help]
   in
     nav [ id "nav-toolbar" ]
-      [ div [ class "navigation" ]
-        [ Html.table []
-          [ Html.tr [] (List.map (\a -> navigationItem a model ) routes)
-          ]
-        ]
-      ]
+      (List.map (\a -> navigationItem a model ) routes)
+--      [ div [ class "navigation" ]
+--        [ Html.table []
+--          [ Html.tr [] (List.map (\a -> navigationItem a model ) routes)
+--          ]
+--        ]
+--      ]
 
 -- Navigaton item TD
 navigationItem : Route -> Model -> Html Msg
 navigationItem route model =
-  Html.td [class (navigationTdClass model.route route)]
-    [ div [ onClickPreventDefault (RouteChanged route) ]
-      [ div [ style "text-align" "center" ]
-        [ img [ src ("img/" ++ (route2img route)) ][] ]
-      , text (routeDisplayName route model)
-      --a
-        --[ href (route2URL route), onClickPreventDefault (UrlChange route) ]
-        --[ text (routeDisplayName route model) ]
+--  Html.td [class (navigationItemClass model.route route)]
+    div
+      [ class (navigationItemClass model.route route)
+      , onClickPreventDefault (RouteChanged route)
       ]
-    ]
+      [ div []
+        [ img [ src ("img/" ++ (route2img route)) ][]
+        , text (routeDisplayName route model)
+        ]
+      ]
+
+-- Choose selected or not selected item display class
+navigationItemClass : Route -> Route -> String
+navigationItemClass selected expected =
+  if selected == expected then
+    "nav-toolbar-item-selected"
+  else
+    "nav-toolbar-item-not-selected"
 
 -- Navigaton item display name from Route
 routeDisplayName : Route -> Model -> String
@@ -93,15 +102,7 @@ route2img route =
       Home -> "home-32x32.png"
       Players -> "players-32x32.png"
       Teams -> "team-32x32.png"
-      CurrentLeague -> "progress-icon-32x32.png"
-      OthersLeagues -> "database-worldwide-32x32.png"
+      CurrentLeague -> "Logo-lmb-32x32.png"
+      OthersLeagues -> "folder-32x32.png"
       Configuration -> "gears-32x32.png"
       Help -> "icon-help-32x32.png"
-
--- Choose selected or not selected item display class
-navigationTdClass : Route -> Route -> String
-navigationTdClass selected expected =
-  if (debugViewNav "navTDclass selected = " selected) == (debugViewNav "navTDclass expected = " expected) then
-    (debugViewNav "navTDclass result =" "navigation-selected")
-  else
-    (debugViewNav "navTDclass result =" "navigation-not-selected")

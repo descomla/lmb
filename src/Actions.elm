@@ -6,16 +6,16 @@ import Browser exposing (..)
 import Browser.Navigation exposing (..)
 
 import Msg exposing (..)
-import Model exposing (..)
+import Model exposing (Model, clearError)
 import Route exposing (..)
+import Session exposing (updateSessionUser, clearSession)
+import SessionInput exposing (clearSessionError)
 import SessionError exposing (..)
 
-import Addresses exposing (..)
+import DatabaseRequests exposing (..)
 
 import CmdExtra exposing (createCmd)
 
-import SessionController exposing (..)
-import LeaguesController exposing (..)
 import TournamentsController exposing (..)
 import UserDecoder exposing (decoderUserProfiles)
 
@@ -61,7 +61,7 @@ update msg model =
         Ok league ->
           ( { model | leaguesModel = setCurrentLeague league model.leaguesModel }, Cmd.none )
         Err error ->
-          (model, CmdExtra.createCmd (HttpFail error))
+          (model, CmdExtra.createCmd (DatabaseRequestResult (HttpFail error)))
     {--
     --
     -- SESSION
@@ -103,7 +103,7 @@ update msg model =
           ( { model | leaguesModel = (setLeagues leagues model.leaguesModel) }
             , Cmd.none )
         Err err ->
-          ( { model | error = (httpError2String err) }, Cmd.none )
+          (model, CmdExtra.createCmd (DatabaseRequestResult (HttpFail err)))
 
     -- Display the league form
     LeagueOpenForm i ->
@@ -152,15 +152,14 @@ update msg model =
         Just league_id ->
           let
             league = getLeague league_id model.leaguesModel
-            ( m, c ) = LeaguesController.deleteLeague league model.leaguesModel
           in
-            ( { model | leaguesModel = m }, c )
+            ( model, DatabaseRequests.deleteLeague league )
     LeagueDeleteResult result ->
       case result of
         Ok _ ->
-          ( clearError model, LeaguesController.retrieveLeagues)
+          ( clearError model, DatabaseRequests.retrieveLeagues)
         Err err ->
-          ( { model | error = (httpError2String err) }, Cmd.none )
+          (model, CmdExtra.createCmd (DatabaseRequestResult (HttpFail err)))
     {--
 
     TOURNAMENTS
@@ -206,8 +205,12 @@ update msg model =
     GLOBAL HTTP ERROR
 
     --}
-    HttpFail err ->
-        ( { model | error = httpError2String err }, Cmd.none)
+    DatabaseRequestResult result ->
+      case result of
+        InvalidLeagueType ->
+          ( { model | error = "Type de league invalide!!" }, Cmd.none)
+        HttpFail err ->
+          ( { model | error = httpError2String err }, Cmd.none)
 
 --
 --
@@ -227,7 +230,7 @@ update_session model msg =
           Ok s ->
             ( { model | session = s }, Cmd.none )
           Err error ->
-            (model, CmdExtra.createCmd (HttpFail error))
+            (model, CmdExtra.createCmd (DatabaseRequestResult (HttpFail error)))
       -- Login input changed by user
       LoginChange s ->
         let
@@ -242,11 +245,8 @@ update_session model msg =
           ( { model | sessionInput = result }, Cmd.none )
       -- Action de connection
       Login ->
-        let
-          cmd = SessionController.requestLogin model.sessionInput
-          result = clearSessionError model.sessionInput
-        in
-          ( { model | sessionInput = result }, cmd )
+          ( { model | sessionInput = clearSessionError model.sessionInput },
+            DatabaseRequests.requestLogin model.sessionInput )
       -- Réponse du serveur sur demande de connection
       OnLoginResult result ->
         case result of
@@ -262,10 +262,7 @@ update_session model msg =
               in -- update model & clear Error
                 ( { model | session = r }, Cmd.none )
           Err error -> --> connection error
-              let
-                r = { input | error = (HttpError (httpError2String error)) }
-              in -- update model for error display
-                ( { model | sessionInput = r }, CmdExtra.createCmd (HttpFail error))
+            ( model, CmdExtra.createCmd (DatabaseRequestResult (HttpFail error)))
       -- Action de déconnection
       Logout ->
           ( { model | session = (clearSession model.session) }, Cmd.none )
@@ -317,10 +314,7 @@ update_league_form_data msg model =
             ({ model | leaguesModel = (setLeagueFormData formData model.leaguesModel) }, Cmd.none )
     -- League form validation request
     LeagueValidateForm ->
-          let
-            ( m, c ) = LeaguesController.validateLeagueForm model.leaguesModel.leagueForm  model.leaguesModel
-          in
-        ({ model | leaguesModel = m }, c )
+      ( model, DatabaseRequests.validateLeagueForm model.leaguesModel.leagueForm  model.leaguesModel.leagues )
     -- League form cancel, error clear & close
     LeagueCancelForm ->
       ({ model | leaguesModel = clearLeagueFormData model.leaguesModel }, Cmd.none )
@@ -328,18 +322,12 @@ update_league_form_data msg model =
     LeagueValidateFormResult result ->
       case result of
         Ok league ->
-            ( clearError { model | leaguesModel = clearLeagueFormData model.leaguesModel }, LeaguesController.retrieveLeagues )
+            ( clearError { model | leaguesModel = clearLeagueFormData model.leaguesModel },
+              DatabaseRequests.retrieveLeagues )
         Err err ->
           ( { model | error = (httpError2String err) }, Cmd.none )
     others ->
       ( model, Cmd.none )
-
---
--- Clear error
---
-clearError : Model -> Model
-clearError model =
-  { model | error = "" }
 
 --
 -- Http Error conversion to displayed error string
