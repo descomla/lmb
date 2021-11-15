@@ -8,4 +8,8 @@ import Msg exposing (..)
 
 viewError : Model -> Html Msg
 viewError model =
-  div [ class "messageErreur" ] [ label [ id "messageErreur" ][ text model.error ] ]
+  if String.isEmpty model.error then
+    div [ style "height" "0px" ] []
+  else
+    div [ class "messageErreur" ]
+      [ label [ id "messageErreur" ] [ text model.error ] ]

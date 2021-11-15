@@ -20,7 +20,6 @@ import LeaguesDecoder exposing (decoderLeague, decoderLeagues)
 import Session exposing (Session, newSession, defaultSession)
 import SessionInput exposing (SessionInput)
 import SessionDecoder exposing (decoderSession, encoderSession)
-import SessionError exposing (..)
 
 import UserModel exposing (..)
 import UserDecoder exposing (decoderUserProfiles)

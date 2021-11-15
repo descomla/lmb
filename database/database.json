@@ -95,7 +95,10 @@
       "id": 9,
       "name": "LMB 2017-2018",
       "kind": "LeagueWithRanking",
-      "nbRankingTournaments": 5
+      "nbRankingTournaments": 5,
+      "tournaments": [
+        1, 2, 3
+      ]
     },
     {
       "id": 10,

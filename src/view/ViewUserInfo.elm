@@ -8,7 +8,6 @@ import Msg exposing (..)
 
 import Session exposing (..)
 import SessionInput exposing (..)
-import SessionError exposing (..)
 
 -- User info display
 viewUserInfo : Session -> SessionInput -> Html Msg
@@ -27,8 +26,7 @@ viewLoginForm input =
       , Html.td [][ Html.input [ type_ "text", id "login", onInput LoginChange, placeholder "login", value input.login ][] ]
       , Html.td [][ Html.label [][ text "Mot de passe:" ] ]
       , Html.td [][ Html.input [ type_ "password", id "password", onInput PasswordChange, placeholder "password", value input.password ][] ]
-      , Html.td [][ Html.label [ id "loginButton", onClick Login ][ text "Se connecter"] ]
-      , Html.td [ class "messageErreur" ][ text (errorToString input.error) ]
+      , Html.td [][ Html.div [ id "loginButton", onClick Login ][ img [ src "img/arrow-left-16x16.png" ][] ] ]-- [ text "Se connecter"] ]
       ]
     ]
   ]
@@ -41,31 +39,7 @@ viewConnectedUser session =
       [ Html.td [][ Html.label [][ text "Connecté en tant que " ] ]
       , Html.td [][ Html.label [ class "messageInfo" ]
         [ text (session.firstName  ++ " " ++ session.lastName ++ " (" ++ session.login ++ ") ") ] ]
-      , Html.td [][ Html.label [ id "loginButton", onClick Logout ][ text "Se déconnecter"] ]
+      , Html.td [][ Html.div [ id "loginButton", onClick Logout ][ img [ src "img/Logout-16x16.png" ][] ] ]-- [ text "Se déconnecter"] ]
       ]
     ]
   ]
-
-errorToString : SessionError -> String
-errorToString err =
-  case err of
-    NoError ->
-      ""
-    ProfileNotFound ->
-      "Profile utilisateur inconnu."
-    WrongLoginOrPassword ->
-      "Login ou Mot de passe erroné."
-{--
-    ExistingLogin ->
-      "L'utilisateur existe déjà."
-    IncorrectLogin ->
-      "Le nom d'utilisateur ne respecte pas les règles."
-    IncorrectPassword ->
-      "Le mot de passe ne respecte par les règles."
-    EmptyFirstName ->
-      "Prénom vide."
-    EmptyLastName ->
-      "Nom de famille vide."
---}
-    HttpError error ->
-      "Http error : " ++ error

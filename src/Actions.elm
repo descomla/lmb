@@ -9,8 +9,7 @@ import Msg exposing (..)
 import Model exposing (Model, clearError)
 import Route exposing (..)
 import Session exposing (updateSessionUser, clearSession)
-import SessionInput exposing (clearSessionError)
-import SessionError exposing (..)
+import SessionInput exposing (clearPassword)
 
 import DatabaseRequests exposing (..)
 
@@ -40,9 +39,9 @@ update msg model =
     -- Récupération de l'URL
     --
     RouteChanged route ->
-      ( { model  | route = route }, Browser.Navigation.pushUrl model.key (route2URL route) )
+      ( clearError { model  | route = route }, Browser.Navigation.pushUrl model.key (route2URL route) )
     UrlChanged url ->
-      ( { model  | route = parseURL url }, Cmd.none )
+      ( clearError { model  | route = parseURL url }, Cmd.none )
     LinkClicked urlRequest ->
       let
         r = Debug.log "LinkClicked " urlRequest
@@ -59,7 +58,7 @@ update msg model =
     CurrentLeagueLoaded result ->
       case (Debug.log "CurrentLeagueLoaded " result) of
         Ok league ->
-          ( { model | leaguesModel = setCurrentLeague league model.leaguesModel }, Cmd.none )
+          ( clearError { model | leaguesModel = setCurrentLeague league model.leaguesModel }, Cmd.none )
         Err error ->
           (model, CmdExtra.createCmd (DatabaseRequestResult (HttpFail error)))
     {--
@@ -88,7 +87,7 @@ update msg model =
 
     -- Récupération de la liste des profiles
     OnProfilesLoaded result ->
-      ( model, Cmd.none ) --updateUserModel msg model
+      ( clearError model, Cmd.none ) --updateUserModel msg model
 
     {--
     --
@@ -100,10 +99,10 @@ update msg model =
     OnLeaguesLoaded result ->
       case result of
         Ok leagues ->
-          ( { model | leaguesModel = (setLeagues leagues model.leaguesModel) }
+          ( clearError { model | leaguesModel = (setLeagues leagues model.leaguesModel) }
             , Cmd.none )
         Err err ->
-          (model, CmdExtra.createCmd (DatabaseRequestResult (HttpFail err)))
+          ( model, CmdExtra.createCmd (DatabaseRequestResult (HttpFail err)))
 
     -- Display the league form
     LeagueOpenForm i ->
@@ -129,16 +128,16 @@ update msg model =
 
     -- League table sort change
     LeagueSortChange s ->
-      ( { model | leaguesModel = setLeaguesSortState s model.leaguesModel }, Cmd.none )
+      ( clearError { model | leaguesModel = setLeaguesSortState s model.leaguesModel }, Cmd.none )
     -- League table filter change
     LeagueFilterChange s ->
-      ( { model | leaguesModel = setLeaguesFilter s model.leaguesModel }, Cmd.none )
+      ( clearError { model | leaguesModel = setLeaguesFilter s model.leaguesModel }, Cmd.none )
 
     -- Display a specific league
     LeagueDisplay i ->
     -- TODO set the query for displaying a league
     -- ( { model  | route = route }, Browser.Navigation.pushUrl model.key (route2URL route) )
-      ( model, Cmd.none )
+      ( clearError model, Cmd.none )
 
     -- Ask for league deletion to user
     LeagueDelete league_id ->
@@ -153,13 +152,13 @@ update msg model =
           let
             league = getLeague league_id model.leaguesModel
           in
-            ( model, DatabaseRequests.deleteLeague league )
+            ( clearError model, DatabaseRequests.deleteLeague league )
     LeagueDeleteResult result ->
       case result of
         Ok _ ->
           ( clearError model, DatabaseRequests.retrieveLeagues)
         Err err ->
-          (model, CmdExtra.createCmd (DatabaseRequestResult (HttpFail err)))
+          ( model, CmdExtra.createCmd (DatabaseRequestResult (HttpFail err)))
     {--
 
     TOURNAMENTS
@@ -230,42 +229,41 @@ update_session model msg =
           Ok s ->
             ( { model | session = s }, Cmd.none )
           Err error ->
-            (model, CmdExtra.createCmd (DatabaseRequestResult (HttpFail error)))
+            ( clearError model, CmdExtra.createCmd (DatabaseRequestResult (HttpFail error)) )
       -- Login input changed by user
       LoginChange s ->
         let
             result = { input | login = s }
         in
-          ( { model | sessionInput = result }, Cmd.none )
+          ( clearError { model | sessionInput = result }, Cmd.none )
       -- Password input changed by user
       PasswordChange s ->
         let
             result = { input | password = s }
         in
-          ( { model | sessionInput = result }, Cmd.none )
+          ( clearError{ model | sessionInput = result }, Cmd.none )
       -- Action de connection
       Login ->
-          ( { model | sessionInput = clearSessionError model.sessionInput },
+          ( { model | sessionInput = clearPassword model.sessionInput },
             DatabaseRequests.requestLogin model.sessionInput )
       -- Réponse du serveur sur demande de connection
       OnLoginResult result ->
         case result of
           Ok userList -> -- the list must contain only one user
             if List.isEmpty userList then
-              let --> if empty => it is a login or password error
-                r = { input | error = WrongLoginOrPassword }
-              in -- update model for error display
-                ( { model | sessionInput = r }, Cmd.none )
+              --> if empty => it is a login or password error
+              -- update model for error display
+              ( { model | error = "Login ou Mot de passe erroné." }, Cmd.none )
             else
               let --> if not empty =we assume there is only one (the head) > clear error
                 r = updateSessionUser session (Maybe.withDefault defaultUserProfile (List.head userList))
               in -- update model & clear Error
-                ( { model | session = r }, Cmd.none )
+                ( clearError { model | session = r }, Cmd.none )
           Err error -> --> connection error
             ( model, CmdExtra.createCmd (DatabaseRequestResult (HttpFail error)))
       -- Action de déconnection
       Logout ->
-          ( { model | session = (clearSession model.session) }, Cmd.none )
+          ( clearError { model | session = (clearSession model.session) }, Cmd.none )
 
       others ->
         ( model, Cmd.none )
@@ -284,40 +282,40 @@ update_league_form_data msg model =
         league = getLeague i model.leaguesModel
         formData = fillFromLeague league
       in
-        ( { model | leaguesModel = setLeagueFormData formData  model.leaguesModel }, Cmd.none )
+        ( clearError { model | leaguesModel = setLeagueFormData formData  model.leaguesModel }, Cmd.none )
     -- League form real-time input update
     LeagueFormNameChange s ->
       if String.isEmpty s then
-        ({ model | error = "Le nom de la ligue ne doit pas être vide !" }, Cmd.none )
+        ( { model | error = "Le nom de la ligue ne doit pas être vide !" }, Cmd.none )
       else
         let
           formData = LeagueFormData.setName s model.leaguesModel.leagueForm
         in
-          ({ model | leaguesModel = (setLeagueFormData formData model.leaguesModel) }, Cmd.none )
+          ( clearError { model | leaguesModel = (setLeagueFormData formData model.leaguesModel) }, Cmd.none )
     LeagueFormKindChange s ->
       case (leagueTypeFromDatabaseString s) of
         Nothing ->
-          ({ model | error = "Le type de ligue (" ++ s ++ ") est invalide !" }, Cmd.none )
+          ( { model | error = "Le type de ligue (" ++ s ++ ") est invalide !" }, Cmd.none )
         Just kind ->
           let
             formData = LeagueFormData.setKind kind model.leaguesModel.leagueForm
           in
-            ({ model | leaguesModel = (setLeagueFormData formData model.leaguesModel) }, Cmd.none )
+            ( clearError { model | leaguesModel = (setLeagueFormData formData model.leaguesModel) }, Cmd.none )
     LeagueFormNbTournamentsChange s ->
       case (String.toInt s) of
         Nothing ->
-          ({ model | error = "Valeur '" ++ s ++ "' invalide !" }, Cmd.none )
+          ( { model | error = "Valeur '" ++ s ++ "' invalide !" }, Cmd.none )
         Just n ->
           let
             formData = LeagueFormData.setNbRanklingTournaments n model.leaguesModel.leagueForm
           in
-            ({ model | leaguesModel = (setLeagueFormData formData model.leaguesModel) }, Cmd.none )
+            ( clearError { model | leaguesModel = (setLeagueFormData formData model.leaguesModel) }, Cmd.none )
     -- League form validation request
     LeagueValidateForm ->
-      ( model, DatabaseRequests.validateLeagueForm model.leaguesModel.leagueForm  model.leaguesModel.leagues )
+      ( clearError model, DatabaseRequests.validateLeagueForm model.leaguesModel.leagueForm  model.leaguesModel.leagues )
     -- League form cancel, error clear & close
     LeagueCancelForm ->
-      ({ model | leaguesModel = clearLeagueFormData model.leaguesModel }, Cmd.none )
+      ( clearError { model | leaguesModel = clearLeagueFormData model.leaguesModel }, Cmd.none )
     -- League form validation result & close (if ok)
     LeagueValidateFormResult result ->
       case result of

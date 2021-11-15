@@ -18,8 +18,13 @@
 	color: #0000AA;
 }
 
+.messageErreurHidden
+{
+    visibility: hidden;
+}
 .messageErreur
 {
+  padding: 1em;
   background-color: #FF0000;
   border-style: solid;
   border-color: #000000;
