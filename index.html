@@ -26,6 +26,12 @@
           app.ports.confirmDeleteLeague.send(word);
         }
       });
+      // Définition des ports de connexion pour LinkToJS (sens ELM vers JS)
+      app.ports.requestDeleteTournamentConfirmation.subscribe(function(word) {
+        if( confirm("Voulez-vous vraiment supprimer ce tournoi?"/*""(id="+word+")"*/) == true ) {
+          app.ports.confirmDeleteTournament.send(word);
+        }
+      });
 
     </script>
   </body>
