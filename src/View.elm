@@ -28,7 +28,7 @@ view model =
     , body =
       [ lazy ViewNavigation.viewNavigation model
       , lazy2 ViewUserInfo.viewUserInfo model.session model.sessionInput
-      , lazy ViewError.viewError model
+      , lazy ViewError.viewError model.error
       , lazy viewContainer (viewContent model)
       , infoFooter model
       ]
@@ -47,10 +47,10 @@ viewContent model =
         viewPlayers model
       Teams ->
         viewTeams model
-      CurrentLeague {--subNavigation--} ->
-        viewCurrentLeague model.session.rights LeaguesPages.Default model.leaguesModel
-      OthersLeagues {--subNavigation--} ->
-        viewOthersLeagues LeaguesPages.Default model --subNavigation model
+      CurrentLeague s{--subNavigation--} ->
+        viewCurrentLeague model
+      OthersLeagues s{--subNavigation--} ->
+        viewOthersLeagues model --subNavigation model
       Configuration ->
         viewConfiguration model
       Help ->

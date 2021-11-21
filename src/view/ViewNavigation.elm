@@ -34,9 +34,9 @@ isUpperOrEqualRightsRoute rights route =
       isUpperOrEqualRights Visitor rights
     Route.Teams ->
       isUpperOrEqualRights Visitor rights
-    Route.CurrentLeague ->
+    Route.CurrentLeague s ->
       isUpperOrEqualRights Visitor rights
-    Route.OthersLeagues ->
+    Route.OthersLeagues s ->
       isUpperOrEqualRights Visitor rights
     Route.Configuration ->
       isUpperOrEqualRights Administrator rights
@@ -50,7 +50,7 @@ viewNavigation model =
     routes =
       List.filter
         (isUpperOrEqualRightsRoute model.session.rights)
-        [Home, Players, Teams, CurrentLeague, OthersLeagues, Configuration, Help]
+          [Home, Players, Teams, CurrentLeague NoQuery, OthersLeagues NoQuery, Configuration, Help]
   in
     nav [ id "nav-toolbar" ]
       (List.map (\a -> navigationItem a model ) routes)
@@ -90,8 +90,8 @@ routeDisplayName route model =
       Home -> "Accueil"
       Players -> "Les joueurs"
       Teams -> "Les équipes"
-      CurrentLeague -> getCurrentLeagueName model.leaguesModel
-      OthersLeagues -> "Les autres ligues"
+      CurrentLeague s -> getCurrentLeagueName model.leaguesModel
+      OthersLeagues s -> "Les autres ligues"
       Configuration -> "Configuration"
       Help -> "Aide"
 
@@ -102,7 +102,7 @@ route2img route =
       Home -> "home-32x32.png"
       Players -> "players-32x32.png"
       Teams -> "team-32x32.png"
-      CurrentLeague -> "Logo-lmb-32x32.png"
-      OthersLeagues -> "folder-32x32.png"
+      CurrentLeague s -> "Logo-lmb-32x32.png"
+      OthersLeagues s -> "folder-32x32.png"
       Configuration -> "gears-32x32.png"
       Help -> "icon-help-32x32.png"

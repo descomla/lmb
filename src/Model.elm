@@ -1,4 +1,4 @@
-module Model exposing (Model, initModel, clearError)
+module Model exposing (Model, initModel, clearError, clearTeamFilter)
 
 import Browser.Navigation exposing (..)
 import Url exposing (..)
@@ -32,6 +32,21 @@ initModel url key =
     , leaguesModel = defaultLeaguesModel
     , error = ""
   }
+
+--
+--
+-- CLEAR TEAM FILTER
+--
+--
+clearTeamFilter : Model -> Model
+clearTeamFilter model =
+  let
+    initial = model.leaguesModel
+    result = { initial | teamFilter = "" }
+  in
+    { model | leaguesModel = result }
+
+
 
 --
 -- Clear error

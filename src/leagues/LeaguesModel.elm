@@ -2,12 +2,16 @@ module LeaguesModel exposing (LeaguesModel, defaultLeaguesModel
   , getCurrentLeague, getCurrentLeagueName, setCurrentLeague
   , getLeague, setLeagues
   , setLeagueFormData, clearLeagueFormData
-  , setLeaguesSortState, setLeaguesFilter )
+  , setLeaguesSortState, setLeaguesFilter
+  , getLeagueTournaments, setTournaments)
 
 import Table exposing (State)
 
 import League exposing (League, Leagues, compareLeagueId, defaultLeague)
 import LeagueFormData exposing (LeagueFormData, defaultLeagueFormData)
+
+import Teams exposing (Teams)
+import Tournaments exposing (Tournaments)
 
 --
 -- Leagues Model
@@ -16,8 +20,11 @@ type alias LeaguesModel =
   { sortState : Table.State -- table current sort
   , leagueFilter : String -- search text by name
   , leagueForm : LeagueFormData
+  , teamFilter : String -- search team by name
   , currentLeague_id : Int
   , leagues : Leagues
+  , tournaments : Tournaments
+  , teams : Teams
   }
 
 defaultLeaguesModel : LeaguesModel
@@ -25,8 +32,11 @@ defaultLeaguesModel =
   { sortState = Table.initialSort "name"
   , leagueFilter = ""
   , leagueForm = defaultLeagueFormData
+  , teamFilter = ""
   , currentLeague_id = 0
   , leagues = []
+  , tournaments = []
+  , teams = []
   }
 
 -- get the current league
@@ -49,8 +59,8 @@ setCurrentLeague league model =
 
 -- set the current league
 setLeagues : Leagues -> LeaguesModel -> LeaguesModel
-setLeagues l model =
-  { model | leagues = l }
+setLeagues ligues model =
+  { model | leagues = ligues }
 
 -- get the current league data
 getLeague : Int -> LeaguesModel -> League
@@ -85,3 +95,14 @@ setLeaguesSortState state model =
 setLeaguesFilter : String -> LeaguesModel -> LeaguesModel
 setLeaguesFilter s model =
   { model | leagueFilter = s }
+
+-- get Tournaments Data for a specific league
+getLeagueTournaments : League -> LeaguesModel -> Tournaments
+getLeagueTournaments league model = -- filter the full tournaments list
+  --with the tournaments id of the league
+  List.filter (\t -> t.league_id == league.id ) model.tournaments
+
+-- set Tournaments Data
+setTournaments : Tournaments -> LeaguesModel -> LeaguesModel
+setTournaments tournois model =
+  { model | tournaments = tournois }

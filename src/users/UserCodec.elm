@@ -1,4 +1,4 @@
-module UserDecoder exposing (decoderUserProfile, decoderUserProfiles)
+module UserCodec exposing (decoderUserProfile, decoderUserProfiles)
 
 import Json.Decode exposing (Decoder, string, map)
 import Json.Decode.Pipeline exposing (required)

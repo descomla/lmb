@@ -39,17 +39,18 @@ subscriptions model =
     Sub.batch
         [ Time.every 1000 TickTime
         , LinkToJS.confirmDeleteLeague LeagueConfirmDelete
-        , LinkToJS.confirmDeleteTournament ConfirmDeleteTournament
+        , LinkToJS.confirmDeleteTournament TournamentConfirmDelete
           --, WebSocket.listen (model.modelURL) (NewSimuState << Json.Decode.decodeString Decoders.timerResponseDecode)--, LinkToJS.scenarioSelected ScenarioSelected
         ]
 
 -- INIT
 init : () -> Url.Url -> Browser.Navigation.Key -> (Model, Cmd Msg)
 init flags url key =
-  ( initModel url key
+  ( initModel url (Debug.log "initModel key " key)
     , Cmd.batch
       [ Task.perform AdjustZone Time.here
       , DatabaseRequests.retrieveLeagues
       , DatabaseRequests.retrieveCurrentLeague
+      , DatabaseRequests.retrieveTournaments
       ]
   )

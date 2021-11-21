@@ -9,7 +9,7 @@ import Session exposing (Session)
 import UserModel exposing (UserProfile, UserProfiles)
 
 import League exposing (League, Leagues)
-import TournamentsModel exposing (Tournament, Tournaments)
+import Tournaments exposing (Tournament, Tournaments)
 
 import Table exposing (State)
 import Route exposing (Route)
@@ -67,13 +67,23 @@ type Msg
   --
   ---------------------------------------
   | TournamentsLoaded (Result Error Tournaments)
-  | DisplayTournament Int
+  | TournamentUpdateResult (Result Error Tournament)
+  -- Display a tournament
+  | TournamentDisplay Int
+  -- Tournament add team
+  | TournamentAddTeam Int Int -- tournament id / team id
   -- Tournament Creation
-  | OpenTournamentForm Int -- 0 for creation / id for update
-  | ValidateTournamentForm
-  | CancelTournamentForm
-  | OnCreateTournamentResult (Result Error Tournament)
+  | TournamentOpenForm Int -- 0 for creation / id for update
+  | TournamentValidateForm
+  | TournamentCancelForm
+  | TournamentValidateResult (Result Error Tournament)
   -- Tournament Deletion
-  | DeleteTournament Int
-  | ConfirmDeleteTournament String
-  | OnDeletedTournamentResult (Result Error Tournament)
+  | TournamentDelete Int
+  | TournamentConfirmDelete String
+  | TournamentDeletedResult (Result Error Tournament)
+  ----------------------------------------
+  --
+  -- Teams
+  --
+  ----------------------------------------
+  | TeamFilterNameChange String

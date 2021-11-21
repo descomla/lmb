@@ -1,4 +1,4 @@
-module UserRightsDecoder exposing (decodeUserRights, encodeUserRights)
+module UserRightsCodec exposing (decodeUserRights, encodeUserRights)
 
 import Json.Decode exposing (Decoder, string)
 

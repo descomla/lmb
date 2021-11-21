@@ -6,6 +6,7 @@
         "src/html",
         "src/view",
         "src/users",
+        "src/teams",
         "src/tables",
         "src/leagues",
         "src/session",

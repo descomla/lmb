@@ -6,6 +6,7 @@ import Html.Events exposing (onInput, onClick, onMouseOver )
 import Html.Lazy exposing (lazy, lazy2)
 
 import Table exposing (..)
+import TableCommon exposing (..)
 import TableActionButtons exposing (..)
 
 import Toolbar exposing (..)
@@ -19,9 +20,13 @@ import UserRights exposing (..)
 import League exposing (League)
 import LeagueType exposing (..)
 import LeaguesPages exposing (..)
-import LeaguesModel exposing (LeaguesModel, getLeague, getCurrentLeague)
+import LeaguesModel exposing (LeaguesModel, getLeague, getCurrentLeague, setTournaments, getLeagueTournaments)
 
-import TournamentsModel exposing (Tournament, Tournaments)
+import Tournaments exposing (Tournament, Tournaments)
+
+import ViewTournament exposing (..)
+import ViewError exposing (..)
+import ViewUnderConstruction exposing (..)
 
 -- debugString : LeaguesModel -> String
 -- debugString model =
@@ -38,86 +43,90 @@ import TournamentsModel exposing (Tournament, Tournaments)
 CurrentLeague navigation page display
 
 --}
-viewCurrentLeague : UserRights -> LeaguesPages -> LeaguesModel -> Html Msg
-viewCurrentLeague rights page model =
-    case page of
-      Default ->
-        viewCurrentLeagueDefault rights model
+viewCurrentLeague : Model -> Html Msg
+viewCurrentLeague model =
+    case model.route of
+      CurrentLeague s ->
+        case s of
+          NoQuery ->
+            viewCurrentLeagueDefault model
+          QueryTournament i ->
+            viewTournament i True model
+          others ->
+            viewError ("Route " ++ (route2URL model.route) ++ " invalide pour 'Les autres ligues' !!!")
+      others ->
+        viewError ("Route " ++ (route2URL model.route) ++ " invalide pour 'Ligue courante' !!!")
+
+{--
+
+CurrentLeague navigation page display
+
+--}
+viewOthersLeagues : Model -> Html Msg
+viewOthersLeagues model =
+    case model.route of
+      OthersLeagues s ->
+        case s of
+          NoQuery ->
+            viewLeaguesList model.session.rights model.leaguesModel
+          QueryLeague league ->
+            viewOthersLeaguesDefault league model
+          QueryTournament tournament ->
+            viewTournament tournament False model
+          QueryLeagueTournament league tournament ->
+            viewTournament tournament False model
+
+      others ->
+        viewError ("Route " ++ (route2URL model.route) ++ " invalide pour 'Les autres ligues' !!!")
+{--
+      LeagueInputForm ->
+        viewLeagueForm model.leaguesModel
       CreateTournament league_id ->
         viewCreateTournament league_id
-      others ->
-        viewCurrentLeagueDefault rights model
+      LeagueContent league_id ->
+        viewLeagueDisplay model.session.rights (getLeague league_id model.leaguesModel) False
+      TournamentContent tournament_id ->
+--}
 
-viewCurrentLeagueDefault : UserRights -> LeaguesModel -> Html Msg
-viewCurrentLeagueDefault rights model =
+viewCurrentLeagueDefault : Model -> Html Msg
+viewCurrentLeagueDefault model =
   let
-    currentLeague = getCurrentLeague model
+    league = getCurrentLeague model.leaguesModel
   in
-    viewLeagueDisplay rights currentLeague True
+    viewLeagueDisplay league True model.leaguesModel model.session.rights
 
-viewLeagueDisplay : UserRights -> League -> Bool -> Html Msg
-viewLeagueDisplay rights league isCurrentLeague =
+viewOthersLeaguesDefault : Int -> Model -> Html Msg
+viewOthersLeaguesDefault league_id model =
+  let
+    league = getLeague league_id model.leaguesModel
+  in
+    viewLeagueDisplay league False model.leaguesModel model.session.rights
+
+viewLeagueDisplay : League -> Bool -> LeaguesModel -> UserRights -> Html Msg
+viewLeagueDisplay league isCurrentLeague model rights =
   div [ class "fullWidth" ]
     [ div [ class "titre" ] [ text league.name ] -- Titre
-    , div [ class "fullWidth" ] -- Content
-      [ div [ class "texte "]
-        [ div [ class "soustitre" ][ text "Tournois" ] -- Sous-titre
-        , br [][]
-        , div [ id "tournois.liste", class "texte" ]
-          [ ]--lazy2 viewTournamentTable rights league.tournaments ]
-        ]
+    , div [ class "soustitre" ][ text "Tournois" ] -- Sous-titre
+    , div [class "paragraphe" ]--class "paragraphe" ]
+      [ br [][]
+      , div [ id "liste_tournois" ] -- liste des tournois de la ligue
+        [ lazy2 viewTournamentTable (getLeagueTournaments league model) rights ]
       , br [][]
       , lazy2 viewToolbar rights [ toolbarButtonCreateTournament league.id  ] -- Create tournament action button
       , br [][]
-      , div [ class "texte "]
-        [ div [ class "soustitre" ][ text "Classement" ] -- Sous-titre
-        , br [][]
-        , div [ id "classement", class "texte" ]
-          [ ]--lazy viewClassementTable league ]
-        ]
+      ]
+    , div [ class "soustitre" ][ text "Classement" ] -- Sous-titre
+    , div [ class "paragraphe" ]
+      [ br [][]
+      , div [ id "classement" ] -- classement de la ligue
+        [ lazy viewClassementTable league ]
       , br [][]
-      , if isCurrentLeague then
-          lazy2 viewToolbar rights [ toolbarButtonModifyLeague league.id ] -- actions toolbar
-        else
-          lazy2 viewToolbar rights [ toolbarButtonModifyLeague league.id, toolbarButtonBackToLeaguesList ] -- actions toolbar
+      , if isCurrentLeague then -- Modification of the league actions button
+          lazy2 viewToolbar rights [ toolbarButtonModifyLeague league.id ]
+        else -- Modification of the league actions button + Back to leagues list action button
+          lazy2 viewToolbar rights [ toolbarButtonModifyLeague league.id, toolbarButtonBackToLeaguesList ]
       ]
     ]
-
-toolbarButtonCreateTournament : Int -> ToolbarButton
-toolbarButtonCreateTournament league_id =
-  { buttonId = "ligues.creation.tournoi"
-  , labelId = "createTournamentButton"
-  , msg = OpenTournamentForm league_id
-  , caption = "Création d'un nouveau tournoi pour cette ligue"
-  , minimalRights = Director
-  }
-
-toolbarButtonModifyLeague : Int -> ToolbarButton
-toolbarButtonModifyLeague league_id =
-  { buttonId = "ligue.modifie.ligue"
-  , labelId = "modifyLeagueButton"
-  , msg = LeagueOpenForm league_id
-  , caption = "Modification de la ligue"
-  , minimalRights = Director
-  }
-
-toolbarButtonCreateLeague : ToolbarButton
-toolbarButtonCreateLeague =
-  { buttonId = "ligue.creation.ligue"
-  , labelId = "createLeagueButton"
-  , msg = LeagueOpenForm 0
-  , caption = "Création d'une nouvelle ligue"
-  , minimalRights = Director
-  }
-
-toolbarButtonBackToLeaguesList : ToolbarButton
-toolbarButtonBackToLeaguesList =
-  { buttonId = "ligue.retour.ligues"
-  , labelId = "backToLeaguesListButton"
-  , msg = RouteChanged OthersLeagues
-  , caption = "Retour à la liste des ligues"
-  , minimalRights = Visitor
-  }
 
 {--
 
@@ -125,8 +134,8 @@ List of tournaments for a league
 
 --}
 -- Leagues table
-viewTournamentTable : UserRights -> Tournaments -> Html Msg
-viewTournamentTable rights tournois =
+viewTournamentTable : Tournaments -> UserRights -> Html Msg
+viewTournamentTable tournois rights =
     Table.view (tournamentTableConfig rights) (Table.initialSort "Nom du tournoi") tournois
 
 -- Leagues table configuration
@@ -151,10 +160,6 @@ tournamentTableConfig rights =
     , customizations = tableCustomizations
   }
 
-noSorter : State -> Msg
-noSorter state =
-  NoOp
-
 tournamentNameToHtmlDetails : Tournament -> HtmlDetails msg
 tournamentNameToHtmlDetails tournois =
     stringToHtmlDetails tournois.name
@@ -174,8 +179,8 @@ tournamentImgActionList rights name toInt =
 tournamentActionsDetails : UserRights -> Int -> HtmlDetails Msg
 tournamentActionsDetails rights i =
   renderActionButtons rights
-    [ actionButton "EditTournament" (DisplayTournament i) "img/arrow-left-16x16.png" Visitor
-    , actionButton "DeleteTournament" (DeleteTournament i) "img/delete-16x16.png" Director
+    [ actionButton "EditTournament" (TournamentDisplay i) "img/arrow-right-16x16.png" Visitor
+    , actionButton "DeleteTournament" (TournamentDelete i) "img/delete-16x16.png" Director
     ]
 
 {--
@@ -186,25 +191,6 @@ Classement
 viewClassementTable : League -> Html Msg
 viewClassementTable league =
   div [][]
-
-{--
-
-CurrentLeague navigation page display
-
---}
-viewOthersLeagues : LeaguesPages -> Model -> Html Msg
-viewOthersLeagues page model =
-    case page of
-      Default ->
-        viewLeaguesList model.session.rights model.leaguesModel
-      LeagueInputForm ->
-        viewLeagueForm model.leaguesModel
-      CreateTournament league_id ->
-        viewCreateTournament league_id
-      LeagueContent league_id ->
-        viewLeagueDisplay model.session.rights (getLeague league_id model.leaguesModel) False
-      TournamentContent tournament_id ->
-        div [][]
 
 {--
 
@@ -220,23 +206,19 @@ viewLeaguesList rights model =
       [ div [ class "texte" ]
         [
           label [][ text "Chercher une ligue :" ]
-        , input
-          [
-            class "champTexte"
-            , id "ligues.recherche.ligue"
-            , maxlength 255
-            , size 8
-            , style "min-width" "300px"
-            , onInput LeagueFilterChange
-            , type_ "text"
-            , placeholder "nom de la ligue"
+        , Html.input [ type_ "text"
+          , id "ligues.recherche.ligue"
+          , onInput LeagueFilterChange
+          , placeholder "nom de la ligue"
+          , value model.leagueFilter
           ] []
         ]
         , br [][]
-        , div [ id "ligues.liste", class "texte" ]
-          [ lazy2 viewLeagueTable rights model ]
-        , br [][]
-        , lazy2 viewToolbar rights [ toolbarButtonCreateLeague  ] -- Create tournament action button
+        , div [ id "ligues.liste", class "paragraphe" ]
+          [ lazy2 viewLeagueTable rights model
+          , br [][]
+          , lazy2 viewToolbar rights [ toolbarButtonCreateLeague  ] -- Create tournament action button
+          ]
       ]
     ]
 
@@ -269,6 +251,14 @@ leagueTableConfig rights =
     , customizations = tableCustomizations
   }
 
+leagueImgActionList : UserRights -> String -> (data -> Int) -> Column data Msg
+leagueImgActionList rights name toInt =
+   Table.veryCustomColumn
+     { name = name
+     , viewData = (leagueActionsDetails rights) << toInt
+     , sorter = Table.unsortable
+     }
+
 -- Handle conversion from LeagueType to HtmlDetails msg
 leagueNameToHtmlDetails : League -> HtmlDetails msg
 leagueNameToHtmlDetails league =
@@ -293,45 +283,10 @@ leagueTournamentsToInt : League -> Int
 leagueTournamentsToInt league =
     league.nbRankingTournaments
 
-tableCustomizations : Customizations data msg
-tableCustomizations =
-  { tableAttrs = [class "tableau_recherche"]
-  , caption = Nothing
-  , thead = tableThead
-  , tfoot = Nothing
-  , tbodyAttrs = []
-  , rowAttrs = tableRowAttrs
-  }
-
-tableThead : List (String, Status, Attribute msg) -> HtmlDetails msg
-tableThead headers =
-  HtmlDetails [] (List.map tableTheadHelp headers)
-
--- Handle conversion from LeagueType to HtmlDetails msg
-stringToHtmlDetails : String -> HtmlDetails msg
-stringToHtmlDetails str =
-    HtmlDetails [ class "tableau_recherche_td" ] [ Html.text str ]
-
-tableRowAttrs : data -> List (Attribute msg)
-tableRowAttrs _ =
-  [ class "tableau_recherche_tr" ]
-
-tableTheadHelp : ( String, Status, Attribute msg ) -> Html msg
-tableTheadHelp (name, status, onClick) =
-    Html.th [ class "tableau_recherche_th", onClick ] (simpleTheadContent name status)
-
-leagueImgActionList : UserRights -> String -> (data -> Int) -> Column data Msg
-leagueImgActionList rights name toInt =
-   Table.veryCustomColumn
-     { name = name
-     , viewData = (leagueActionsDetails rights) << toInt
-     , sorter = Table.decreasingBy toInt
-     }
-
 leagueActionsDetails : UserRights -> Int -> HtmlDetails Msg
 leagueActionsDetails rights i =
   renderActionButtons rights
-    [ actionButton "EditLeague" (LeagueDisplay i) "img/arrow-left-16x16.png" Visitor
+    [ actionButton "EditLeague" (LeagueDisplay i) "img/arrow-right-16x16.png" Visitor
     , actionButton "DeleteLeague" (LeagueDelete i) "img/delete-16x16.png" Director
     ]
 

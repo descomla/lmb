@@ -1,15 +1,9 @@
-module TournamentsController exposing (update, delete, requestTournaments)
+module TournamentsController exposing (..)
 
-import Http exposing (get)
-import Json.Decode exposing (..)
-
-import Msg exposing (..)
-
-import TournamentsModel exposing (..)
-import TournamentsDecoder exposing (decoderTournament, decoderTournaments)
-
-import Addresses exposing (..)
-
+type alias TournamentsController =
+  { id : Int
+  }
+{--
 update : Msg -> Tournament -> (Tournament, Cmd Msg)
 update msg model =
   case msg of
@@ -18,14 +12,6 @@ update msg model =
     -- Others messages not processed
     other ->
       ( model, Cmd.none)
-
--- request a tournament for a league
-requestTournaments : Cmd Msg
-requestTournaments =
-  Http.get
-    { url = databaseTournamentsUrl
-    , expect = Http.expectJson TournamentsLoaded decoderTournaments
-    }
 
 replaceTournament : Tournament -> Tournaments -> Tournaments
 replaceTournament tournament tournaments =
@@ -62,3 +48,4 @@ requestDeleteTournament tournament_id =
       , timeout = Nothing
       , tracker = Nothing
       }
+--}

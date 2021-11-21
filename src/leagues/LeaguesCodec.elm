@@ -1,12 +1,10 @@
-module LeaguesDecoder exposing (decoderLeague, decoderLeagues, decoderEmptyLeague)
+module LeaguesCodec exposing (decoderLeague, decoderLeagues, decoderEmptyLeague)
 
 import Json.Decode exposing (Decoder, string, map)
 import Json.Decode.Pipeline exposing (required, optional)
 
 import LeagueType exposing (..)
 import League exposing (League, Leagues)
-
-import TournamentsModel exposing (..)
 
 --
 -- Json Decoder for League
@@ -18,7 +16,7 @@ decoderLeague =
     |> Json.Decode.Pipeline.required "name" (Json.Decode.string)
     |> Json.Decode.Pipeline.required "kind" decodeLeagueType
     |> Json.Decode.Pipeline.required "nbRankingTournaments" (Json.Decode.int)
-    |> Json.Decode.Pipeline.optional "tournaments" (Json.Decode.list Json.Decode.int) []
+--    |> Json.Decode.Pipeline.optional "tournaments" (Json.Decode.list Json.Decode.int) []
 
 decoderEmptyLeague : Decoder League
 decoderEmptyLeague =
@@ -27,7 +25,7 @@ decoderEmptyLeague =
     |> Json.Decode.Pipeline.optional "name" (Json.Decode.string) ""
     |> Json.Decode.Pipeline.optional "kind" decodeLeagueType SingleEvent
     |> Json.Decode.Pipeline.optional "nbRankingTournaments" (Json.Decode.int) 0
-    |> Json.Decode.Pipeline.optional "tournaments" (Json.Decode.list Json.Decode.int) []
+--    |> Json.Decode.Pipeline.optional "tournaments" (Json.Decode.list Json.Decode.int) []
 
 --
 -- Json Decoder for LeaguerRights
@@ -51,6 +49,7 @@ decoderLeagues : Decoder Leagues
 decoderLeagues =
     Json.Decode.list decoderLeague
 
+{--
 decodeTournamentIds : Decoder Tournaments
 decodeTournamentIds =
   Json.Decode.list decoderTournamentId
@@ -63,3 +62,4 @@ decoderTournamentId =
     |> Json.Decode.Pipeline.optional "location" Json.Decode.string ""
     |> Json.Decode.Pipeline.optional "maxTeams" Json.Decode.int 0
     |> Json.Decode.Pipeline.optional "league_id" Json.Decode.int 0
+--}

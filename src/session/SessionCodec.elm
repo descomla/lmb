@@ -1,10 +1,10 @@
-module SessionDecoder exposing (decoderSession, encoderSession)
+module SessionCodec exposing (decoderSession, encoderSession)
 
 import Json.Decode exposing (Decoder, Value, string)
 import Json.Decode.Pipeline exposing (required)
 import Json.Encode exposing (string)
 import Session exposing (Session)
-import UserRightsDecoder exposing (..)
+import UserRightsCodec exposing (..)
 
 --
 -- Json Decoder for Session

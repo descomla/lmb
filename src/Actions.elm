@@ -6,17 +6,18 @@ import Browser exposing (..)
 import Browser.Navigation exposing (..)
 
 import Msg exposing (..)
-import Model exposing (Model, clearError)
+import Model exposing (Model, clearError, clearTeamFilter)
 import Route exposing (..)
 import Session exposing (updateSessionUser, clearSession)
 import SessionInput exposing (clearPassword)
+import Tournaments exposing (getTournament, addTeam)
+import Teams exposing (getTeam)
 
 import DatabaseRequests exposing (..)
 
 import CmdExtra exposing (createCmd)
 
-import TournamentsController exposing (..)
-import UserDecoder exposing (decoderUserProfiles)
+import UserCodec exposing (decoderUserProfiles)
 
 import LeaguesPages exposing (..)
 import LeagueType exposing (..)
@@ -39,19 +40,16 @@ update msg model =
     -- Récupération de l'URL
     --
     RouteChanged route ->
-      ( clearError { model  | route = route }, Browser.Navigation.pushUrl model.key (route2URL route) )
+      ( clearError { model | route = (Debug.log "RouteChanged " route) }, Browser.Navigation.pushUrl model.key (route2URL route) )
     UrlChanged url ->
-      ( clearError { model  | route = parseURL url }, Cmd.none )
+      ( clearError { model | route = (Debug.log "UrlChanged Route=" (parseURL (Debug.log "UrlChanged URL=" url))) }, Cmd.none )
     LinkClicked urlRequest ->
-      let
-        r = Debug.log "LinkClicked " urlRequest
-      in
-        case urlRequest of
-          Browser.Internal url ->
-            ( model, Browser.Navigation.pushUrl model.key (Url.toString url) )
+      case urlRequest of
+        Browser.Internal url ->
+          ( model, Browser.Navigation.pushUrl model.key (Url.toString (Debug.log "LinkClicked internal " url) ) )
 
-          Browser.External href ->
-            ( model, Browser.Navigation.load href )
+        Browser.External href ->
+          ( model, Browser.Navigation.load (Debug.log "LinkClicked external " href) )
     --
     -- Récupération de la ligue courante
     --
@@ -135,9 +133,11 @@ update msg model =
 
     -- Display a specific league
     LeagueDisplay i ->
-    -- TODO set the query for displaying a league
-    -- ( { model  | route = route }, Browser.Navigation.pushUrl model.key (route2URL route) )
-      ( clearError model, Cmd.none )
+      case model.route of
+        OthersLeagues s ->
+          ( model, CmdExtra.createCmd ( RouteChanged ( OthersLeagues (QueryLeague i) ) ) )
+        others ->
+          ( model, Cmd.none  )
 
     -- Ask for league deletion to user
     LeagueDelete league_id ->
@@ -164,20 +164,54 @@ update msg model =
     TOURNAMENTS
 
     --}
+    -- Récupération de la liste des tournois
     TournamentsLoaded result ->
-      ( model, Cmd.none ) -- TODO
-    DisplayTournament i ->
+      case result of
+        Ok tournaments ->
+          ( clearError { model | leaguesModel = (setTournaments tournaments model.leaguesModel) }
+            , Cmd.none )
+        Err err ->
+          ( model, CmdExtra.createCmd (DatabaseRequestResult (HttpFail err)))
+    TournamentUpdateResult result ->
+      (model, DatabaseRequests.retrieveTournaments)
+    -- Afficher le tournoi
+    TournamentDisplay tournament_id ->
+      case model.route of
+        CurrentLeague query ->
+          ( model, CmdExtra.createCmd ( RouteChanged ( CurrentLeague (QueryTournament tournament_id) ) ) )
+        OthersLeagues query ->
+          let
+            result = getTournament tournament_id model.leaguesModel.tournaments
+          in
+            case result of
+              Just tournament ->
+                ( model, CmdExtra.createCmd ( RouteChanged ( OthersLeagues (QueryLeagueTournament tournament.league_id tournament_id) ) ) )
+              Nothing ->
+                ( { model | error = ("Tournoi #" ++ String.fromInt tournament_id ++ " n'existe pas !!") }, Cmd.none )
+        others ->
+          ( { model | error = ("Demande d'affichage du Tournoi #" ++ String.fromInt tournament_id ++ " depuis une mauvaise page!!") }, Cmd.none )
+    -- Ajouter une équipe au tournoi
+    TournamentAddTeam tournament_id team_id ->
+      case (getTeam team_id model.leaguesModel.teams) of
+        Nothing -> ( { model | error = "Impossible d'ajouter l'équipe !!" }, Cmd.none )
+        Just team ->
+          case (getTournament tournament_id model.leaguesModel.tournaments) of
+            Nothing -> ( { model | error = "Impossible d'ajouter l'équipe !!" }, Cmd.none )
+            Just tournament ->
+              let
+                updatedTournament = addTeam team tournament
+              in
+                ( clearTeamFilter model, DatabaseRequests.updateTournament updatedTournament )
+    TournamentOpenForm i ->
       ( model, Cmd.none )-- TODO
-    OpenTournamentForm i ->
+    TournamentValidateForm ->
       ( model, Cmd.none )-- TODO
-    ValidateTournamentForm ->
+    TournamentCancelForm ->
       ( model, Cmd.none )-- TODO
-    CancelTournamentForm ->
-      ( model, Cmd.none )-- TODO
-    DeleteTournament tournament_id ->
-      ( model, Cmd.none )-- TODO
+    TournamentDelete tournament_id ->
+      ( model, LinkToJS.requestDeleteTournamentConfirmation (String.fromInt tournament_id) )
       --( model, LinkToJS.requestDeleteTournamentConfirmation (String.fromInt tournament_id) )
-    ConfirmDeleteTournament s ->
+    TournamentConfirmDelete s ->
       ( model, Cmd.none )-- TODO
 {--      case (String.toInt s) of
         Just tournament_id ->
@@ -186,9 +220,9 @@ update msg model =
           ( { model | error = "Tournament_id reçu ("++s++") pour confirmation invalide !" }
           , Cmd.none )
 --}
-    OnCreateTournamentResult result ->
+    TournamentValidateResult result ->
       ( model, Cmd.none )-- TODO
-    OnDeletedTournamentResult result ->
+    TournamentDeletedResult result ->
       ( model, Cmd.none )-- TODO
 {--      case result of
         Ok _ ->
@@ -199,6 +233,12 @@ update msg model =
         Err err ->
           ( { model | error = (httpError2String err) }, Cmd.none )
 --}
+    TeamFilterNameChange s ->
+      let
+        leagues_model = model.leaguesModel
+        newModel = { leagues_model | teamFilter = s }
+      in
+        ( { model | leaguesModel = newModel }, Cmd.none )
     {--
 
     GLOBAL HTTP ERROR

@@ -85,7 +85,6 @@ initialSort header =
   State header False
 
 
-
 -- CONFIG
 
 

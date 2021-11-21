@@ -11,7 +11,7 @@ type alias League =
   , name : String
   , kind : LeagueType
   , nbRankingTournaments: Int
-  , tournaments : List Int
+--  , tournaments : List Int
   }
 
 type alias Leagues = List League
@@ -22,7 +22,7 @@ defaultLeague =
   , name = ""
   , kind = SingleEvent
   , nbRankingTournaments = 0
-  , tournaments = []
+--  , tournaments = []
   }
 
 -- compare current league id with others leagues ids

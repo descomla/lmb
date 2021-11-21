@@ -1,9 +1,11 @@
-module TournamentsDecoder exposing (decoderTournament, decoderTournaments)
+module TournamentsCodec exposing (decoderTournament, decoderTournaments)
 
 import Json.Decode exposing (Decoder, string, succeed)
-import Json.Decode.Pipeline exposing (required)
+import Json.Decode.Pipeline exposing (required, optional)
 
-import TournamentsModel exposing (..)
+import TeamsCodec exposing (..)
+
+import Tournaments exposing (..)
 
 --
 -- Json Decoder for League
@@ -16,6 +18,7 @@ decoderTournament =
     |> Json.Decode.Pipeline.required "location" (Json.Decode.string)
     |> Json.Decode.Pipeline.required "maxTeams" (Json.Decode.int)
     |> Json.Decode.Pipeline.required "league_id" (Json.Decode.int)
+    |> Json.Decode.Pipeline.optional "teams" (Json.Decode.list decoderTeam) []
 
 decoderTournaments : Decoder Tournaments
 decoderTournaments =

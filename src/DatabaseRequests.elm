@@ -1,6 +1,7 @@
 module DatabaseRequests exposing (validateLeagueForm, updateLeague, deleteLeague,
   retrieveLeagues, retrieveCurrentLeague,
-  createSession, requestLogin )
+  createSession, requestLogin,
+  retrieveTournaments, updateTournament )
 
 import Http exposing (get, post, request)
 import Time exposing (..)
@@ -15,14 +16,19 @@ import LeagueType exposing (..)
 import League exposing (League, Leagues, defaultLeague, retrieveFreeId)
 import LeaguesModel exposing (LeaguesModel)
 import LeagueFormData exposing (LeagueFormData)
-import LeaguesDecoder exposing (decoderLeague, decoderLeagues)
+import LeaguesCodec exposing (decoderLeague, decoderLeagues)
 
 import Session exposing (Session, newSession, defaultSession)
 import SessionInput exposing (SessionInput)
-import SessionDecoder exposing (decoderSession, encoderSession)
+import SessionCodec exposing (decoderSession, encoderSession)
 
 import UserModel exposing (..)
-import UserDecoder exposing (decoderUserProfiles)
+import UserCodec exposing (decoderUserProfiles)
+
+import Tournaments exposing (Tournament)
+import TournamentsCodec exposing (decoderTournaments, decoderTournament)
+
+import TeamsCodec exposing (encoderTeam)
 
 --
 -- Update or create a new League from LeaguFormData
@@ -97,7 +103,7 @@ updateLeague league =
       , ("name", Json.Encode.string league.name)
       , ("kind", Json.Encode.string (leagueTypeToDatabaseString league.kind))
       , ("nbRankingTournaments", Json.Encode.int league.nbRankingTournaments)
-      , ("tournaments", Json.Encode.list Json.Encode.int league.tournaments)
+--      , ("tournaments", Json.Encode.list Json.Encode.int league.tournaments)
       ]
     jsonbody = Http.stringBody "application/json" (Json.Encode.encode 0 json)
   in
@@ -183,4 +189,39 @@ requestLogin input =
     Http.get
       { url = url
       , expect = Http.expectJson OnLoginResult decoderUserProfiles
+      }
+
+--
+-- requests all tournaments
+--
+retrieveTournaments : Cmd Msg
+retrieveTournaments =
+  Http.get
+    { url = databaseTournamentsUrl
+    , expect = Http.expectJson TournamentsLoaded decoderTournaments
+    }
+
+--
+-- Update a tournament
+--
+updateTournament : Tournament -> Cmd Msg
+updateTournament tournament =
+  let
+    json = Json.Encode.object
+      [ ("id", Json.Encode.int tournament.id)
+      , ("name", Json.Encode.string tournament.name)
+      , ("maxTeams", Json.Encode.int tournament.maxTeams)
+      , ("league_id", Json.Encode.int tournament.league_id)
+      , ("teams", Json.Encode.list encoderTeam tournament.teams)
+      ]
+    jsonbody = Http.stringBody "application/json" (Json.Encode.encode 0 json)
+  in
+    Http.request
+      { method = "POST" -- "UPDATE"
+      , headers = []
+      , url = databaseTournamentsUrl ++ (String.fromInt tournament.id)
+      , body = jsonbody
+      , expect = Http.expectJson TournamentUpdateResult decoderTournament
+      , timeout = Nothing
+      , tracker = Nothing
       }

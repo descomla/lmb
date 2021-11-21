@@ -19,27 +19,19 @@ viewUserInfo session input =
 
 viewLoginForm : SessionInput -> Html Msg
 viewLoginForm input =
-  Html.div [ class "menuLogin" ]
-  [ Html.table []
-    [ Html.tr []
-      [ Html.td [][ Html.label [][ text "Utilisateur:" ] ]
-      , Html.td [][ Html.input [ type_ "text", id "login", onInput LoginChange, placeholder "login", value input.login ][] ]
-      , Html.td [][ Html.label [][ text "Mot de passe:" ] ]
-      , Html.td [][ Html.input [ type_ "password", id "password", onInput PasswordChange, placeholder "password", value input.password ][] ]
-      , Html.td [][ Html.div [ id "loginButton", onClick Login ][ img [ src "img/arrow-left-16x16.png" ][] ] ]-- [ text "Se connecter"] ]
-      ]
+  div [ class "menuLogin" ]
+    [ div [][ Html.label [][ text "Utilisateur:" ] ]
+    , div [][ Html.input [ type_ "text", id "login", onInput LoginChange, placeholder "login", value input.login ][] ]
+    , div [][ Html.label [][ text "Mot de passe:" ] ]
+    , div [][ Html.input [ type_ "password", id "password", onInput PasswordChange, placeholder "password", value input.password ][] ]
+    , div [ class "actionButton", onClick Login ][ img [ src "img/arrow-right-16x16.png" ][] ]-- [ text "Se connecter"] ]
     ]
-  ]
 
 viewConnectedUser : Session -> Html Msg
 viewConnectedUser session =
-  Html.div [ class "menuLogin" ]
-  [ Html.table []
-    [ Html.tr []
-      [ Html.td [][ Html.label [][ text "Connecté en tant que " ] ]
-      , Html.td [][ Html.label [ class "messageInfo" ]
-        [ text (session.firstName  ++ " " ++ session.lastName ++ " (" ++ session.login ++ ") ") ] ]
-      , Html.td [][ Html.div [ id "loginButton", onClick Logout ][ img [ src "img/Logout-16x16.png" ][] ] ]-- [ text "Se déconnecter"] ]
-      ]
+  div [ class "menuLogin" ]
+    [ div [][ Html.label [][ text "Connecté en tant que " ] ]
+    , div [][ Html.label []
+      [ text (session.firstName  ++ " " ++ session.lastName ++ " (" ++ session.login ++ ") ") ] ]
+    , div [][ div [ class "actionButton", onClick Logout ][ img [ src "img/Logout-16x16.png" ][] ] ]-- [ text "Se déconnecter"] ]
     ]
-  ]

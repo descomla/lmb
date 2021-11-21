@@ -6,10 +6,12 @@ import Html.Attributes exposing (..)
 import Model exposing (..)
 import Msg exposing (..)
 
-viewError : Model -> Html Msg
-viewError model =
-  if String.isEmpty model.error then
+viewError : String -> Html Msg
+viewError error =
+  if String.isEmpty error then
     div [ style "height" "0px" ] []
   else
-    div [ class "messageErreur" ]
-      [ label [ id "messageErreur" ] [ text model.error ] ]
+    div [ class "messageWrapper" ]
+      [ div [ class "messageErreur" ]
+        [ label [ id "messageErreur" ] [ text error ] ]
+      ]
