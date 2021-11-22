@@ -7,3 +7,4 @@ elm install elm/time
 elm install elm/url
 elm install avh4/elm-color
 elm install rtfeldman/elm-hex
+elm install elm/file

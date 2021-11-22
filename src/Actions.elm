@@ -4,6 +4,9 @@ import Http exposing (..)
 import Url exposing (..)
 import Browser exposing (..)
 import Browser.Navigation exposing (..)
+import File exposing (File)
+import File.Select as Select
+import Task
 
 import Msg exposing (..)
 import Model exposing (Model, clearError)
@@ -297,8 +300,16 @@ update msg model =
       ( { model | teamsModel = setTeamFormColor s model.teamsModel }, Cmd.none )
     TeamFormLogoChange s ->
       ( { model | teamsModel = setTeamFormLogo s model.teamsModel }, Cmd.none )
+    TeamFormLogoUpload ->
+      ( model, Select.file ["image/*"] TeamFormLogoGotFile )
+    TeamFormLogoGotFile file ->
+      ( model, Task.perform TeamFormLogoChange <| (File.toUrl file) )
     TeamFormPictureChange s ->
       ( { model | teamsModel = setTeamFormPicture s model.teamsModel }, Cmd.none )
+    TeamFormPictureUpload ->
+      ( model, Select.file ["image/*"] TeamFormPictureGotFile )
+    TeamFormPictureGotFile file ->
+      ( model, Task.perform TeamFormPictureChange <| (File.toUrl file) )
     -- Ask for team deletion to user
     TeamDelete team_id ->
       ( model, LinkToJS.requestDeleteTeamConfirmation (String.fromInt team_id) )

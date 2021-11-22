@@ -28,6 +28,20 @@ stringToHtmlDetails str =
     HtmlDetails [ class "tableau_recherche_td" ] [ Html.text str ]
 
 -- Handle conversion from LeagueType to HtmlDetails msg
+urlToHtmlDetails : Int -> Int -> String -> HtmlDetails msg
+urlToHtmlDetails w h str =
+    HtmlDetails [ class "tableau_recherche_td" ]
+      [ div
+        [ style "width" ((String.fromInt w) ++ "px")
+        , style "height" ((String.fromInt h) ++ "px")
+        , style "background-image" ("url('" ++ str ++ "')")
+        , style "background-position" "center"
+        , style "background-repeat" "no-repeat"
+        , style "background-size" "contain"
+        ] []
+      ]
+
+-- Handle conversion from LeagueType to HtmlDetails msg
 stringToColorHtmlDetails : Color -> String -> HtmlDetails msg
 stringToColorHtmlDetails c str =
     HtmlDetails [ class "tableau_recherche_td", styleColor c ] [ Html.text str ]

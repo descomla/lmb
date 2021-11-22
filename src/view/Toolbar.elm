@@ -38,7 +38,7 @@ viewToolbar rights list =
     if List.isEmpty htmlList then
       div [][]
     else --TODO ajouter un espace entre les boutons
-      div [] htmlList
+      div [ class "action-toolbar" ] htmlList
 
 -- toolbar button Validate
 --    validate the Form data

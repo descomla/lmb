@@ -107,7 +107,7 @@ teamsTableConfig rights =
 
 teamLogoToHtmlDetails : Team -> HtmlDetails msg
 teamLogoToHtmlDetails team =
-    stringToHtmlDetails team.logo
+    urlToHtmlDetails 60 60 team.logo
 
 teamNameToHtmlDetails : Team -> HtmlDetails msg
 teamNameToHtmlDetails team =
@@ -166,6 +166,44 @@ viewTeamForm rights data =
         , styleColor data.colors
         ] []
       , Colors.colorSelectionList TeamFormColorChange -- liste des couleurs prédéfinies
+      , br [][]
+      , label [][ text "Logo :" ]
+      , div []
+        [ button [ onClick TeamFormLogoUpload ][ text "Logo..." ]
+--      , Html.input [ type_ "file"
+--        , id "teamFormLogo"
+--        , onInput TeamFormLogoChange
+--        , placeholder ""
+--        , value data.logo
+--        ] []
+        , div
+          [ style "width" "60px"
+          , style "height" "60px"
+          , style "background-image" ("url('" ++ data.logo ++ "')")
+          , style "background-position" "center"
+          , style "background-repeat" "no-repeat"
+          , style "background-size" "contain"
+          ] []
+        ]
+      , br [][]
+      , label [][ text "Picture :" ]
+      , div []
+        [ button [ onClick TeamFormPictureUpload ][ text "Photo d'équipe..." ]
+--      , Html.input [ type_ "file"
+--        , id "teamFormPicture"
+--        , onInput TeamFormPictureChange
+--        , placeholder ""
+--        , value data.picture
+--        ] []
+        , div
+          [ style "width" "160px"
+          , style "height" "120px"
+          , style "background-image" ("url('" ++ data.picture ++ "')")
+          , style "background-position" "center"
+          , style "background-repeat" "no-repeat"
+          , style "background-size" "contain"
+          ] []
+        ]
       , br [][]
       , lazy2 viewToolbar rights [ toolbarButtonValidate TeamValidateForm, toolbarButtonCancel TeamCancelForm ]
       ]

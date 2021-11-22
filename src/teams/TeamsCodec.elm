@@ -1,4 +1,4 @@
-module TeamsCodec exposing (decoderTeam, decoderTeams, encoderTeam, encoderTeamForm)
+module TeamsCodec exposing (decoderTeam, decoderTeams, encoderTeamForm)
 
 import Json.Decode exposing (Decoder, string, int)
 import Json.Encode exposing (Value)
@@ -29,19 +29,6 @@ decoderTeams =
 decoderColor : Decoder Color
 decoderColor =
   Json.Decode.map Colors.fromCssString Json.Decode.string
-
---
--- Json Encoder for Team
---
-encoderTeam : Team -> Value
-encoderTeam team =
-    Json.Encode.object
-      [ ("id", Json.Encode.int team.id)
-      , ("name", Json.Encode.string team.name)
-      , ("colors", Json.Encode.string (Colors.toCssString team.colors) )
-      , ("logo", Json.Encode.string team.logo)
-      , ("picture", Json.Encode.string team.picture)
-      ]
 
 --
 -- Json Encoder for Team

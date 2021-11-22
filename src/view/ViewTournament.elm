@@ -49,7 +49,7 @@ viewTournament tournament_id fromCurrentLeague model =
             ]
           , br [] []
           , div [ class "soustitre" ] [ text "Equipe(s) inscrite(s) au tournoi" ] -- Titre
-          , viewTournamentTeams tournament
+          , viewTournamentTeams tournament model.teamsModel.teams
           , viewTournamentTeamSelection tournament_id model
           , br [] []
           , viewTournamentPhases tournament
@@ -63,13 +63,22 @@ viewTournament tournament_id fromCurrentLeague model =
           ]
 
 -- View Tournament Teams
-viewTournamentTeams : Tournament -> Html Msg
-viewTournamentTeams tournament =
+viewTournamentTeams : Tournament -> Teams -> Html Msg
+viewTournamentTeams tournament teams =
   if (List.length tournament.teams) > 0 then
-    div [ class "paragraphe" ]
-      (List.map (\t -> ( div [ class "paragraphe", style "color" (Colors.toCssString t.colors) ][ text t.name ] ) ) tournament.teams)
+    let
+      tournamentTeams = List.filter (\t -> List.member t.id tournament.teams) teams
+    in
+      div [ class "paragraphe" ]
+        ( List.map viewColoredTeamName tournamentTeams )
   else
     div [ class "paragraphe" ] [ text "Aucune équipe inscrite au tournoi." ]
+
+viewColoredTeamName : Team -> Html Msg
+viewColoredTeamName team =
+  div
+    [ class "paragraphe", style "color" (Colors.toCssString team.colors) ]
+    [ text team.name ]
 
 -- View Tournament Teams Selection
 viewTournamentTeamSelection : Int -> Model -> Html Msg
@@ -98,14 +107,12 @@ viewTournamentTeamSelection tournament_id model =
 -- View Tournament Classement
 viewTournamentClassement : Tournament -> Html Msg
 viewTournamentClassement tournament =
-  div [ ]
-    (List.map (\t -> ( div [ class "paragraphe", style "color" (Colors.toCssString t.colors) ][ text t.name ] ) ) tournament.teams)
+  viewError "Classement à implémenter"
 
 -- View Tournament Classement
 viewTournamentPhases : Tournament -> Html Msg
 viewTournamentPhases tournament =
-  div [ ]
-    (List.map (\t -> ( div [ class "paragraphe", style "color" (Colors.toCssString t.colors) ][ text t.name ] ) ) tournament.teams)
+  viewError "Phases à implémenter"
 
 -- View Teams Selection Table
 viewTeamsSelectionTable : UserRights -> Tournament -> Teams -> Html Msg

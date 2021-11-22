@@ -34,7 +34,7 @@ fillForm team =
   , name = team.name
   , colors = team.colors
   , logo = team.logo
-  , picture = ""
+  , picture = team.picture
   }
 
 -- Fill the name of Team Form Data

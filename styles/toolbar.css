@@ -1,30 +1,8 @@
-.nav-toolbar-item-selected, .nav-toolbar-item-not-selected
-{
-  padding: 5px 5px 0px 0px;
-
-  width: 128px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.nav-toolbar-item-selected div, .nav-toolbar-item-not-selected div
+.action-toolbar
 {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.nav-toolbar-item-selected:hover, .nav-toolbar-item-not-selected:hover
-{
-  color : #FFA500;
-  cursor : pointer;
-}
-
-.nav-toolbar-item-selected
-{
-  border-style: dotted;
-	border-width: 1px;
-	border-color: #000088;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 10px;
 }

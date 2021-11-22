@@ -12,7 +12,7 @@ type alias Tournament =
   , location : String
   , maxTeams : Int
   , league_id : Int
-  , teams : Teams
+  , teams : List Int
   }
 
 type alias Tournaments = List Tournament
@@ -44,7 +44,7 @@ getTournament tournament_id tournaments =
 addTeam : Team -> Tournament -> Tournament
 addTeam team tournament =
   let
-    result = team :: tournament.teams
+    result = team.id :: tournament.teams
   in
     { tournament | teams = List.reverse result }
 
@@ -52,6 +52,6 @@ addTeam team tournament =
 removeTeam : Team -> Tournament -> Tournament
 removeTeam team tournament =
   let
-    result = List.filter (\t -> if (t.id == team.id) then False else True) tournament.teams
+    result = List.filter (\i -> if (i == team.id) then False else True) tournament.teams
   in
     { tournament | teams = result }

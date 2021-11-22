@@ -4,6 +4,7 @@ import Http exposing (..)
 import Url exposing (..)
 import Time exposing (..)
 import Browser exposing (..)
+import File exposing (..)
 
 import Color exposing (..)
 
@@ -101,7 +102,11 @@ type Msg
   | TeamFormNameChange String
   | TeamFormColorChange Color
   | TeamFormLogoChange String
+  | TeamFormLogoUpload
+  | TeamFormLogoGotFile File
   | TeamFormPictureChange String
+  | TeamFormPictureUpload
+  | TeamFormPictureGotFile File
   -- Team Deletion
   | TeamDelete Int
   | TeamConfirmDelete String

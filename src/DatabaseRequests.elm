@@ -27,10 +27,10 @@ import UserModel exposing (..)
 import UserCodec exposing (decoderUserProfiles)
 
 import Tournaments exposing (Tournament, defaultTournament)
-import TournamentsCodec exposing (decoderTournaments, decoderTournament)
+import TournamentsCodec exposing (decoderTournaments, decoderTournament, encoderTournament)
 
 import Teams exposing (Teams, Team, defaultTeam)
-import TeamsCodec exposing (decoderTeams, decoderTeam, encoderTeam, encoderTeamForm)
+import TeamsCodec exposing (decoderTeams, decoderTeam, encoderTeamForm)
 import TeamFormData exposing (TeamFormData)
 
 -- get the last free id from a list
@@ -227,13 +227,7 @@ retrieveTournaments =
 updateTournament : Tournament -> Cmd Msg
 updateTournament tournament =
   let
-    json = Json.Encode.object
-      [ ("id", Json.Encode.int tournament.id)
-      , ("name", Json.Encode.string tournament.name)
-      , ("maxTeams", Json.Encode.int tournament.maxTeams)
-      , ("league_id", Json.Encode.int tournament.league_id)
-      , ("teams", Json.Encode.list encoderTeam tournament.teams)
-      ]
+    json = TournamentsCodec.encoderTournament tournament
     jsonbody = Http.stringBody "application/json" (Json.Encode.encode 0 json)
   in
     Http.request
