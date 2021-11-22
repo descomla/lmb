@@ -1,7 +1,9 @@
 module Toolbar exposing (viewToolbar, ToolbarButton,
+ toolbarButtonValidate, toolbarButtonCancel,
  toolbarButtonCreateLeague, toolbarButtonModifyLeague,
  toolbarButtonCreateTournament, toolbarButtonModifyTournament,
- toolbarButtonBackToLeaguesList, toolbarButtonBackToLeague)
+ toolbarButtonBackToLeaguesList, toolbarButtonBackToLeague,
+ toolbarButtonCreateTeam)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -37,6 +39,33 @@ viewToolbar rights list =
       div [][]
     else --TODO ajouter un espace entre les boutons
       div [] htmlList
+
+-- toolbar button Validate
+--    validate the Form data
+--
+toolbarButtonValidate : Msg -> ToolbarButton
+toolbarButtonValidate msg =
+  { buttonId = "validation"
+  , labelId = "validateButton"
+  , msg = msg
+  , caption = "Valider"
+  , img = "img/validate-16x16.png"
+  , minimalRights = Director
+  }
+
+--
+-- toolbar button Validate
+--    validate the Form data
+--
+toolbarButtonCancel : Msg -> ToolbarButton
+toolbarButtonCancel msg =
+  { buttonId = "cancel"
+  , labelId = "cancelButton"
+  , msg = msg
+  , caption = "Annuler"
+  , img = "img/delete-16x16.png"
+  , minimalRights = Director
+  }
 
 --
 -- viewToolbar with arguments
@@ -162,3 +191,19 @@ toolbarButtonBackToLeague league_id fromCurrentLeague =
   , img = "img/arrow-left-16x16.png"
   , minimalRights = Visitor
   }
+
+--
+-- toolbar button CreateTeam
+--    creates a team
+--
+toolbarButtonCreateTeam : ToolbarButton
+toolbarButtonCreateTeam =
+  { buttonId = "team.creation"
+  , labelId = "createTeamButton"
+  , msg = TeamOpenForm 0
+  , caption = "Création d'une nouvelle équipe"
+  , img = "img/plus-16x16.png"
+  , minimalRights = Director
+  }
+
+--

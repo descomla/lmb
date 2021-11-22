@@ -10,8 +10,6 @@ import Model exposing (..)
 import Route exposing (..)
 import Time exposing (..)
 
-import LeaguesPages exposing (..)
-
 import ViewUserInfo exposing (viewUserInfo)
 import ViewLeague exposing (viewCurrentLeague, viewOthersLeagues)
 import ViewNavigation exposing (viewNavigation)

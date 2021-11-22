@@ -5,6 +5,8 @@ import Url exposing (..)
 import Time exposing (..)
 import Browser exposing (..)
 
+import Color exposing (..)
+
 import Session exposing (Session)
 import UserModel exposing (UserProfile, UserProfiles)
 
@@ -13,6 +15,7 @@ import Tournaments exposing (Tournament, Tournaments)
 
 import Table exposing (State)
 import Route exposing (Route)
+import Teams exposing (Team, Teams)
 
 type RequestErrorType
   = InvalidLeagueType
@@ -66,7 +69,7 @@ type Msg
   -- Tournaments
   --
   ---------------------------------------
-  | TournamentsLoaded (Result Error Tournaments)
+  | OnTournamentsLoaded (Result Error Tournaments)
   | TournamentUpdateResult (Result Error Tournament)
   -- Display a tournament
   | TournamentDisplay Int
@@ -86,4 +89,20 @@ type Msg
   -- Teams
   --
   ----------------------------------------
+  | OnTeamsLoaded (Result Error Teams)
+  -- Teams table events
   | TeamFilterNameChange String
+  -- Team Creation
+  | TeamOpenForm Int -- 0 for creation / id for update
+  | TeamValidateForm
+  | TeamCancelForm
+  | TeamValidateResult (Result Error Team)
+  -- Team Form
+  | TeamFormNameChange String
+  | TeamFormColorChange Color
+  | TeamFormLogoChange String
+  | TeamFormPictureChange String
+  -- Team Deletion
+  | TeamDelete Int
+  | TeamConfirmDelete String
+  | TeamDeletedResult (Result Error Team)

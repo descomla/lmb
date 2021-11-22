@@ -24,6 +24,9 @@ databaseTournamentsUrl : String
 databaseTournamentsUrl =
   databaseMainUrl ++ "tournaments/"
 
+databaseTeamsUrl : String
+databaseTeamsUrl =
+  databaseMainUrl ++ "teams/"
 
 siteMainUrl : String
 siteMainUrl =

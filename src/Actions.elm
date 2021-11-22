@@ -6,7 +6,7 @@ import Browser exposing (..)
 import Browser.Navigation exposing (..)
 
 import Msg exposing (..)
-import Model exposing (Model, clearError, clearTeamFilter)
+import Model exposing (Model, clearError)
 import Route exposing (..)
 import Session exposing (updateSessionUser, clearSession)
 import SessionInput exposing (clearPassword)
@@ -19,11 +19,13 @@ import CmdExtra exposing (createCmd)
 
 import UserCodec exposing (decoderUserProfiles)
 
-import LeaguesPages exposing (..)
+import League exposing (getLeague)
 import LeagueType exposing (..)
 import LeaguesModel exposing (..)
 import LeagueFormData exposing (..)
 import UserModel exposing (..)
+import TeamsModel exposing (..)
+import TeamFormData exposing (..)
 
 import LinkToJS exposing (..)
 
@@ -42,7 +44,7 @@ update msg model =
     RouteChanged route ->
       ( clearError { model | route = (Debug.log "RouteChanged " route) }, Browser.Navigation.pushUrl model.key (route2URL route) )
     UrlChanged url ->
-      ( clearError { model | route = (Debug.log "UrlChanged Route=" (parseURL (Debug.log "UrlChanged URL=" url))) }, Cmd.none )
+      ( clearError { model | route = parseURL url }, Cmd.none )
     LinkClicked urlRequest ->
       case urlRequest of
         Browser.Internal url ->
@@ -150,9 +152,13 @@ update msg model =
             , Cmd.none )
         Just league_id ->
           let
-            league = getLeague league_id model.leaguesModel
+            result = getLeague league_id model.leaguesModel.leagues
           in
-            ( clearError model, DatabaseRequests.deleteLeague league )
+            case result of
+              Nothing ->
+                ( { model | error = "La Ligue #"++s++") n'existe pas !" }, Cmd.none )
+              Just league ->
+                ( clearError model, DatabaseRequests.deleteLeague league )
     LeagueDeleteResult result ->
       case result of
         Ok _ ->
@@ -165,13 +171,14 @@ update msg model =
 
     --}
     -- Récupération de la liste des tournois
-    TournamentsLoaded result ->
+    OnTournamentsLoaded result ->
       case result of
         Ok tournaments ->
           ( clearError { model | leaguesModel = (setTournaments tournaments model.leaguesModel) }
             , Cmd.none )
         Err err ->
           ( model, CmdExtra.createCmd (DatabaseRequestResult (HttpFail err)))
+    -- Résultat d'une requête portant sur un tournoi
     TournamentUpdateResult result ->
       (model, DatabaseRequests.retrieveTournaments)
     -- Afficher le tournoi
@@ -192,7 +199,7 @@ update msg model =
           ( { model | error = ("Demande d'affichage du Tournoi #" ++ String.fromInt tournament_id ++ " depuis une mauvaise page!!") }, Cmd.none )
     -- Ajouter une équipe au tournoi
     TournamentAddTeam tournament_id team_id ->
-      case (getTeam team_id model.leaguesModel.teams) of
+      case (getTeam team_id model.teamsModel.teams) of
         Nothing -> ( { model | error = "Impossible d'ajouter l'équipe !!" }, Cmd.none )
         Just team ->
           case (getTournament tournament_id model.leaguesModel.tournaments) of
@@ -201,7 +208,8 @@ update msg model =
               let
                 updatedTournament = addTeam team tournament
               in
-                ( clearTeamFilter model, DatabaseRequests.updateTournament updatedTournament )
+                ( { model | teamsModel = clearTeamFilter model.teamsModel },
+                  DatabaseRequests.updateTournament updatedTournament )
     TournamentOpenForm i ->
       ( model, Cmd.none )-- TODO
     TournamentValidateForm ->
@@ -212,14 +220,20 @@ update msg model =
       ( model, LinkToJS.requestDeleteTournamentConfirmation (String.fromInt tournament_id) )
       --( model, LinkToJS.requestDeleteTournamentConfirmation (String.fromInt tournament_id) )
     TournamentConfirmDelete s ->
-      ( model, Cmd.none )-- TODO
-{--      case (String.toInt s) of
-        Just tournament_id ->
-          deleteTournament (tournament_id) model
+      case (String.toInt s) of
         Nothing ->
           ( { model | error = "Tournament_id reçu ("++s++") pour confirmation invalide !" }
           , Cmd.none )
---}
+        Just tournament_id ->
+          let
+            result = getTournament tournament_id model.leaguesModel.tournaments
+          in
+            case result of
+              Nothing ->
+                ( { model | error = "Le Tournoi #"++s++") n'existe pas !" }, Cmd.none )
+              Just tournament ->
+                ( clearError model, DatabaseRequests.deleteTournament tournament )
+
     TournamentValidateResult result ->
       ( model, Cmd.none )-- TODO
     TournamentDeletedResult result ->
@@ -233,12 +247,82 @@ update msg model =
         Err err ->
           ( { model | error = (httpError2String err) }, Cmd.none )
 --}
+    {--
+
+    TEAMS
+
+    --}
+    -- Récupération de la liste des équipes
+    OnTeamsLoaded result ->
+      case (Debug.log "Teams Loaded " result) of
+        Ok teams ->
+          ( clearError { model | teamsModel = (setTeams teams model.teamsModel) }
+            , Cmd.none )
+        Err err ->
+          ( model, CmdExtra.createCmd (DatabaseRequestResult (HttpFail err)))
     TeamFilterNameChange s ->
       let
         leagues_model = model.leaguesModel
         newModel = { leagues_model | teamFilter = s }
       in
         ( { model | leaguesModel = newModel }, Cmd.none )
+    TeamOpenForm team_id ->
+      if (Debug.log "TeamOpenForm #" team_id) == 0 then -- Creation form
+        ( clearError { model | teamsModel = displayTeamFormData model.teamsModel }, Cmd.none )
+      else -- Edition form
+        let
+          -- Recherche de l'équipe
+          result = getTeam team_id model.teamsModel.teams
+        in
+          case result of
+            Just team ->
+              ( clearError { model | teamsModel = initTeamFormData team model.teamsModel }, Cmd.none )
+            Nothing ->
+              ( { model | error = ("Aucune équipe #" ++ (String.fromInt team_id) ++ " trouvée !!") } , Cmd.none )
+    TeamValidateForm ->
+      ( model,
+        DatabaseRequests.validateTeamForm model.teamsModel.formData model.teamsModel.teams)
+    TeamCancelForm ->
+      ( clearError { model | teamsModel = clearTeamFormData model.teamsModel }, Cmd.none )-- TODO
+    TeamValidateResult result ->
+      case result of
+        Ok team ->
+            ( clearError { model | teamsModel = clearTeamFormData model.teamsModel },
+              DatabaseRequests.retrieveTeams )
+        Err err ->
+          ( { model | error = (httpError2String err) }, Cmd.none )
+    TeamFormNameChange s ->
+      ( { model | teamsModel = setTeamFormName s model.teamsModel }, Cmd.none )
+    TeamFormColorChange s ->
+      ( { model | teamsModel = setTeamFormColor s model.teamsModel }, Cmd.none )
+    TeamFormLogoChange s ->
+      ( { model | teamsModel = setTeamFormLogo s model.teamsModel }, Cmd.none )
+    TeamFormPictureChange s ->
+      ( { model | teamsModel = setTeamFormPicture s model.teamsModel }, Cmd.none )
+    -- Ask for team deletion to user
+    TeamDelete team_id ->
+      ( model, LinkToJS.requestDeleteTeamConfirmation (String.fromInt team_id) )
+    -- Team deletion confirmation received from user
+    TeamConfirmDelete s ->
+      case (String.toInt s) of
+        Nothing ->
+          ( { model | error = "Team_id reçu ("++s++") pour confirmation invalide !" }
+            , Cmd.none )
+        Just team_id ->
+          let
+            result = getTeam team_id model.teamsModel.teams
+          in
+            case result of
+              Nothing ->
+                ( { model | error = "L'équipe' #"++s++") n'existe pas !" }, Cmd.none )
+              Just team ->
+                ( clearError model, DatabaseRequests.deleteTeam team )
+    TeamDeletedResult result ->
+      case result of
+        Ok _ ->
+          ( clearError model, DatabaseRequests.retrieveTeams)
+        Err err ->
+          ( model, CmdExtra.createCmd (DatabaseRequestResult (HttpFail err)))
     {--
 
     GLOBAL HTTP ERROR
@@ -317,12 +401,16 @@ update_league_form_data : Msg -> Model -> (Model, Cmd Msg)
 update_league_form_data msg model =
   case msg of
     -- Display the league form
-    LeagueOpenForm i ->
+    LeagueOpenForm league_id ->
       let
-        league = getLeague i model.leaguesModel
-        formData = fillFromLeague league
+        result = getLeague league_id model.leaguesModel.leagues
       in
-        ( clearError { model | leaguesModel = setLeagueFormData formData  model.leaguesModel }, Cmd.none )
+        case result of
+          Nothing ->
+            ( { model | error = "Aucune ligue #" ++ (String.fromInt league_id) ++ "trouvée !!" }, Cmd.none )
+          Just league ->
+            ( clearError { model | leaguesModel =
+                setLeagueFormData (LeagueFormData.fillFromLeague league) model.leaguesModel }, Cmd.none )
     -- League form real-time input update
     LeagueFormNameChange s ->
       if String.isEmpty s then

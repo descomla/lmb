@@ -17,15 +17,15 @@ import Route exposing (..)
 
 import UserRights exposing (..)
 
-import League exposing (League)
+import League exposing (League, getLeague, getLeagueTournaments)
 import LeagueType exposing (..)
-import LeaguesPages exposing (..)
-import LeaguesModel exposing (LeaguesModel, getLeague, getCurrentLeague, setTournaments, getLeagueTournaments)
+import LeaguesModel exposing (LeaguesModel, getCurrentLeague, setTournaments)
 
 import Tournaments exposing (Tournament, Tournaments)
 
-import ViewTournament exposing (..)
+import TeamsModel exposing (..)
 import ViewError exposing (..)
+import ViewTournament exposing (..)
 import ViewUnderConstruction exposing (..)
 
 -- debugString : LeaguesModel -> String
@@ -91,16 +91,24 @@ viewOthersLeagues model =
 viewCurrentLeagueDefault : Model -> Html Msg
 viewCurrentLeagueDefault model =
   let
-    league = getCurrentLeague model.leaguesModel
+    result = getCurrentLeague model.leaguesModel
   in
-    viewLeagueDisplay league True model.leaguesModel model.session.rights
+    case result of
+      Nothing ->
+        viewError "Aucune ligue courante définie !!"
+      Just league ->
+        viewLeagueDisplay league True model.leaguesModel model.session.rights
 
 viewOthersLeaguesDefault : Int -> Model -> Html Msg
 viewOthersLeaguesDefault league_id model =
   let
-    league = getLeague league_id model.leaguesModel
+    result = getLeague league_id model.leaguesModel.leagues
   in
-    viewLeagueDisplay league False model.leaguesModel model.session.rights
+    case result of
+      Nothing ->
+        viewError ("Aucune ligue #" ++ (String.fromInt league_id) ++ " !!")
+      Just league ->
+        viewLeagueDisplay league False model.leaguesModel model.session.rights
 
 viewLeagueDisplay : League -> Bool -> LeaguesModel -> UserRights -> Html Msg
 viewLeagueDisplay league isCurrentLeague model rights =
@@ -110,7 +118,7 @@ viewLeagueDisplay league isCurrentLeague model rights =
     , div [class "paragraphe" ]--class "paragraphe" ]
       [ br [][]
       , div [ id "liste_tournois" ] -- liste des tournois de la ligue
-        [ lazy2 viewTournamentTable (getLeagueTournaments league model) rights ]
+        [ lazy2 viewTournamentTable (getLeagueTournaments league model.tournaments) rights ]
       , br [][]
       , lazy2 viewToolbar rights [ toolbarButtonCreateTournament league.id  ] -- Create tournament action button
       , br [][]

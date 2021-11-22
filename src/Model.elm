@@ -1,4 +1,4 @@
-module Model exposing (Model, initModel, clearError, clearTeamFilter)
+module Model exposing (Model, initModel, clearError)
 
 import Browser.Navigation exposing (..)
 import Url exposing (..)
@@ -8,6 +8,7 @@ import Route exposing (..)
 import Session exposing (Session, defaultSession)
 import SessionInput exposing (..)
 import LeaguesModel exposing (LeaguesModel, defaultLeaguesModel)
+import TeamsModel exposing (TeamsModel, defaultTeamsModel)
 
 -- MODEL
 type alias Model =
@@ -18,6 +19,7 @@ type alias Model =
   , session : Session
   , sessionInput : SessionInput
   , leaguesModel : LeaguesModel
+  , teamsModel : TeamsModel
   , error : String
   }
 
@@ -30,22 +32,9 @@ initModel url key =
     , session = defaultSession
     , sessionInput = defaultSessionInput
     , leaguesModel = defaultLeaguesModel
+    , teamsModel = defaultTeamsModel
     , error = ""
   }
-
---
---
--- CLEAR TEAM FILTER
---
---
-clearTeamFilter : Model -> Model
-clearTeamFilter model =
-  let
-    initial = model.leaguesModel
-    result = { initial | teamFilter = "" }
-  in
-    { model | leaguesModel = result }
-
 
 
 --

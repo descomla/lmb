@@ -52,5 +52,6 @@ init flags url key =
       , DatabaseRequests.retrieveLeagues
       , DatabaseRequests.retrieveCurrentLeague
       , DatabaseRequests.retrieveTournaments
+      , DatabaseRequests.retrieveTeams
       ]
   )

@@ -5,6 +5,9 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onInput, onClick, onMouseOver )
 import Html.Lazy exposing (lazy, lazy2, lazy3)
 
+import Color exposing (..)
+import Colors exposing (toCssString)
+
 import Table exposing (..)
 import TableCommon exposing (..)
 import TableActionButtons exposing (..)
@@ -36,6 +39,7 @@ viewTournament tournament_id fromCurrentLeague model =
     result = getTournament tournament_id model.leaguesModel.tournaments
   in
     case result of
+      Nothing -> viewError ("Aucun tournoi #" ++ (String.fromInt tournament_id) ++ "trouvé !!")
       Just tournament ->
         div [ class "fullWidth" ]
           [ div [ class "titre" ] [ text tournament.name ] -- Titre
@@ -57,15 +61,13 @@ viewTournament tournament_id fromCurrentLeague model =
               [ toolbarButtonBackToLeague tournament.league_id fromCurrentLeague ]
             ]
           ]
-      Nothing ->
-        viewError ("Aucun tournoi #" ++ (String.fromInt tournament_id) ++ "trouvé !!!")
 
 -- View Tournament Teams
 viewTournamentTeams : Tournament -> Html Msg
 viewTournamentTeams tournament =
   if (List.length tournament.teams) > 0 then
     div [ class "paragraphe" ]
-      (List.map (\t -> ( div [ class "paragraphe", style "color" t.textcolor ][ text t.name ] ) ) tournament.teams)
+      (List.map (\t -> ( div [ class "paragraphe", style "color" (Colors.toCssString t.colors) ][ text t.name ] ) ) tournament.teams)
   else
     div [ class "paragraphe" ] [ text "Aucune équipe inscrite au tournoi." ]
 
@@ -86,7 +88,7 @@ viewTournamentTeamSelection tournament_id model =
                 [ text "Chercher une équipe à ajouter : "
                 , Html.input [ type_ "text", id "team.name.filter", onInput TeamFilterNameChange, placeholder "", value model.leaguesModel.teamFilter ][]
                 ]
-                , lazy3 viewTeamsSelectionTable model.session.rights tournament model.leaguesModel.teams
+                , lazy3 viewTeamsSelectionTable model.session.rights tournament model.teamsModel.teams
               ]
           else --> Pas suffisamment de droits pour gérer les équipes
             div [][]
@@ -97,13 +99,13 @@ viewTournamentTeamSelection tournament_id model =
 viewTournamentClassement : Tournament -> Html Msg
 viewTournamentClassement tournament =
   div [ ]
-    (List.map (\t -> ( div [ class "paragraphe", style "color" t.textcolor ][ text t.name ] ) ) tournament.teams)
+    (List.map (\t -> ( div [ class "paragraphe", style "color" (Colors.toCssString t.colors) ][ text t.name ] ) ) tournament.teams)
 
 -- View Tournament Classement
 viewTournamentPhases : Tournament -> Html Msg
 viewTournamentPhases tournament =
   div [ ]
-    (List.map (\t -> ( div [ class "paragraphe", style "color" t.textcolor ][ text t.name ] ) ) tournament.teams)
+    (List.map (\t -> ( div [ class "paragraphe", style "color" (Colors.toCssString t.colors) ][ text t.name ] ) ) tournament.teams)
 
 -- View Teams Selection Table
 viewTeamsSelectionTable : UserRights -> Tournament -> Teams -> Html Msg

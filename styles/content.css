@@ -28,6 +28,16 @@ body
   gap: 10px;
 }
 
+#teamFormName
+{
+  width: 200px;
+}
+
+#teamFormColor
+{
+  width: 55px;
+}
+
 .infoFooter
 {
   font-weight: bold;

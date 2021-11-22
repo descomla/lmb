@@ -1,16 +1,15 @@
 module LeaguesModel exposing (LeaguesModel, defaultLeaguesModel
   , getCurrentLeague, getCurrentLeagueName, setCurrentLeague
-  , getLeague, setLeagues
+  , setLeagues
   , setLeagueFormData, clearLeagueFormData
   , setLeaguesSortState, setLeaguesFilter
-  , getLeagueTournaments, setTournaments)
+  , setTournaments)
 
 import Table exposing (State)
 
-import League exposing (League, Leagues, compareLeagueId, defaultLeague)
+import League exposing (League, Leagues, compareLeagueId, defaultLeague, getLeague)
 import LeagueFormData exposing (LeagueFormData, defaultLeagueFormData)
 
-import Teams exposing (Teams)
 import Tournaments exposing (Tournaments)
 
 --
@@ -24,7 +23,6 @@ type alias LeaguesModel =
   , currentLeague_id : Int
   , leagues : Leagues
   , tournaments : Tournaments
-  , teams : Teams
   }
 
 defaultLeaguesModel : LeaguesModel
@@ -36,21 +34,19 @@ defaultLeaguesModel =
   , currentLeague_id = 0
   , leagues = []
   , tournaments = []
-  , teams = []
   }
 
 -- get the current league
-getCurrentLeague : LeaguesModel -> League
+getCurrentLeague : LeaguesModel -> Maybe League
 getCurrentLeague model =
-  getLeague model.currentLeague_id model
+  getLeague model.currentLeague_id model.leagues
 
 -- get the current league name
-getCurrentLeagueName : LeaguesModel -> String
+getCurrentLeagueName : LeaguesModel -> Maybe String
 getCurrentLeagueName model =
-  let
-    league = getCurrentLeague model
-  in
-    league.name
+  case getCurrentLeague model of
+    Nothing -> Nothing
+    Just league -> Just league.name
 
 -- set the current league
 setCurrentLeague : League -> LeaguesModel -> LeaguesModel
@@ -61,19 +57,6 @@ setCurrentLeague league model =
 setLeagues : Leagues -> LeaguesModel -> LeaguesModel
 setLeagues ligues model =
   { model | leagues = ligues }
-
--- get the current league data
-getLeague : Int -> LeaguesModel -> League
-getLeague league_id model =
-  let
-    temp = List.filter (compareLeagueId league_id) model.leagues
-  in
-    if List.isEmpty temp then
-      { defaultLeague | name = "Aucune ligue !" {--++ (debugString model)--} }
-    else if (List.length temp) > 1 then
-      { defaultLeague | name = "Trop de ligues !" }
-    else
-      Maybe.withDefault defaultLeague (List.head temp)
 
 -- update the league form data
 setLeagueFormData : LeagueFormData -> LeaguesModel -> LeaguesModel
@@ -95,12 +78,6 @@ setLeaguesSortState state model =
 setLeaguesFilter : String -> LeaguesModel -> LeaguesModel
 setLeaguesFilter s model =
   { model | leagueFilter = s }
-
--- get Tournaments Data for a specific league
-getLeagueTournaments : League -> LeaguesModel -> Tournaments
-getLeagueTournaments league model = -- filter the full tournaments list
-  --with the tournaments id of the league
-  List.filter (\t -> t.league_id == league.id ) model.tournaments
 
 -- set Tournaments Data
 setTournaments : Tournaments -> LeaguesModel -> LeaguesModel

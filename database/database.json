@@ -46,7 +46,9 @@
       "kind": "LeagueWithRanking",
       "nbRankingTournaments": 4,
       "tournaments": [
-        1, 2, 3
+        1,
+        2,
+        3
       ]
     },
     {
@@ -97,7 +99,9 @@
       "kind": "LeagueWithRanking",
       "nbRankingTournaments": 5,
       "tournaments": [
-        1, 2, 3
+        1,
+        2,
+        3
       ]
     },
     {
@@ -394,6 +398,15 @@
       "location": "Chatenoy Le Royal",
       "maxTeams": 7,
       "league_id": 10
+    }
+  ],
+  "teams": [
+    {
+      "id": 1,
+      "name": "Anim' à fond",
+      "colors": "#cc0000",
+      "logo": "",
+      "picture": ""
     }
   ]
 }

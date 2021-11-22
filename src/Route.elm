@@ -34,31 +34,18 @@ type alias QueryParameters =
   }
 
 --
--- Debug function for Route Module
---
-debugRoute : String -> a -> a
-debugRoute s a =
-    Debug.log s a
-
-
---
 -- parse URL and get the Route from Location
 --
 parseURL : Url.Url -> Route
 parseURL url =
   let
-      l = debugRoute "parseURL url.pathname = " url.path
-      q = debugRoute "parseURL url.query = " url.query
-      f = debugRoute "parseURL url.fragment = " url.fragment
---      p = debugRoute "parseURL pathname = " (Url.Parser.parsePath Url.Parser.string url.path)
       resultRoute = Url.Parser.parse parserRoute url
---      resultQuery = Url.Parser.Query.query parserQuery url
   in
       case resultRoute of
         Just route ->
-          debugRoute "parseURL route = " route--(path2RouteEx p)
+          route
         Nothing ->
-          debugRoute "parseURL route = Nothing -> " Home
+          Home
 
 -- Parse URL to get the main Route
 parserRoute : Url.Parser.Parser (Route -> a) a
@@ -77,15 +64,6 @@ parserRoute =
         <?> Query.int "ligue"
         <?> Query.int "tournoi"
     ]
-
-{--
--- Parse URL to get the Query part
-parserQuery : Url.Parser.Query.Parser QueryParameters
-parserQuery =
-  Url.Parser.Query.map
-    QueryParameters
-    (Url.Parser."ligue" <=> Url.Parser.Query.int <&> Url.Parser.Query.s "tournoi" <=> Url.Parser.Query.int)
---}
 
 -- converter for query result on Current League
 queryToCurrentLeague : Maybe Int -> Maybe Int -> Route

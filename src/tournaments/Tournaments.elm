@@ -29,17 +29,16 @@ defaultTournament =
 
 -- get Tournament Data
 getTournament : Int -> Tournaments -> Maybe Tournament
-getTournament i tournaments =
+getTournament tournament_id tournaments =
   let
-    result = List.filter (\t -> t.id == i) tournaments
+    result = List.filter (\t -> t.id == tournament_id) tournaments
   in
-    if (List.length result) == 0 then
-      Debug.log ("No tournament #" ++ (String.fromInt i)) Nothing
+    if List.isEmpty result then
+      Debug.log ("Aucun tournoi #" ++ (String.fromInt tournament_id)) Nothing
+    else if (List.length result) > 1 then
+      Debug.log ("Trop de tournois #" ++ (String.fromInt tournament_id)) Nothing
     else
-      if (List.length result) > 1 then
-        Debug.log ("More than one tournament #" ++ (String.fromInt i)) Nothing
-      else
-        List.head result
+      List.head result
 
 -- add a Team to the Tournament
 addTeam : Team -> Tournament -> Tournament

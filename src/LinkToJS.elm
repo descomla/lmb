@@ -7,6 +7,7 @@ port module LinkToJS exposing (..)
 --}
 port requestDeleteLeagueConfirmation : String -> Cmd msg
 port requestDeleteTournamentConfirmation : String -> Cmd msg
+port requestDeleteTeamConfirmation : String -> Cmd msg
 
 {--
 //////////////////////////////////////////////////////////////////////////////
@@ -17,6 +18,7 @@ port requestDeleteTournamentConfirmation : String -> Cmd msg
 -- -- recuperation du modele XML en js dans elm
 port confirmDeleteLeague : (String -> msg) -> Sub msg
 port confirmDeleteTournament : (String -> msg) -> Sub msg
+port confirmDeleteTeam : (String -> msg) -> Sub msg
 --
 -- -- selection : recuperation de la selection js dans elm
 -- port scenarioSelected : (String -> msg) -> Sub msg

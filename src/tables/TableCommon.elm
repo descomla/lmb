@@ -5,6 +5,8 @@ import Html.Attributes exposing (..)
 import Msg exposing (..)
 import Table exposing (..)
 
+import Color exposing (Color)
+import Colors exposing (styleColor)
 
 tableCustomizations : Customizations data msg
 tableCustomizations =
@@ -24,6 +26,11 @@ tableThead headers =
 stringToHtmlDetails : String -> HtmlDetails msg
 stringToHtmlDetails str =
     HtmlDetails [ class "tableau_recherche_td" ] [ Html.text str ]
+
+-- Handle conversion from LeagueType to HtmlDetails msg
+stringToColorHtmlDetails : Color -> String -> HtmlDetails msg
+stringToColorHtmlDetails c str =
+    HtmlDetails [ class "tableau_recherche_td", styleColor c ] [ Html.text str ]
 
 tableRowAttrs : data -> List (Attribute msg)
 tableRowAttrs _ =
