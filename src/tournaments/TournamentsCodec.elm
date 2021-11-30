@@ -4,12 +4,19 @@ import Json.Decode exposing (Decoder, string, succeed)
 import Json.Encode exposing (Value)
 import Json.Decode.Pipeline exposing (required, optional)
 
+import DateCodec exposing (..)
 import TeamsCodec exposing (..)
+import PhaseCodec exposing (..)
+import MatchDurationCodec exposing (..)
 
 import Tournaments exposing (..)
 
+decoderTournaments : Decoder Tournaments
+decoderTournaments =
+    Json.Decode.list decoderTournament
+
 --
--- Json Decoder for League
+-- Json Decoder for Tournament
 --
 decoderTournament : Decoder Tournament
 decoderTournament =
@@ -20,10 +27,7 @@ decoderTournament =
     |> Json.Decode.Pipeline.required "maxTeams" (Json.Decode.int)
     |> Json.Decode.Pipeline.required "league_id" (Json.Decode.int)
     |> Json.Decode.Pipeline.optional "teams" (Json.Decode.list Json.Decode.int) []
-
-decoderTournaments : Decoder Tournaments
-decoderTournaments =
-    Json.Decode.list decoderTournament
+    |> Json.Decode.Pipeline.optional "phases"(Json.Decode.list decoderPhase) []
 
 --
 -- Json Encoder for Tournament
@@ -37,4 +41,5 @@ encoderTournament tournament =
       , ("maxTeams", Json.Encode.int tournament.maxTeams)
       , ("league_id", Json.Encode.int tournament.league_id)
       , ("teams", Json.Encode.list Json.Encode.int tournament.teams)
+      , ("phases", Json.Encode.list encoderPhase tournament.phases)
       ]

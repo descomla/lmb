@@ -19,11 +19,13 @@ import UserRights exposing (..)
 
 import League exposing (League, getLeague, getLeagueTournaments)
 import LeagueType exposing (..)
-import LeaguesModel exposing (LeaguesModel, getCurrentLeague, setTournaments)
+import LeaguesModel exposing (LeaguesModel, getCurrentLeague)
 
 import Tournaments exposing (Tournament, Tournaments)
+import TournamentsModel exposing (setTournaments)
 
 import TeamsModel exposing (..)
+
 import ViewError exposing (..)
 import ViewTournament exposing (..)
 import ViewUnderConstruction exposing (..)
@@ -91,36 +93,36 @@ viewOthersLeagues model =
 viewCurrentLeagueDefault : Model -> Html Msg
 viewCurrentLeagueDefault model =
   let
-    result = getCurrentLeague model.leaguesModel
+    (mb_league, error) = getCurrentLeague model.leaguesModel
   in
-    case result of
+    case mb_league of
       Nothing ->
         viewError "Aucune ligue courante définie !!"
       Just league ->
-        viewLeagueDisplay league True model.leaguesModel model.session.rights
+        viewLeagueDisplay league True model
 
 viewOthersLeaguesDefault : Int -> Model -> Html Msg
 viewOthersLeaguesDefault league_id model =
   let
-    result = getLeague league_id model.leaguesModel.leagues
+    (mb_league, error) = getLeague league_id model.leaguesModel.leagues
   in
-    case result of
+    case mb_league of
       Nothing ->
-        viewError ("Aucune ligue #" ++ (String.fromInt league_id) ++ " !!")
+        viewError error
       Just league ->
-        viewLeagueDisplay league False model.leaguesModel model.session.rights
+        viewLeagueDisplay league False model
 
-viewLeagueDisplay : League -> Bool -> LeaguesModel -> UserRights -> Html Msg
-viewLeagueDisplay league isCurrentLeague model rights =
+viewLeagueDisplay : League -> Bool -> Model -> Html Msg
+viewLeagueDisplay league isCurrentLeague model =
   div [ class "fullWidth" ]
     [ div [ class "titre" ] [ text league.name ] -- Titre
     , div [ class "soustitre" ][ text "Tournois" ] -- Sous-titre
     , div [class "paragraphe" ]--class "paragraphe" ]
       [ br [][]
       , div [ id "liste_tournois" ] -- liste des tournois de la ligue
-        [ lazy2 viewTournamentTable (getLeagueTournaments league model.tournaments) rights ]
+        [ lazy2 viewTournamentTable (getLeagueTournaments league model.tournamentsModel.tournaments) model.session.rights ]
       , br [][]
-      , lazy2 viewToolbar rights [ toolbarButtonCreateTournament league.id  ] -- Create tournament action button
+      , lazy2 viewToolbar model.session.rights [ toolbarButtonCreateTournament league.id  ] -- Create tournament action button
       , br [][]
       ]
     , div [ class "soustitre" ][ text "Classement" ] -- Sous-titre
@@ -130,9 +132,9 @@ viewLeagueDisplay league isCurrentLeague model rights =
         [ lazy viewClassementTable league ]
       , br [][]
       , if isCurrentLeague then -- Modification of the league actions button
-          lazy2 viewToolbar rights [ toolbarButtonModifyLeague league.id ]
+          lazy2 viewToolbar model.session.rights [ toolbarButtonModifyLeague league.id ]
         else -- Modification of the league actions button + Back to leagues list action button
-          lazy2 viewToolbar rights [ toolbarButtonModifyLeague league.id, toolbarButtonBackToLeaguesList ]
+          lazy2 viewToolbar model.session.rights [ toolbarButtonModifyLeague league.id, toolbarButtonBackToLeaguesList ]
       ]
     ]
 
@@ -188,7 +190,7 @@ tournamentActionsDetails : UserRights -> Int -> HtmlDetails Msg
 tournamentActionsDetails rights i =
   renderActionButtons rights
     [ actionButton "EditTournament" (TournamentDisplay i) "img/arrow-right-16x16.png" Visitor
-    , actionButton "DeleteTournament" (TournamentDelete i) "img/delete-16x16.png" Director
+    , actionButton "DeleteTournament" (TournamentDelete i) "img/trash-16x16.png" Director
     ]
 
 {--
@@ -295,7 +297,7 @@ leagueActionsDetails : UserRights -> Int -> HtmlDetails Msg
 leagueActionsDetails rights i =
   renderActionButtons rights
     [ actionButton "EditLeague" (LeagueDisplay i) "img/arrow-right-16x16.png" Visitor
-    , actionButton "DeleteLeague" (LeagueDelete i) "img/delete-16x16.png" Director
+    , actionButton "DeleteLeague" (LeagueDelete i) "img/trash-16x16.png" Director
     ]
 
 {--

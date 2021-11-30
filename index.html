@@ -12,6 +12,7 @@
     <link rel="stylesheet" type="text/css" href="styles/toolbar.css">
     <link rel="stylesheet" type="text/css" href="styles/login.css">
     <link rel="stylesheet" type="text/css" href="styles/colors.css">
+    <link rel="stylesheet" type="text/css" href="styles/date-selector.css">
 
   </head>
   <body>
@@ -38,6 +39,24 @@
       app.ports.requestDeleteTeamConfirmation.subscribe(function(word) {
         if( confirm("Voulez-vous vraiment supprimer cette équipe?"/*""(id="+word+")"*/) == true ) {
           app.ports.confirmDeleteTeam.send(word);
+        }
+      });
+      // Définition des ports de connexion pour LinkToJS (sens ELM vers JS)
+      app.ports.requestRemoveTournamentTeamConfirmation.subscribe(function(word) {
+        if( confirm("Voulez-vous vraiment retirer cette équipe du tournoi?"/*""(id="+word+")"*/) == true ) {
+          app.ports.confirmRemoveTournamentTeam.send(word);
+        }
+      });
+      // Définition des ports de connexion pour LinkToJS (sens ELM vers JS)
+      app.ports.requestDeletePhaseConfirmation.subscribe(function(word) {
+        if( confirm("Voulez-vous vraiment supprimer cette phase?"/*""(id="+word+")"*/) == true ) {
+          app.ports.confirmDeletePhase.send(word);
+        }
+      });
+      // Définition des ports de connexion pour LinkToJS (sens ELM vers JS)
+      app.ports.requestDeletePouleConfirmation.subscribe(function(word) {
+        if( confirm("Voulez-vous vraiment supprimer cette poule?"/*""(id="+word+")"*/) == true ) {
+          app.ports.confirmDeletePoule.send(word);
         }
       });
 

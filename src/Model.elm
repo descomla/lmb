@@ -8,6 +8,7 @@ import Route exposing (..)
 import Session exposing (Session, defaultSession)
 import SessionInput exposing (..)
 import LeaguesModel exposing (LeaguesModel, defaultLeaguesModel)
+import TournamentsModel exposing (TournamentsModel, defaultTournamentsModel)
 import TeamsModel exposing (TeamsModel, defaultTeamsModel)
 
 -- MODEL
@@ -19,6 +20,7 @@ type alias Model =
   , session : Session
   , sessionInput : SessionInput
   , leaguesModel : LeaguesModel
+  , tournamentsModel : TournamentsModel
   , teamsModel : TeamsModel
   , error : String
   }
@@ -32,6 +34,7 @@ initModel url key =
     , session = defaultSession
     , sessionInput = defaultSessionInput
     , leaguesModel = defaultLeaguesModel
+    , tournamentsModel = defaultTournamentsModel
     , teamsModel = defaultTeamsModel
     , error = ""
   }

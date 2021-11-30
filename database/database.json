@@ -369,7 +369,80 @@
       "name": "Rennes 2017",
       "location": "Rennes",
       "maxTeams": 12,
-      "league_id": 9
+      "league_id": 9,
+      "teams": [
+        1
+      ],
+      "phases": [
+        {
+          "id": 1,
+          "name": "Poules",
+          "date": "2022-02-19",
+          "parameters": {
+            "nbPoules": 4,
+            "matchDuration": {
+              "nbPeriod": 2,
+              "duration": 8
+            },
+            "poules": [
+              {
+                "id": 1,
+                "name": "poule 1",
+                "status": "Pending",
+                "pointsVictory": 10000,
+                "pointsDefeat": 0,
+                "pointsNull": 100,
+                "goalAverage": 0
+              }
+            ]
+          }
+        },
+        {
+          "id": 2,
+          "name": "Poules",
+          "date": "2022-02-19",
+          "parameters": {
+            "nbTeams": 16,
+            "finale": {
+              "nbPeriod": 4,
+              "duration": 10
+            },
+            "littleFinale": {
+              "nbPeriod": 4,
+              "duration": 10
+            },
+            "semiFinale": {
+              "nbPeriod": 4,
+              "duration": 10
+            },
+            "quarterFinale": {
+              "nbPeriod": 4,
+              "duration": 10
+            },
+            "eighthFinale": {
+              "nbPeriod": 4,
+              "duration": 10
+            },
+            "sixteenthFinale": {
+              "nbPeriod": 4,
+              "duration": 10
+            }
+          }
+        },
+        {
+          "id": 3,
+          "name": "Poules",
+          "date": "2022-02-20",
+          "parameters": {
+            "nbPoules": 3,
+            "matchDuration": {
+              "nbPeriod": 2,
+              "duration": 8
+            },
+            "poules": []
+          }
+        }
+      ]
     },
     {
       "id": 38,

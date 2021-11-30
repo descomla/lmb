@@ -2,8 +2,7 @@ module LeaguesModel exposing (LeaguesModel, defaultLeaguesModel
   , getCurrentLeague, getCurrentLeagueName, setCurrentLeague
   , setLeagues
   , setLeagueFormData, clearLeagueFormData
-  , setLeaguesSortState, setLeaguesFilter
-  , setTournaments)
+  , setLeaguesSortState, setLeaguesFilter)
 
 import Table exposing (State)
 
@@ -19,10 +18,8 @@ type alias LeaguesModel =
   { sortState : Table.State -- table current sort
   , leagueFilter : String -- search text by name
   , leagueForm : LeagueFormData
-  , teamFilter : String -- search team by name
   , currentLeague_id : Int
   , leagues : Leagues
-  , tournaments : Tournaments
   }
 
 defaultLeaguesModel : LeaguesModel
@@ -30,23 +27,24 @@ defaultLeaguesModel =
   { sortState = Table.initialSort "name"
   , leagueFilter = ""
   , leagueForm = defaultLeagueFormData
-  , teamFilter = ""
   , currentLeague_id = 0
   , leagues = []
-  , tournaments = []
   }
 
 -- get the current league
-getCurrentLeague : LeaguesModel -> Maybe League
+getCurrentLeague : LeaguesModel -> (Maybe League, String)
 getCurrentLeague model =
   getLeague model.currentLeague_id model.leagues
 
 -- get the current league name
-getCurrentLeagueName : LeaguesModel -> Maybe String
+getCurrentLeagueName : LeaguesModel -> (Maybe String, String)
 getCurrentLeagueName model =
-  case getCurrentLeague model of
-    Nothing -> Nothing
-    Just league -> Just league.name
+  let
+    (mb_league, error) = getCurrentLeague model
+  in
+    case mb_league of
+      Nothing -> (Nothing, error)
+      Just league -> (Just league.name, "")
 
 -- set the current league
 setCurrentLeague : League -> LeaguesModel -> LeaguesModel
@@ -78,8 +76,3 @@ setLeaguesSortState state model =
 setLeaguesFilter : String -> LeaguesModel -> LeaguesModel
 setLeaguesFilter s model =
   { model | leagueFilter = s }
-
--- set Tournaments Data
-setTournaments : Tournaments -> LeaguesModel -> LeaguesModel
-setTournaments tournois model =
-  { model | tournaments = tournois }

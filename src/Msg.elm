@@ -5,17 +5,27 @@ import Url exposing (..)
 import Time exposing (..)
 import Browser exposing (..)
 import File exposing (..)
+import Date exposing (..)
+import Table exposing (State)
+
+import Route exposing (Route)
 
 import Color exposing (..)
 
 import Session exposing (Session)
+
 import UserModel exposing (UserProfile, UserProfiles)
 
 import League exposing (League, Leagues)
+
 import Tournaments exposing (Tournament, Tournaments)
 
-import Table exposing (State)
-import Route exposing (Route)
+import Phase exposing (PhaseType, PouleData)
+import PhaseFormEvent exposing (..)
+
+import Poule exposing (..)
+import PouleFormEvent exposing (..)
+
 import Teams exposing (Team, Teams)
 
 type RequestErrorType
@@ -60,31 +70,44 @@ type Msg
   | LeagueOpenForm Int -- 0 for creation / id for update
   | LeagueValidateForm
   | LeagueCancelForm
-  | LeagueValidateFormResult (Result Error League)
   -- League Deletion
   | LeagueDelete Int
   | LeagueConfirmDelete String
-  | LeagueDeleteResult (Result Error League)
+  -- League request result
+  | LeagueResult (Result Error League)
   ---------------------------------------
   --
   -- Tournaments
   --
   ---------------------------------------
   | OnTournamentsLoaded (Result Error Tournaments)
-  | TournamentUpdateResult (Result Error Tournament)
   -- Display a tournament
   | TournamentDisplay Int
   -- Tournament add team
   | TournamentAddTeam Int Int -- tournament id / team id
+  | TournamentRemoveTeam Int Int -- tournament id / team id
+  | TournamentConfirmRemoveTeam String -- tournament id / team id
   -- Tournament Creation
   | TournamentOpenForm Int -- 0 for creation / id for update
   | TournamentValidateForm
   | TournamentCancelForm
-  | TournamentValidateResult (Result Error Tournament)
   -- Tournament Deletion
   | TournamentDelete Int
   | TournamentConfirmDelete String
-  | TournamentDeletedResult (Result Error Tournament)
+  -- Tournament request result
+  | TournamentResult (Result Error Tournament)
+  ---------------------------------------
+  --
+  -- Phases
+  --
+  ---------------------------------------
+  -- Tournament Phase Form
+  | TournamentPhaseFormEvent PhaseFormEvent
+  | TournamentPhaseValidateForm
+  | TournamentPhaseCancelForm
+  -- Tournament Phase Deletion
+  | TournamentPhaseDelete Int Int -- tournament id / phase id
+  | TournamentPhaseConfirmDelete String -- tournament id / phase id
   ----------------------------------------
   --
   -- Teams
@@ -97,7 +120,6 @@ type Msg
   | TeamOpenForm Int -- 0 for creation / id for update
   | TeamValidateForm
   | TeamCancelForm
-  | TeamValidateResult (Result Error Team)
   -- Team Form
   | TeamFormNameChange String
   | TeamFormColorChange Color
@@ -110,4 +132,25 @@ type Msg
   -- Team Deletion
   | TeamDelete Int
   | TeamConfirmDelete String
-  | TeamDeletedResult (Result Error Team)
+  -- Team request result
+  | TeamResult (Result Error Team)
+  ----------------------------------------
+  --
+  -- Poules
+  --
+  ----------------------------------------
+  | PouleDisplay Int Int Int --tournament_id phase_id poule_id
+  -- Poule Creation
+  | PouleFormInput PouleFormEvent
+  | PouleValidateForm
+  | PouleCancelForm
+  -- Poule Deletion
+  | PouleDelete Int Int Int --tournament_id phase_id poule_id
+  | PouleConfirmDelete String
+  ----------------------------------------
+  --
+  -- Matchs
+  --
+  ----------------------------------------
+  | MatchPrint Int -- match id
+  | MatchPrintAll Int Int -- tournament id / phase id

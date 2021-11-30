@@ -3,6 +3,7 @@ module Tournaments exposing (Tournament, Tournaments, defaultTournament
   , addTeam, removeTeam)
 
 import Teams exposing (..)
+import Phase exposing (Phase)
 --
 -- Tournament
 --
@@ -13,6 +14,7 @@ type alias Tournament =
   , maxTeams : Int
   , league_id : Int
   , teams : List Int
+  , phases : List Phase
   }
 
 type alias Tournaments = List Tournament
@@ -25,20 +27,25 @@ defaultTournament =
   , maxTeams = 0
   , league_id = 0
   , teams = []
+  , phases = []
   }
 
 -- get Tournament Data
-getTournament : Int -> Tournaments -> Maybe Tournament
+getTournament : Int -> Tournaments -> (Maybe Tournament, String)
 getTournament tournament_id tournaments =
   let
     result = List.filter (\t -> t.id == tournament_id) tournaments
   in
     if List.isEmpty result then
-      Debug.log ("Aucun tournoi #" ++ (String.fromInt tournament_id)) Nothing
+      ( Nothing, "Aucun tournoi #" ++ (String.fromInt tournament_id) )
     else if (List.length result) > 1 then
-      Debug.log ("Trop de tournois #" ++ (String.fromInt tournament_id)) Nothing
+      ( Nothing, "Trop de tournois #" ++ (String.fromInt tournament_id) )
     else
-      List.head result
+      case List.head result of
+        Nothing ->
+          ( Nothing, "Le tournoi #" ++ (String.fromInt tournament_id) ++ "n'a pas été trouvé" )
+        Just tournament ->
+          ( Just tournament, "" )
 
 -- add a Team to the Tournament
 addTeam : Team -> Tournament -> Tournament

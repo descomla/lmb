@@ -133,7 +133,7 @@ teamsActionsDetails : UserRights -> Int -> HtmlDetails Msg
 teamsActionsDetails rights team_id =
   renderActionButtons rights
     [ actionButton "EditTeam" (TeamOpenForm team_id) "img/edit-16x16.png" Director
-    , actionButton "DeleteTeam" (TeamDelete team_id) "img/delete-16x16.png" Director
+    , actionButton "DeleteTeam" (TeamDelete team_id) "img/trash-16x16.png" Director
     ]
 
 

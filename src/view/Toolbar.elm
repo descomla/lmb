@@ -1,9 +1,4 @@
-module Toolbar exposing (viewToolbar, ToolbarButton,
- toolbarButtonValidate, toolbarButtonCancel,
- toolbarButtonCreateLeague, toolbarButtonModifyLeague,
- toolbarButtonCreateTournament, toolbarButtonModifyTournament,
- toolbarButtonBackToLeaguesList, toolbarButtonBackToLeague,
- toolbarButtonCreateTeam)
+module Toolbar exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -11,8 +6,10 @@ import Html.Events exposing (..)
 
 import Msg exposing (..)
 import UserRights exposing (..)
-
 import Route exposing (..)
+import PhaseFormEvent exposing (..)
+import Phase exposing (PouleData)
+import PouleFormEvent exposing (..)
 
 type alias ToolbarButton =
   { buttonId : String
@@ -22,6 +19,13 @@ type alias ToolbarButton =
   , img : String -- optional : empty if not required
   , minimalRights : UserRights
   }
+
+actionImg : String -> Msg -> UserRights -> UserRights -> Html Msg
+actionImg imgPath msg rights expected =
+  if isUpperOrEqualRights expected rights then
+    img [src imgPath, width 16, onClick msg] []
+  else
+    text ""
 
 --
 -- viewToolbar with arguments
@@ -105,8 +109,8 @@ viewToolbarButton button =
 --
 toolbarButtonCreateLeague : ToolbarButton
 toolbarButtonCreateLeague =
-  { buttonId = "ligue.creation.ligue"
-  , labelId = "createLeagueButton"
+  { buttonId = "createLeagueButton"
+  , labelId = "createLeagueButtonLabel"
   , msg = LeagueOpenForm 0
   , caption = "Création d'une nouvelle ligue"
   , img = "img/plus-16x16.png"
@@ -120,8 +124,8 @@ toolbarButtonCreateLeague =
 --
 toolbarButtonModifyLeague : Int -> ToolbarButton
 toolbarButtonModifyLeague league_id =
-  { buttonId = "ligue.modifie.ligue"
-  , labelId = "modifyLeagueButton"
+  { buttonId = "modifyLeagueButton"
+  , labelId = "modifyLeagueButtonLabel"
   , msg = LeagueOpenForm league_id
   , caption = "Modification de la ligue"
   , img = "img/edit-16x16.png"
@@ -134,8 +138,8 @@ toolbarButtonModifyLeague league_id =
 --
 toolbarButtonBackToLeaguesList : ToolbarButton
 toolbarButtonBackToLeaguesList =
-  { buttonId = "ligue.retour.ligues"
-  , labelId = "backToLeaguesListButton"
+  { buttonId = "backToLeaguesListButton"
+  , labelId = "backToLeaguesListButtonLabel"
   , msg = RouteChanged (OthersLeagues NoQuery)
   , caption = "Retour à la liste des ligues"
   , img = "img/arrow-left-16x16.png"
@@ -150,8 +154,8 @@ toolbarButtonBackToLeaguesList =
 --
 toolbarButtonCreateTournament : Int -> ToolbarButton
 toolbarButtonCreateTournament league_id =
-  { buttonId = "ligues.creation.tournoi"
-  , labelId = "createTournamentButton"
+  { buttonId = "createTournamentButton"
+  , labelId = "createTournamentButtonLabel"
   , msg = RouteChanged (CurrentLeague NoQuery) --TODO -TournamentOpenForm league_id 0
   , caption = "Création d'un nouveau tournoi pour cette ligue"
   , img = "img/plus-16x16.png"
@@ -159,18 +163,35 @@ toolbarButtonCreateTournament league_id =
   }
 
 --
--- toolbar button ModifyTournament
---    modify a tournament for the selected league
+-- toolbar button CreateTournamentPhase
+--    creates a tournament phase
 --    -> Int : the league id
---    -> Int : the tournament id / 0 for new one
+--    -> Int : the tournament id
 --
-toolbarButtonModifyTournament : Int -> Int -> ToolbarButton
-toolbarButtonModifyTournament league_id tournament_id =
-  { buttonId = "ligues.modify.tournoi"
-  , labelId = "modifyTournamentButton"
-  , msg = TournamentOpenForm tournament_id
-  , caption = "Modification du tournoi"
-  , img = "img/edit-16x16.png"
+toolbarButtonCreateTournamentPhase : Int -> Int -> ToolbarButton
+toolbarButtonCreateTournamentPhase league_id tournament_id =
+  { buttonId = "createTournamentPhaseButton"
+  , labelId = "createTournamentPhaseButtonLabel"
+  , msg = TournamentPhaseFormEvent (PhaseFormEvent.AddPhase tournament_id)
+  , caption = "Création d'un nouveau tournoi pour cette ligue"
+  , img = "img/plus-16x16.png"
+  , minimalRights = Director
+  }
+
+--
+-- toolbar button CreatePoule
+--    creates a tournament phase poule
+--    -> Int : the tournament id
+--    -> Int : phase id
+--    -> PouleData : poule configuration
+--
+toolbarButtonCreatePoule : Int -> Int -> ToolbarButton
+toolbarButtonCreatePoule tournament_id phase_id =
+  { buttonId = "createTournamentPouleButton"
+  , labelId = "createTournamentPouleButtonLabel"
+  , msg = (PouleFormInput (PouleFormEvent.AddPoule tournament_id phase_id))
+  , caption = "Création d'une nouvelle poule pour cette phase"
+  , img = "img/plus-16x16.png"
   , minimalRights = Director
   }
 
@@ -180,8 +201,8 @@ toolbarButtonModifyTournament league_id tournament_id =
 --
 toolbarButtonBackToLeague : Int -> Bool -> ToolbarButton
 toolbarButtonBackToLeague league_id fromCurrentLeague =
-  { buttonId = "ligue.retour.ligue"
-  , labelId = "backToLeagueButton"
+  { buttonId = "backToLeagueButton"
+  , labelId = "backToLeagueButtonLabel"
   , msg =
     if fromCurrentLeague then
       RouteChanged (CurrentLeague NoQuery)
@@ -198,8 +219,8 @@ toolbarButtonBackToLeague league_id fromCurrentLeague =
 --
 toolbarButtonCreateTeam : ToolbarButton
 toolbarButtonCreateTeam =
-  { buttonId = "team.creation"
-  , labelId = "createTeamButton"
+  { buttonId = "createTeamButton"
+  , labelId = "createTeamButtonLabel"
   , msg = TeamOpenForm 0
   , caption = "Création d'une nouvelle équipe"
   , img = "img/plus-16x16.png"
@@ -207,3 +228,15 @@ toolbarButtonCreateTeam =
   }
 
 --
+-- toolbar button Print
+--    creates a team
+--
+toolbarButtonPrintAll : Int -> Int -> ToolbarButton
+toolbarButtonPrintAll tournament_id phase_id =
+  { buttonId = "printAllButton"
+  , labelId = "printAllButtonLabel"
+  , msg = MatchPrintAll tournament_id phase_id
+  , caption = "Imprimer les feuilles de match"
+  , img = "img/printer-16x16.png"
+  , minimalRights = Visitor
+  }

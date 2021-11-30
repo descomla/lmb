@@ -40,6 +40,10 @@ subscriptions model =
         [ Time.every 1000 TickTime
         , LinkToJS.confirmDeleteLeague LeagueConfirmDelete
         , LinkToJS.confirmDeleteTournament TournamentConfirmDelete
+        , LinkToJS.confirmDeleteTeam TeamConfirmDelete
+        , LinkToJS.confirmRemoveTournamentTeam TournamentConfirmRemoveTeam
+        --, LinkToJS.confirmDeletePhase TournamentConfirmDeletePhase
+        , LinkToJS.confirmDeletePoule PouleConfirmDelete
           --, WebSocket.listen (model.modelURL) (NewSimuState << Json.Decode.decodeString Decoders.timerResponseDecode)--, LinkToJS.scenarioSelected ScenarioSelected
         ]
 

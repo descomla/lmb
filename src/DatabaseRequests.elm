@@ -85,7 +85,7 @@ createLeague leagues skind name nb =
     Http.post
       { url = databaseLeaguesUrl
       , body = jsonbody
-      , expect = Http.expectJson LeagueValidateFormResult decoderLeague
+      , expect = Http.expectJson LeagueResult decoderLeague
       }
 
 --
@@ -107,7 +107,7 @@ patchLeague  id skind name nb =
       , headers = []
       , url = databaseLeaguesUrl ++ (String.fromInt id)
       , body = jsonbody
-      , expect = Http.expectJson LeagueValidateFormResult decoderLeague
+      , expect = Http.expectJson LeagueResult decoderLeague
       , timeout = Nothing
       , tracker = Nothing
       }
@@ -132,7 +132,7 @@ updateLeague league =
       , headers = []
       , url = databaseLeaguesUrl ++ (String.fromInt league.id)
       , body = jsonbody
-      , expect = Http.expectJson LeagueValidateFormResult decoderLeague
+      , expect = Http.expectJson LeagueResult decoderLeague
       , timeout = Nothing
       , tracker = Nothing
       }
@@ -155,7 +155,7 @@ deleteLeague league =
       , headers = []
       , url = databaseLeaguesUrl ++ (String.fromInt league.id)
       , body = Http.emptyBody
-      , expect = Http.expectJson LeagueDeleteResult decoder
+      , expect = Http.expectJson LeagueResult decoder
       , timeout = Nothing
       , tracker = Nothing
       }
@@ -231,11 +231,11 @@ updateTournament tournament =
     jsonbody = Http.stringBody "application/json" (Json.Encode.encode 0 json)
   in
     Http.request
-      { method = "POST" -- "UPDATE"
+      { method = "PATCH" -- "UPDATE"
       , headers = []
       , url = databaseTournamentsUrl ++ (String.fromInt tournament.id)
       , body = jsonbody
-      , expect = Http.expectJson TournamentUpdateResult decoderTournament
+      , expect = Http.expectJson TournamentResult decoderTournament
       , timeout = Nothing
       , tracker = Nothing
       }
@@ -258,7 +258,7 @@ deleteTournament tournament =
       , headers = []
       , url = databaseTournamentsUrl ++ (String.fromInt tournament.id)
       , body = Http.emptyBody
-      , expect = Http.expectJson TournamentDeletedResult decoder
+      , expect = Http.expectJson TournamentResult decoder
       , timeout = Nothing
       , tracker = Nothing
       }
@@ -296,7 +296,7 @@ createTeam data teams =
     Http.post
       { url = databaseTeamsUrl
       , body = jsonbody
-      , expect = Http.expectJson TeamValidateResult decoderTeam
+      , expect = Http.expectJson TeamResult decoderTeam
       }
 
 --
@@ -313,7 +313,7 @@ patchTeam data =
       , headers = []
       , url = databaseTeamsUrl ++ (String.fromInt data.id)
       , body = jsonbody
-      , expect = Http.expectJson TeamValidateResult decoderTeam
+      , expect = Http.expectJson TeamResult decoderTeam
       , timeout = Nothing
       , tracker = Nothing
       }
@@ -336,7 +336,7 @@ deleteTeam team =
       , headers = []
       , url = databaseTeamsUrl ++ (String.fromInt team.id)
       , body = Http.emptyBody
-      , expect = Http.expectJson TeamDeletedResult decoder
+      , expect = Http.expectJson TeamResult decoder
       , timeout = Nothing
       , tracker = Nothing
       }

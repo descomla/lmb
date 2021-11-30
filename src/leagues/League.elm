@@ -33,17 +33,17 @@ compareLeagueId i league =
   i == league.id
 
 -- get a league data
-getLeague : Int -> Leagues -> Maybe League
+getLeague : Int -> Leagues -> (Maybe League, String)
 getLeague league_id leagues =
   let
     result = List.filter (compareLeagueId league_id) leagues
   in
     if List.isEmpty result then
-      Debug.log ("Aucune ligue #" ++ (String.fromInt league_id)) Nothing
+      (Nothing, "Aucune ligue #" ++ (String.fromInt league_id) )
     else if (List.length result) > 1 then
-      Debug.log ("Trop de ligues #" ++ (String.fromInt league_id)) Nothing
+      (Nothing, "Trop de ligues #" ++ (String.fromInt league_id) )
     else
-      List.head result
+      (List.head result, "")
 
 -- get Tournaments Data for a specific league
 getLeagueTournaments : League -> Tournaments -> Tournaments

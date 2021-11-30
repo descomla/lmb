@@ -22,6 +22,8 @@ type Query
   | QueryLeague Int -- league_id
   | QueryTournament Int -- tournament_id
   | QueryLeagueTournament Int Int -- league_id + tournament_id
+--  | QueryTournamentPoule Int Int Int -- tournament_id phase_id poule_id
+--  | QueryLeagueTournamentPoule Int Int Int Int -- league_id + tournament_id phase_id poule_id
 
 {--
 --

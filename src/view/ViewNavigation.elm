@@ -91,9 +91,12 @@ routeDisplayName route model =
       Players -> "Les joueurs"
       Teams -> "Les équipes"
       CurrentLeague s ->
-        case getCurrentLeagueName model.leaguesModel of
-          Nothing -> "Ligue courante"-- si la ligue courante n'est pas définie, on affiche un générique
-          Just name -> name -- si la ligue courante est définie, on affiche son nom
+        let
+          (mb_name, error) = getCurrentLeagueName model.leaguesModel
+        in
+          case mb_name of
+            Nothing -> "Ligue courante"-- si la ligue courante n'est pas définie, on affiche un générique
+            Just name -> name -- si la ligue courante est définie, on affiche son nom
       OthersLeagues s -> "Les autres ligues"
       Configuration -> "Configuration"
       Help -> "Aide"
