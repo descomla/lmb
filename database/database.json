@@ -387,7 +387,34 @@
             "poules": [
               {
                 "id": 1,
-                "name": "poule 1",
+                "name": "A",
+                "status": "Pending",
+                "pointsVictory": 10000,
+                "pointsDefeat": 0,
+                "pointsNull": 100,
+                "goalAverage": 0
+              },
+              {
+                "id": 2,
+                "name": "B",
+                "status": "Pending",
+                "pointsVictory": 10000,
+                "pointsDefeat": 0,
+                "pointsNull": 100,
+                "goalAverage": 0
+              },
+              {
+                "id": 3,
+                "name": "C",
+                "status": "Pending",
+                "pointsVictory": 10000,
+                "pointsDefeat": 0,
+                "pointsNull": 100,
+                "goalAverage": 0
+              },
+              {
+                "id": 4,
+                "name": "D",
                 "status": "Pending",
                 "pointsVictory": 10000,
                 "pointsDefeat": 0,

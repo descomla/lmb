@@ -26,6 +26,10 @@ setTournaments : Tournaments -> TournamentsModel -> TournamentsModel
 setTournaments tournois model =
   { model | tournaments = tournois }
 
+closeTournamentsForms : TournamentsModel -> TournamentsModel
+closeTournamentsForms model =
+  closePouleForm (closePhaseForm model)
+
 closePhaseForm : TournamentsModel -> TournamentsModel
 closePhaseForm model =
   { model | phaseForm = defaultPhaseForm }

@@ -1,4 +1,4 @@
-module Model exposing (Model, initModel, clearError)
+module Model exposing (Model, initModel, clearError, closeAllForms)
 
 import Browser.Navigation exposing (..)
 import Url exposing (..)
@@ -7,9 +7,9 @@ import Time exposing (Posix, Zone)
 import Route exposing (..)
 import Session exposing (Session, defaultSession)
 import SessionInput exposing (..)
-import LeaguesModel exposing (LeaguesModel, defaultLeaguesModel)
-import TournamentsModel exposing (TournamentsModel, defaultTournamentsModel)
-import TeamsModel exposing (TeamsModel, defaultTeamsModel)
+import LeaguesModel exposing (LeaguesModel, defaultLeaguesModel, clearLeagueFormData)
+import TournamentsModel exposing (TournamentsModel, defaultTournamentsModel, closeTournamentsForms)
+import TeamsModel exposing (TeamsModel, defaultTeamsModel, clearTeamFormData)
 
 -- MODEL
 type alias Model =
@@ -39,6 +39,23 @@ initModel url key =
     , error = ""
   }
 
+
+--
+-- Close all forms
+--
+closeAllForms : Model -> Model
+closeAllForms model =
+    { route = model.route
+    , key = model.key
+    , zone = model.zone
+    , time = model.time
+    , session = model.session
+    , sessionInput = model.sessionInput
+    , leaguesModel = clearLeagueFormData model.leaguesModel
+    , tournamentsModel = closeTournamentsForms model.tournamentsModel
+    , teamsModel = clearTeamFormData model.teamsModel
+    , error = model.error
+  }
 
 --
 -- Clear error

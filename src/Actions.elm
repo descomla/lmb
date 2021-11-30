@@ -10,7 +10,7 @@ import Task
 import Date exposing (..)
 
 import Msg exposing (..)
-import Model exposing (Model, clearError)
+import Model exposing (Model, clearError, closeAllForms)
 import Route exposing (..)
 import Session exposing (updateSessionUser, clearSession)
 import SessionInput exposing (clearPassword)
@@ -250,7 +250,7 @@ update msg model =
     TournamentResult result ->
       case result of
         Ok _ ->
-          ( clearError model, DatabaseRequests.retrieveTournaments)
+          ( clearError (closeAllForms model), DatabaseRequests.retrieveTournaments)
         Err err ->
           ( model, CmdExtra.createCmd (DatabaseRequestResult (HttpFail err)))
     {--
