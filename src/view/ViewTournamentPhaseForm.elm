@@ -73,9 +73,9 @@ viewTournamentPhaseForm rights phaseForm =
           TournamentPhaseFormEvent (PhaseFormEvent.PhaseTypeChange (phaseTypeFromValueString s)))
         ]
         ( List.map phaseTypeOption
-          [ PoulePhase defaultPouleData-- Nombre de Poules + MatchDuration
+          [ FreePhase
+          , PoulePhase defaultPouleData-- Nombre de Poules + MatchDuration
           , EliminationPhase defaultEliminationData-- Nombre d'équipes
-          , FreePhase
           ]
         )
       ]

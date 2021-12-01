@@ -426,47 +426,61 @@
         },
         {
           "id": 2,
-          "name": "Poules",
-          "date": "2022-02-19",
-          "parameters": {
-            "nbTeams": 16,
-            "finale": {
-              "nbPeriod": 4,
-              "duration": 10
-            },
-            "littleFinale": {
-              "nbPeriod": 4,
-              "duration": 10
-            },
-            "semiFinale": {
-              "nbPeriod": 4,
-              "duration": 10
-            },
-            "quarterFinale": {
-              "nbPeriod": 4,
-              "duration": 10
-            },
-            "eighthFinale": {
-              "nbPeriod": 4,
-              "duration": 10
-            },
-            "sixteenthFinale": {
-              "nbPeriod": 4,
-              "duration": 10
-            }
-          }
-        },
-        {
-          "id": 3,
-          "name": "Poules",
+          "name": "Poules retour",
           "date": "2022-02-20",
           "parameters": {
-            "nbPoules": 3,
+            "nbPoules": 5,
             "matchDuration": {
-              "nbPeriod": 2,
-              "duration": 8
+              "nbPeriod": 4,
+              "duration": 10
             },
-            "poules": []
+            "poules": [
+              {
+                "id": 1,
+                "name": "Poule 1",
+                "status": "Pending",
+                "pointsVictory": 10000,
+                "pointsDefeat": 0,
+                "pointsNull": 100,
+                "goalAverage": 0
+              },
+              {
+                "id": 2,
+                "name": "Poule 2",
+                "status": "Pending",
+                "pointsVictory": 10000,
+                "pointsDefeat": 0,
+                "pointsNull": 100,
+                "goalAverage": 0
+              },
+              {
+                "id": 3,
+                "name": "Poule 3",
+                "status": "Pending",
+                "pointsVictory": 10000,
+                "pointsDefeat": 0,
+                "pointsNull": 100,
+                "goalAverage": 0
+              },
+              {
+                "id": 4,
+                "name": "Poule 4",
+                "status": "Pending",
+                "pointsVictory": 10000,
+                "pointsDefeat": 0,
+                "pointsNull": 100,
+                "goalAverage": 0
+              },
+              {
+                "id": 5,
+                "name": "Poule 5",
+                "status": "Pending",
+                "pointsVictory": 10000,
+                "pointsDefeat": 0,
+                "pointsNull": 100,
+                "goalAverage": 0
+              }
+            ]
           }
         }
       ]

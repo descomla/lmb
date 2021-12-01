@@ -89,7 +89,24 @@ validatePhaseForm phaseForm tournaments =
             if tournament.phases |> containsPhase newPhase then
               ( Just { tournament | phases = tournament.phases |> updatePhase newPhase }, "" )
             else
-              ( Just { tournament | phases =  List.append tournament.phases (List.singleton newPhase)}, "" )
+              let -- fill the phase with appropriate data
+                phase =
+                  case newPhase.parameters of
+                    PoulePhase data ->
+                      { newPhase | parameters = PoulePhase ( createDefaultPoules data ) }
+                    _ ->
+                      newPhase
+              in
+                ( Just { tournament | phases =  List.append tournament.phases (List.singleton phase)}, "" )
+
+-- create poules
+createDefaultPoules : PouleData -> PouleData
+createDefaultPoules data =
+  { data | poules =
+    List.map (\n ->
+       setPouleName ("Poule " ++ (String.fromInt n))(setPouleId n defaultPoule))
+        (List.range 1 data.nbPoules) }
+
 
 -- update Poule Form events
 updatePouleForm : PouleFormEvent -> TournamentsModel -> ( TournamentsModel, String )

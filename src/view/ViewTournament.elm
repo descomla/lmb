@@ -95,17 +95,17 @@ viewTournamentTeams tournament teams rights =
       tournamentTeams = List.filter (\t -> List.member t.id tournament.teams) teams
     in
       div [ ]
-        ( List.map (viewColoredTeamName rights tournament.id) tournamentTeams )
+        ( List.map (viewTournamentTeam rights tournament) tournamentTeams )
   else
     div [ class "paragraphe" ] [ text "Aucune équipe inscrite au tournoi." ]
 
 -- Display a team name with its own color
-viewColoredTeamName : UserRights -> Int -> Team -> Html Msg
-viewColoredTeamName rights tournament_id team =
+viewTournamentTeam : UserRights -> Tournament -> Team -> Html Msg
+viewTournamentTeam rights tournament team =
   div
     [ class "paragraphe", style "color" (Colors.toCssString team.colors) ]
     [ text team.name
-    , actionImg "img/trash-16x16.png" (TournamentRemoveTeam tournament_id team.id) rights Director
+    , actionImg "img/trash-16x16.png" (TournamentRemoveTeam tournament.id team.id) rights Director
     ]
 
 -- filter teams list

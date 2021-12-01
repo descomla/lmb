@@ -42,7 +42,7 @@ subscriptions model =
         , LinkToJS.confirmDeleteTournament TournamentConfirmDelete
         , LinkToJS.confirmDeleteTeam TeamConfirmDelete
         , LinkToJS.confirmRemoveTournamentTeam TournamentConfirmRemoveTeam
-        --, LinkToJS.confirmDeletePhase TournamentConfirmDeletePhase
+        , LinkToJS.confirmDeletePhase TournamentPhaseConfirmDelete
         , LinkToJS.confirmDeletePoule PouleConfirmDelete
           --, WebSocket.listen (model.modelURL) (NewSimuState << Json.Decode.decodeString Decoders.timerResponseDecode)--, LinkToJS.scenarioSelected ScenarioSelected
         ]
